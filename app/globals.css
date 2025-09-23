@@ -120,3 +120,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+html {
+  /* 始终预留滚动条宽度, 防止页面内容宽度来回变化出现视觉闪烁 */
+  overflow-y: auto;                 /* 必须是可滚动容器，属性才生效 */
+  scrollbar-gutter: stable;         /* 或 stable both-edges 视情况 */
+}
