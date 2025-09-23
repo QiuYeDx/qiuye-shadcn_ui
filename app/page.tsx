@@ -28,7 +28,7 @@ import {
 const features = [
   {
     title: "一键CLI安装",
-    description: "使用 npx shadcn-ui@latest add qiuye-ui/[component] 命令一键安装组件",
+    description: "使用 npx shadcn@latest add @qiuye-ui/[component] 命令一键安装组件",
     icon: CodeIcon,
   },
   {

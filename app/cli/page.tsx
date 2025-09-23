@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, CheckCircle, Terminal, Package, Download, Code } from "lucide-react";
+import { Copy, CheckCircle, Terminal, Package } from "lucide-react";
 import { motion } from "motion/react";
 
 import { Button } from "@/components/ui/button";
@@ -120,7 +120,7 @@ export default function CLIPage() {
                     确保您的项目已经安装并配置了 shadcn/ui：
                   </p>
                   <CodeBlock 
-                    code="npx shadcn-ui@latest init" 
+                    code="npx shadcn@latest init" 
                     copyKey="shadcn-init"
                   />
                   <p className="text-sm text-muted-foreground mt-2">
@@ -131,34 +131,41 @@ export default function CLIPage() {
                 <Separator />
 
                 <div>
-                  <h3 className="text-lg font-semibold mb-3">配置自定义注册表</h3>
+                  <h3 className="text-lg font-semibold mb-3">方式一：配置注册表（推荐）</h3>
                   <p className="text-sm text-muted-foreground mb-3">
                     在项目根目录的 <code className="text-xs bg-muted px-1 py-0.5 rounded">components.json</code> 文件中添加秋夜组件库的注册表：
                   </p>
                   <CodeBlock 
                     code={`{
   "registries": {
-    "qiuye-ui": {
-      "baseUrl": "https://qiuye-ui.vercel.app/registry",
-      "style": "new-york"
-    }
+    "@qiuye-ui": "https://qiuye-ui.vercel.app/registry/{name}.json"
   }
 }`}
                     language="json"
                     copyKey="registry-config"
+                  />
+                  <p className="text-sm text-muted-foreground mt-3 mb-3">
+                    然后使用简化的命令安装组件：
+                  </p>
+                  <CodeBlock 
+                    code="npx shadcn@latest add @qiuye-ui/animated-button" 
+                    copyKey="install-component"
                   />
                 </div>
 
                 <Separator />
 
                 <div>
-                  <h3 className="text-lg font-semibold mb-3">安装组件</h3>
+                  <h3 className="text-lg font-semibold mb-3">方式二：直接URL安装</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    如果不想配置注册表，可以直接使用URL安装组件：
+                  </p>
                   <CodeBlock 
-                    code="npx shadcn-ui@latest add qiuye-ui/animated-button" 
-                    copyKey="install-component"
+                    code="npx shadcn@latest add https://qiuye-ui.vercel.app/registry/animated-button.json" 
+                    copyKey="install-component-url"
                   />
                   <p className="text-sm text-muted-foreground mt-2">
-                    使用官方 CLI 工具，指定 qiuye-ui 注册表来安装组件
+                    直接指定组件的注册表JSON文件URL进行安装
                   </p>
                 </div>
               </CardContent>
@@ -177,14 +184,26 @@ export default function CLIPage() {
               <CardContent className="space-y-6">
                 <div>
                   <h3 className="text-lg font-semibold mb-3">1. 安装组件</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    方式一：使用注册表名称（需先配置注册表）
+                  </p>
                   <div className="space-y-3">
                     <CodeBlock 
-                      code="npx shadcn-ui@latest add qiuye-ui/animated-button" 
+                      code="npx shadcn@latest add @qiuye-ui/animated-button" 
                       copyKey="add-single"
                     />
                     <CodeBlock 
-                      code="npx shadcn-ui@latest add qiuye-ui/gradient-card qiuye-ui/typing-text" 
+                      code="npx shadcn@latest add @qiuye-ui/gradient-card @qiuye-ui/typing-text" 
                       copyKey="add-multiple"
+                    />
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-3 mb-3">
+                    方式二：直接使用URL（无需配置）
+                  </p>
+                  <div className="space-y-3">
+                    <CodeBlock 
+                      code="npx shadcn@latest add https://qiuye-ui.vercel.app/registry/animated-button.json" 
+                      copyKey="add-single-url"
                     />
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
@@ -272,24 +291,29 @@ export default function App() {
                 <div className="grid gap-4">
                   {[
                     {
-                      command: "npx shadcn-ui@latest init",
+                      command: "npx shadcn@latest init",
                       description: "初始化 shadcn/ui 项目配置",
-                      example: "npx shadcn-ui@latest init",
+                      example: "npx shadcn@latest init",
                     },
                     {
-                      command: "npx shadcn-ui@latest add qiuye-ui/[component]",
-                      description: "添加秋夜UI组件",
-                      example: "npx shadcn-ui@latest add qiuye-ui/animated-button",
+                      command: "npx shadcn@latest add @qiuye-ui/[component]",
+                      description: "添加秋夜UI组件（需配置注册表）",
+                      example: "npx shadcn@latest add @qiuye-ui/animated-button",
                     },
                     {
-                      command: "npx shadcn-ui@latest add qiuye-ui/[multiple]",
+                      command: "npx shadcn@latest add [URL]",
+                      description: "直接使用URL添加组件",
+                      example: "npx shadcn@latest add https://qiuye-ui.vercel.app/registry/animated-button.json",
+                    },
+                    {
+                      command: "npx shadcn@latest add @qiuye-ui/[multiple]",
                       description: "批量添加多个组件",
-                      example: "npx shadcn-ui@latest add qiuye-ui/gradient-card qiuye-ui/typing-text",
+                      example: "npx shadcn@latest add @qiuye-ui/gradient-card @qiuye-ui/typing-text",
                     },
                     {
-                      command: "npx shadcn-ui@latest --help",
+                      command: "npx shadcn@latest --help",
                       description: "查看CLI工具帮助信息",
-                      example: "npx shadcn-ui@latest --help",
+                      example: "npx shadcn@latest --help",
                     },
                   ].map((item, index) => (
                     <div key={index} className="border rounded-lg p-4">
@@ -322,9 +346,9 @@ export default function App() {
                       "typing-text"
                     ].map((component) => (
                       <div key={component} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                        <code className="text-sm font-mono">qiuye-ui/{component}</code>
+                        <code className="text-sm font-mono">@qiuye-ui/{component}</code>
                         <CopyButton 
-                          text={`npx shadcn-ui@latest add qiuye-ui/${component}`} 
+                          text={`npx shadcn@latest add @qiuye-ui/${component}`} 
                           copyKey={`component-${component}`}
                         />
                       </div>
@@ -347,11 +371,6 @@ export default function App() {
               <CardContent className="space-y-6">
                 <div className="grid gap-4">
                   {[
-                    {
-                      endpoint: "/registry/index.json",
-                      description: "所有可用组件的列表",
-                      example: "https://qiuye-ui.vercel.app/registry/index.json",
-                    },
                     {
                       endpoint: "/registry/[component].json",
                       description: "单个组件的详细配置和源代码",
@@ -384,10 +403,7 @@ export default function App() {
                   <CodeBlock 
                     code={`{
   "registries": {
-    "qiuye-ui": {
-      "baseUrl": "https://qiuye-ui.vercel.app/registry",
-      "style": "new-york"
-    }
+    "@qiuye-ui": "https://qiuye-ui.vercel.app/registry/{name}.json"
   }
 }`}
                     language="json"
@@ -405,11 +421,12 @@ export default function App() {
                   <CodeBlock 
                     code={`{
   "name": "component-name",
-  "type": "components:qiuye-ui",
+  "type": "registry:component",
   "dependencies": ["react", "motion"],
   "registryDependencies": [],
   "files": [
     {
+      "type": "registry:component",
       "name": "component-name.tsx",
       "content": "组件源代码..."
     }

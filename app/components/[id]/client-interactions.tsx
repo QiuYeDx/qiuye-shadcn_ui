@@ -35,7 +35,7 @@ export function CopyCommandButton({ cliName }: CopyCommandButtonProps) {
   const [copiedCommand, setCopiedCommand] = useState(false);
 
   const handleCopyCommand = () => {
-    const command = `npx shadcn-ui@latest add qiuye-ui/${cliName}`;
+    const command = `npx shadcn@latest add @qiuye-ui/${cliName}`;
     clipboard.copy(command);
     setCopiedCommand(true);
     setTimeout(() => setCopiedCommand(false), 2000);

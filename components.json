@@ -15,14 +15,10 @@
     "components": "@/components",
     "utils": "@/lib/utils",
     "ui": "@/components/ui",
-    "qiuye-ui": "@/components/qiuye-ui",
     "lib": "@/lib",
     "hooks": "@/hooks"
   },
   "registries": {
-    "qiuye-ui": {
-      "baseUrl": "https://qiuye-ui.vercel.app/registry",
-      "style": "new-york"
-    }
+    "@qiuye-ui": "http://localhost:3000/registry/{name}.json"
   }
 }

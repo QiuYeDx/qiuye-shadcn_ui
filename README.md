@@ -9,7 +9,7 @@
 
 ## ✨ 特性
 
-- 🚀 **一键CLI安装** - 使用 `npx shadcn-ui@latest add qiuye-ui/[component]` 命令一键安装组件
+- 🚀 **一键CLI安装** - 使用 `npx shadcn@latest add @qiuye-ui/[component]` 命令一键安装组件
 - 🎨 **精美设计** - 精心设计的自定义组件，提升应用视觉效果
 - 📦 **即插即用** - 无需复杂配置，安装后立即可用
 - 🔍 **组件浏览器** - 内置组件浏览页面，可视化查看组件效果
@@ -26,12 +26,33 @@
 
 ### 安装组件
 
+#### 方式一：配置注册表后安装（推荐）
+
+首先在 `components.json` 中添加注册表配置：
+
+```json
+{
+  "registries": {
+    "@qiuye-ui": "https://qiuye-ui.vercel.app/registry/{name}.json"
+  }
+}
+```
+
+然后安装组件：
+
 ```bash
 # 安装单个组件
-npx shadcn-ui@latest add qiuye-ui/animated-button
+npx shadcn@latest add @qiuye-ui/animated-button
 
 # 安装多个组件
-npx shadcn-ui@latest add qiuye-ui/animated-button qiuye-ui/gradient-card qiuye-ui/typing-text
+npx shadcn@latest add @qiuye-ui/animated-button @qiuye-ui/gradient-card @qiuye-ui/typing-text
+```
+
+#### 方式二：直接URL安装
+
+```bash
+# 直接使用URL安装组件
+npx shadcn@latest add https://qiuye-ui.vercel.app/registry/animated-button.json
 
 # 查看可用组件（访问在线浏览器）
 open https://qiuye-ui.vercel.app/components
@@ -57,9 +78,9 @@ export default function App() {
 
 | 组件名称 | 描述 | 分类 | CLI命令 |
 |---------|------|-----|---------|
-| **Animated Button** | 带动画效果的按钮组件，支持多种动画风格 | 按钮 | `npx shadcn-ui@latest add qiuye-ui/animated-button` |
-| **Gradient Card** | 渐变色卡片组件，支持多种渐变主题 | 卡片 | `npx shadcn-ui@latest add qiuye-ui/gradient-card` |
-| **Typing Text** | 打字机效果文本组件，支持循环播放 | 文本 | `npx shadcn-ui@latest add qiuye-ui/typing-text` |
+| **Animated Button** | 带动画效果的按钮组件，支持多种动画风格 | 按钮 | `npx shadcn@latest add @qiuye-ui/animated-button` |
+| **Gradient Card** | 渐变色卡片组件，支持多种渐变主题 | 卡片 | `npx shadcn@latest add @qiuye-ui/gradient-card` |
+| **Typing Text** | 打字机效果文本组件，支持循环播放 | 文本 | `npx shadcn@latest add @qiuye-ui/typing-text` |
 
 > 更多组件正在开发中...
 
@@ -70,38 +91,59 @@ export default function App() {
 首先确保您的项目已安装并配置了 shadcn/ui：
 
 ```bash
-npx shadcn-ui@latest init
+npx shadcn@latest init
 ```
 
-### 配置注册表
+### 安装方法
+
+#### 方式一：配置注册表（推荐）
 
 在项目的 `components.json` 文件中添加秋夜组件库注册表：
 
 ```json
 {
   "registries": {
-    "qiuye-ui": {
-      "baseUrl": "https://qiuye-ui.vercel.app/registry",
-      "style": "new-york"
-    }
+    "@qiuye-ui": "https://qiuye-ui.vercel.app/registry/{name}.json"
   }
 }
+```
+
+然后使用简化的命令安装组件：
+
+```bash
+# 安装单个组件
+npx shadcn@latest add @qiuye-ui/animated-button
+
+# 批量安装多个组件
+npx shadcn@latest add @qiuye-ui/animated-button @qiuye-ui/gradient-card @qiuye-ui/typing-text
+```
+
+#### 方式二：直接URL安装
+
+如果不想配置注册表，可以直接使用URL安装组件：
+
+```bash
+# 直接使用URL安装组件
+npx shadcn@latest add https://qiuye-ui.vercel.app/registry/animated-button.json
+
+# 批量安装（多个URL）
+npx shadcn@latest add https://qiuye-ui.vercel.app/registry/gradient-card.json https://qiuye-ui.vercel.app/registry/typing-text.json
 ```
 
 ### 常用命令
 
 ```bash
 # 初始化 shadcn/ui（如果还没有）
-npx shadcn-ui@latest init
+npx shadcn@latest init
 
-# 安装秋夜组件
-npx shadcn-ui@latest add qiuye-ui/[component-name]
+# 方式一：使用注册表名称安装
+npx shadcn@latest add @qiuye-ui/[component-name]
 
-# 批量安装多个组件
-npx shadcn-ui@latest add qiuye-ui/animated-button qiuye-ui/gradient-card
+# 方式二：使用完整URL安装
+npx shadcn@latest add https://qiuye-ui.vercel.app/registry/[component-name].json
 
 # 查看 CLI 帮助
-npx shadcn-ui@latest --help
+npx shadcn@latest --help
 ```
 
 ## 📚 文档
@@ -110,6 +152,7 @@ npx shadcn-ui@latest --help
 - 🎨 [组件浏览器](https://qiuye-ui.vercel.app/components)
 - 💻 [CLI 使用指南](https://qiuye-ui.vercel.app/cli)
 - 🔌 [API 文档](https://qiuye-ui.vercel.app/api/components)
+- 🛠️ [新增自定义组件指南](#新增自定义组件)
 
 ## 🏗️ 本地开发
 
@@ -188,7 +231,6 @@ qiuye-ui-components/
 
 组件库使用静态文件提供组件信息：
 
-- `/registry/index.json` - 所有可用组件列表
 - `/registry/[component].json` - 单个组件的详细配置和源代码
 - 兼容 shadcn/ui CLI 工具标准
 
@@ -206,35 +248,218 @@ pnpm build
 pnpm start
 ```
 
+## 🛠️ 开发者指南
+
+### 新增自定义组件
+
+本指南将详细说明如何在秋夜组件库中新增自定义组件，并支持通过 shadcn/ui CLI 安装到其他项目中使用。
+
+#### 1. 创建组件源码
+
+在 `components/qiuye-ui/` 目录下创建您的组件：
+
+```tsx
+// components/qiuye-ui/my-component.tsx
+"use client";
+
+import React from "react";
+import { cn } from "@/lib/utils";
+
+export interface MyComponentProps 
+  extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: "default" | "primary" | "secondary";
+}
+
+const MyComponent = React.forwardRef<HTMLDivElement, MyComponentProps>(
+  ({ className, variant = "default", children, ...props }, ref) => {
+    return (
+      <div
+        className={cn(
+          "p-4 rounded-lg border",
+          {
+            "bg-background": variant === "default",
+            "bg-primary text-primary-foreground": variant === "primary",
+            "bg-secondary text-secondary-foreground": variant === "secondary",
+          },
+          className
+        )}
+        ref={ref}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+
+MyComponent.displayName = "MyComponent";
+
+export { MyComponent };
+```
+
+#### 2. 创建演示组件（可选）
+
+在 `components/qiuye-ui/demos/` 目录下创建演示组件：
+
+```tsx
+// components/qiuye-ui/demos/my-component-demo.tsx
+import { MyComponent } from "../my-component";
+
+export function MyComponentDemo() {
+  return (
+    <div className="space-y-4">
+      <MyComponent variant="default">
+        默认样式
+      </MyComponent>
+      <MyComponent variant="primary">
+        主要样式
+      </MyComponent>
+      <MyComponent variant="secondary">
+        次要样式
+      </MyComponent>
+    </div>
+  );
+}
+```
+
+#### 3. 创建注册表 JSON 文件
+
+在 `public/registry/` 目录下创建组件的注册表文件：
+
+```json
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "my-component",
+  "title": "MyComponent",
+  "type": "registry:component",
+  "author": "您的名字 <your-email@example.com>",
+  "dependencies": [
+    "react",
+    "clsx"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "type": "registry:component",
+      "path": "components/qiuye-ui/my-component.tsx",
+      "target": "src/components/qiuye-ui/my-component.tsx",
+      "content": ""
+    }
+  ]
+}
+```
+
+**注意**：初始创建时 `content` 字段留空，稍后通过脚本自动填充。
+
+#### 4. 注册表 JSON 文件结构说明
+
+每个注册表 JSON 文件包含以下关键字段：
+
+- **`$schema`**: 指向 shadcn/ui 的 JSON Schema，用于验证文件格式
+- **`name`**: 组件名称，用于 CLI 安装时的标识符
+- **`title`**: 组件的显示标题
+- **`type`**: 固定为 `"registry:component"`
+- **`author`**: 组件作者信息
+- **`dependencies`**: npm 依赖包列表
+- **`registryDependencies`**: 其他 shadcn/ui 组件依赖
+- **`files`**: 组件文件配置数组
+  - **`type`**: 文件类型，通常为 `"registry:component"`
+  - **`path`**: 组件在本项目中的相对路径
+  - **`target`**: 安装到目标项目时的路径
+  - **`content`**: 组件的源代码内容（通过脚本自动填充）
+
+#### 5. 自动填充源代码内容
+
+使用内置的脚本自动将组件源代码填充到注册表 JSON 文件中：
+
+```bash
+# 实际执行，更新所有注册表文件
+npm run update-registry
+
+# 预览模式，仅查看将要更改的内容，不实际写入
+npm run update-registry:dry
+```
+
+**脚本说明**：
+
+- **`update-registry`**: 执行 `scripts/update-registry.mjs` 脚本，自动扫描 `public/registry/` 目录下的所有 JSON 文件，读取对应的组件源码并填充到 `content` 字段中
+- **`update-registry:dry`**: 干运行模式，仅预览将要进行的更改，不实际修改文件，适合验证脚本行为
+
+**脚本工作原理**：
+
+1. 扫描 `public/registry/` 目录下的所有 `.json` 文件
+2. 解析每个 JSON 文件的 `files` 数组
+3. 根据 `path` 字段定位组件源码文件
+4. 读取源码内容并更新到 `content` 字段
+5. 保存更新后的 JSON 文件
+
+#### 6. 完整开发流程
+
+遵循以下步骤确保组件能够正确通过 CLI 安装：
+
+1. **创建组件源码** - 在 `components/qiuye-ui/` 下编写组件
+2. **创建注册表文件** - 在 `public/registry/` 下创建对应的 JSON 文件
+3. **运行更新脚本** - 执行 `npm run update-registry` 填充源代码
+4. **测试本地安装** - 使用 CLI 测试组件安装是否正常
+5. **提交代码** - 将所有文件提交到版本控制
+
+#### 7. CLI 安装测试
+
+在其他项目中测试您的组件是否能正确安装：
+
+##### 方式一：配置注册表后测试
+
+```bash
+# 在目标项目的 components.json 中添加注册表配置
+# 然后安装您的新组件
+npx shadcn@latest add @qiuye-ui/my-component
+
+# 验证文件是否正确生成
+ls src/components/qiuye-ui/my-component.tsx
+```
+
+##### 方式二：直接URL测试
+
+```bash
+# 直接使用URL安装
+npx shadcn@latest add https://qiuye-ui.vercel.app/registry/my-component.json
+
+# 验证文件是否正确生成
+ls src/components/qiuye-ui/my-component.tsx
+```
+
+#### 8. 开发规范
+
+为确保组件质量和一致性，请遵循以下规范：
+
+- ✅ 使用 TypeScript 编写组件
+- ✅ 使用 `React.forwardRef` 支持 ref 传递
+- ✅ 导出清晰的 Props 接口
+- ✅ 支持 `className` 属性并使用 `cn()` 工具函数
+- ✅ 组件名称使用 PascalCase
+- ✅ 文件名使用 kebab-case
+- ✅ 支持深色/浅色主题
+- ✅ 确保响应式设计
+- ✅ 添加必要的 `displayName`
+
 ## 🤝 贡献
 
 欢迎贡献新的组件或改进现有组件！
 
 ### 贡献步骤
 
-1. Fork 这个仓库
-2. 创建特性分支 (`git checkout -b feature/new-component`)
-3. 在 `components/qiuye-ui/` 中添加你的组件
-4. 在 `lib/registry.ts` 中注册组件
-5. 创建演示组件 (`components/qiuye-ui/demos/`)
-6. 提交更改 (`git commit -m 'Add new component'`)
-7. 推送分支 (`git push origin feature/new-component`)
-8. 创建 Pull Request
-
-### 组件开发指南
-
-每个新组件应该包含：
-
-- ✅ 组件源代码 (TypeScript + React)
-- ✅ Props 类型定义
-- ✅ 演示组件
-- ✅ 在注册表中的配置
-- ✅ 支持主题切换
-- ✅ 响应式设计
+1. **Fork 这个仓库**
+2. **创建特性分支** (`git checkout -b feature/new-component`)
+3. **开发新组件** - 参考上面的"新增自定义组件"指南
+4. **测试组件** - 确保组件在本地正常工作
+5. **运行脚本** - 执行 `npm run update-registry` 更新注册表
+6. **提交更改** (`git commit -m 'Add new component: my-component'`)
+7. **推送分支** (`git push origin feature/new-component`)
+8. **创建 Pull Request** - 详细描述新组件的功能和特性
 
 ## 📄 许可证
 
-MIT License © 2024 秋夜
+MIT License © 2025 秋夜
 
 ## 🙏 致谢
 

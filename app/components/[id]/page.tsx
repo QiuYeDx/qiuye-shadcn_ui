@@ -94,7 +94,7 @@ export default async function ComponentDetailPage({ params }: ComponentDetailPag
               <CardContent className="space-y-3">
                 <div className="bg-muted/50 rounded-md p-3">
                   <code className="text-sm font-mono break-all">
-                    npx shadcn-ui@latest add qiuye-ui/{component.cliName}
+                    npx shadcn@latest add @qiuye-ui/{component.cliName}
                   </code>
                 </div>
                 <CopyCommandButton cliName={component.cliName} />

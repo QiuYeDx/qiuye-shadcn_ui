@@ -3,10 +3,18 @@
   "version": "1.0.0",
   "private": false,
   "description": "精心设计的自定义UI组件库，基于 Shadcn/ui 构建，支持一键CLI安装",
-  "keywords": ["ui", "components", "react", "nextjs", "tailwindcss", "shadcn", "typescript"],
+  "keywords": [
+    "ui",
+    "components",
+    "react",
+    "nextjs",
+    "tailwindcss",
+    "shadcn",
+    "typescript"
+  ],
   "homepage": "https://qiuye-ui.vercel.app",
   "repository": {
-    "type": "git", 
+    "type": "git",
     "url": "https://github.com/qiuye/qiuye-ui-components.git"
   },
   "author": "秋夜 <qiuye@example.com>",
@@ -16,7 +24,9 @@
     "build": "next build",
     "start": "npx serve@latest out",
     "lint": "eslint",
-    "preview": "pnpm build && pnpm start"
+    "preview": "pnpm build && pnpm start",
+    "update-registry": "node scripts/update-registry.mjs --dir public/registry --base .",
+    "update-registry:dry": "node scripts/update-registry.mjs --dir public/registry --base . --dry"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

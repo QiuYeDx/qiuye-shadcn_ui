@@ -118,7 +118,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       
       <SidebarFooter>
         <div className="p-2 text-xs text-muted-foreground truncate">
-          © 2024 秋夜组件库
+          © 2025 秋夜组件库
         </div>
       </SidebarFooter>
       

@@ -36,7 +36,7 @@ export default function ComponentsPage() {
     : getComponentsByCategory(selectedCategory);
 
   const handleCopyCommand = (componentId: string) => {
-    const command = `npx shadcn-ui@latest add qiuye-ui/${componentId}`;
+    const command = `npx shadcn@latest add @qiuye-ui/${componentId}`;
     clipboard.copy(command);
     toast.success("复制成功！", {
       description: `已复制命令: ${command}`,
@@ -194,7 +194,7 @@ function ComponentCard({ component, index, onCopyCommand }: ComponentCardProps) 
           <div className="bg-muted/50 rounded-md p-3">
             <div className="flex items-center justify-between">
               <code className="text-sm font-mono">
-                npx shadcn-ui@latest add qiuye-ui/{component.cliName}
+                npx shadcn@latest add @qiuye-ui/{component.cliName}
               </code>
               <Button
                 size="sm"
