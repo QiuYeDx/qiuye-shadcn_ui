@@ -35,7 +35,7 @@ const data = {
       description: "项目概览和介绍",
     },
     {
-      title: "组件库",
+      title: "组件列表",
       url: "/components",
       icon: PaletteIcon,
       description: "浏览所有自定义组件",
@@ -43,22 +43,10 @@ const data = {
   ],
   navDevelopment: [
     {
-      title: "API 文档",
-      url: "/api/components",
-      icon: CodeIcon,
-      description: "组件API接口文档",
-    },
-    {
       title: "CLI 工具",
       url: "/cli",
       icon: TerminalIcon,
       description: "命令行工具使用指南",
-    },
-    {
-      title: "开发指南",
-      url: "/docs",
-      icon: BookOpenIcon,
-      description: "组件开发和贡献指南",
     },
   ],
 }
@@ -72,8 +60,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <PackageIcon className="size-4" />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">秋夜组件库</span>
-            <span className="truncate text-xs">QiuYe UI Components</span>
+            <span className="truncate font-semibold">QiuYe UI</span>
+            <span className="truncate text-xs">Based on Shadcn/ui</span>
           </div>
         </div>
       </SidebarHeader>
@@ -98,7 +86,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarGroup>
         
         <SidebarGroup>
-          <SidebarGroupLabel>开发工具</SidebarGroupLabel>
+          <SidebarGroupLabel>使用说明</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {data.navDevelopment.map((item) => (
@@ -118,7 +106,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       
       <SidebarFooter>
         <div className="p-2 text-xs text-muted-foreground truncate">
-          © 2025 秋夜组件库
+          © 2025 QiuYe UI
         </div>
       </SidebarFooter>
       

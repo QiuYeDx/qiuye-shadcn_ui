@@ -44,16 +44,16 @@ export default function CLIPage() {
 
   const CodeBlock = ({ code, language = "bash", copyKey }: { code: string; language?: string; copyKey: string }) => (
     <div className="relative">
-      <div className="bg-muted/50 rounded-md p-4 pr-12">
+      <pre className="bg-muted/50 rounded-md p-4 pr-12 overflow-x-auto whitespace-pre-wrap break-words">
         <code className={`text-sm font-mono language-${language}`}>
           {code}
         </code>
-      </div>
+      </pre>
       <div className="absolute top-2 right-2">
         <CopyButton text={code} copyKey={copyKey} />
       </div>
     </div>
-  );
+  );  
 
   return (
     <div className="container mx-auto px-6 py-8">
@@ -70,7 +70,7 @@ export default function CLIPage() {
           </div>
           <div>
             <h1 className="text-4xl font-bold tracking-tight">CLI 工具</h1>
-            <p className="text-muted-foreground">一键安装和管理秋夜UI组件</p>
+            <p className="text-muted-foreground">一键安装和管理 QiuYe UI 组件</p>
           </div>
         </div>
 
@@ -110,7 +110,7 @@ export default function CLIPage() {
               <CardHeader>
                 <CardTitle>使用 Shadcn/ui CLI</CardTitle>
                 <CardDescription>
-                  使用官方 shadcn/ui CLI 工具安装秋夜UI组件
+                  使用官方 shadcn/ui CLI 工具安装 QiuYe UI 组件
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -133,7 +133,7 @@ export default function CLIPage() {
                 <div>
                   <h3 className="text-lg font-semibold mb-3">方式一：配置注册表（推荐）</h3>
                   <p className="text-sm text-muted-foreground mb-3">
-                    在项目根目录的 <code className="text-xs bg-muted px-1 py-0.5 rounded">components.json</code> 文件中添加秋夜组件库的注册表：
+                    在项目根目录的 <code className="text-xs bg-muted px-1 py-0.5 rounded">components.json</code> 文件中添加QiuYe UI的注册表：
                   </p>
                   <CodeBlock 
                     code={`{
@@ -178,7 +178,7 @@ export default function CLIPage() {
               <CardHeader>
                 <CardTitle>基本使用</CardTitle>
                 <CardDescription>
-                  学习如何在您的项目中使用秋夜UI组件
+                  学习如何在您的项目中使用 QiuYe UI 组件
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -284,7 +284,7 @@ export default function App() {
               <CardHeader>
                 <CardTitle>常用命令</CardTitle>
                 <CardDescription>
-                  使用官方 shadcn/ui CLI 管理秋夜组件
+                  使用官方 shadcn/ui CLI 管理 QiuYe UI 组件
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -297,7 +297,7 @@ export default function App() {
                     },
                     {
                       command: "npx shadcn@latest add @qiuye-ui/[component]",
-                      description: "添加秋夜UI组件（需配置注册表）",
+                      description: "添加 QiuYe UI 组件（需配置注册表）",
                       example: "npx shadcn@latest add @qiuye-ui/animated-button",
                     },
                     {
@@ -341,6 +341,7 @@ export default function App() {
                   <h3 className="text-lg font-semibold mb-3">可用组件列表</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {[
+                      // TODO: 后续需要添加更多组件, 或支持动态加载组件列表
                       "animated-button",
                       "gradient-card",
                       "typing-text"

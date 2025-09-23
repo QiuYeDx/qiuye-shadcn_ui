@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   getAllComponents, 
   getCategories, 
@@ -53,7 +53,7 @@ export default function ComponentsPage() {
           transition={{ duration: 0.6 }}
         >
           <h1 className="text-4xl font-bold tracking-tight mb-4">
-            秋夜组件库
+            QiuYe UI
           </h1>
           <p className="text-xl text-muted-foreground mb-6">
             精心设计的自定义UI组件，让您的应用更加出色
@@ -125,7 +125,7 @@ export default function ComponentsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredComponents.map((component, index) => (
               <ComponentCard
-                key={component.cliName}
+                key={component.cliName + index}
                 component={component}
                 index={index}
                 onCopyCommand={handleCopyCommand}

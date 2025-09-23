@@ -22,7 +22,7 @@ export function TypingTextDemo() {
           <div className="p-6 bg-muted/50 rounded-lg">
             <h3 className="text-lg font-semibold mb-4">单行文本</h3>
             <TypingText
-              text="欢迎来到秋夜组件库！这里有丰富的UI组件等待你的探索。"
+              text="欢迎来到QiuYe UI！这里有丰富的UI组件等待你的探索。"
               speed={100}
               className="text-lg"
             />

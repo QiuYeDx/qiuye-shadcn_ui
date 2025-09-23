@@ -28,7 +28,8 @@ import {
 const features = [
   {
     title: "一键CLI安装",
-    description: "使用 npx shadcn@latest add @qiuye-ui/[component] 命令一键安装组件",
+    description:
+      "使用 npx shadcn@latest add @qiuye-ui/[component] 命令一键安装组件",
     icon: CodeIcon,
   },
   {
@@ -125,7 +126,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           >
-            秋夜组件库
+            QiuYe UI
           </motion.h1>
 
           <motion.p
@@ -217,7 +218,7 @@ export default function Home() {
             viewport={{ once: true, margin: "-100px" }}
           >
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              为什么选择秋夜组件库？
+              为什么选择QiuYe UI？
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
               我们提供了高质量的自定义UI组件和完善的CLI工具支持
@@ -232,9 +233,10 @@ export default function Home() {
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{
-                    duration: 0.6,
-                    delay: index * 0.2,
-                    ease: "easeOut",
+                    type: "spring",
+                    stiffness: 120,
+                    damping: 40,
+                    delay: index * 0.1,
                   }}
                   viewport={{ once: true, margin: "-50px" }}
                 >

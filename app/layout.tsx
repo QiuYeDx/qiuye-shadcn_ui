@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "秋夜组件库 - 自定义UI组件库",
+  title: "QiuYe UI - Based on Shadcn/ui",
   description: "精心设计的自定义UI组件库，基于 Shadcn/ui 构建，支持一键CLI安装，让您的项目开发更加高效、优雅",
 };
 
