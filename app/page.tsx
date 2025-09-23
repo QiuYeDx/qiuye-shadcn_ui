@@ -86,9 +86,9 @@ function Counter({
             clearInterval(timer);
             return numericValue;
           }
-          return prev + Math.ceil(numericValue / 30);
+          return prev + Math.ceil(numericValue / 100);
         });
-      }, 50);
+      }, 25);
       return () => clearInterval(timer);
     }
   }, [isInView, numericValue]);
@@ -112,7 +112,7 @@ export default function Home() {
             className="mb-8 flex justify-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
           >
             <Badge variant="secondary" className="px-4 py-2">
               <SparklesIcon className="mr-2 h-4 w-4" />
@@ -124,7 +124,7 @@ export default function Home() {
             className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
           >
             QiuYe UI
           </motion.h1>
@@ -133,7 +133,7 @@ export default function Home() {
             className="mt-6 text-lg leading-8 text-muted-foreground"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+            transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
           >
             精心设计的自定义UI组件库，基于 Shadcn/ui 构建。支持一键CLI安装，
             让您的项目开发更加高效、优雅。
@@ -143,7 +143,7 @@ export default function Home() {
             className="mt-10 flex items-center justify-center gap-x-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
+            transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
           >
             <motion.div
               whileHover={{ scale: 1.05 }}
@@ -177,7 +177,7 @@ export default function Home() {
           className="mt-16 flex justify-center"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.8, ease: "easeOut" }}
+          transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
         >
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
             {stats.map((stat, index) => (
@@ -192,7 +192,7 @@ export default function Home() {
                   ease: "easeOut",
                 }}
               >
-                <div className="text-2xl font-bold text-foreground sm:text-3xl">
+                <div className="w-[100px] text-2xl font-bold text-foreground sm:text-3xl">
                   <Counter
                     value={stat.value}
                     numericValue={stat.numericValue}
@@ -214,7 +214,7 @@ export default function Home() {
             className="mx-auto max-w-2xl text-center"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
             viewport={{ once: true, margin: "-100px" }}
           >
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
