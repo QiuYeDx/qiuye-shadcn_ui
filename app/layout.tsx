@@ -20,7 +20,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "QiuYe UI - Based on Shadcn/ui",
-  description: "精心设计的自定义UI组件库，基于 Shadcn/ui 构建，支持一键CLI安装，让您的项目开发更加高效、优雅",
+  description:
+    "精心设计的自定义UI组件库，基于 Shadcn/ui 构建，支持一键CLI安装，让您的项目开发更加高效、优雅",
 };
 
 export default function RootLayout({
@@ -32,6 +33,13 @@ export default function RootLayout({
     <html lang="zh-CN" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        // ! 禁用 radix 库的滚动条补偿
+        style={
+          {
+            "--removed-body-scroll-bar-size":
+              "0px !important; margin-right: 0 !important; width: auto !important;",
+          } as React.CSSProperties
+        }
       >
         <ThemeProvider
           attribute="class"
@@ -43,9 +51,7 @@ export default function RootLayout({
             <AppSidebar />
             <SidebarInset>
               <Header />
-              <main className="flex-1 overflow-hidden">
-                {children}
-              </main>
+              <main className="flex-1 overflow-hidden">{children}</main>
             </SidebarInset>
           </SidebarProvider>
           <Toaster />
