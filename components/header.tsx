@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { HomeIcon, MenuIcon, SearchIcon } from "lucide-react"
+import * as React from "react";
+import Link from "next/link";
+import { HomeIcon, MenuIcon, SearchIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -15,104 +15,71 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/navigation-menu";
+import { cn } from "@/lib/utils";
+import { useSidebar } from "@/components/ui/sidebar";
 
 const components = [
   {
     title: "首页",
     href: "/",
-    description: "欢迎来到QiuYe UI"
+    description: "欢迎来到QiuYe UI",
   },
   {
     title: "组件列表",
     href: "/components",
-    description: "丰富的UI组件库"
+    description: "丰富的UI组件库",
   },
   {
     title: "CLI 工具",
     href: "/cli",
-    description: "CLI 工具与使用说明"
+    description: "CLI 工具与使用说明",
   },
-]
+];
 
 export function Header() {
+  const { toggleSidebar } = useSidebar();
+
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container flex h-14 items-center">
         <div className="mr-4 hidden md:flex items-center">
-          <SidebarTrigger className="mx-1 size-9 cursor-pointer" />
-          <Link 
-            href="/" 
-            className="mr-1 flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none"
+          <SidebarTrigger className="ml-2 mr-1 size-9 cursor-pointer" />
+          <Link
+            href="/"
+            className="mr-1 flex shrink-0 items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none"
           >
             <HomeIcon className="h-4 w-4" />
-            <span className="hidden font-bold sm:inline-block">
-              首页
-            </span>
+            <span className="hidden font-bold sm:inline-block">首页</span>
           </Link>
-          <NavigationMenu>
-            <NavigationMenuList>
-            <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                  <Link href="/components" className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:focus:bg-accent data-[state=open]:bg-accent/50 focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1">
-                    组件列表
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-              {/* <NavigationMenuItem>
-                <NavigationMenuTrigger>开始使用</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid gap-3 p-2 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                    <li className="row-span-3">
-                      <NavigationMenuLink asChild>
-                        <Link
-                          className="bg-gradient-to-b from-muted/50 to-muted flex h-full w-full select-none flex-col justify-end rounded-md p-6 no-underline outline-none focus:shadow-md"
-                          href="/"
-                        >
-                          <HomeIcon className="h-6 w-6" />
-                          <div className="mb-2 mt-4 text-lg font-medium">
-                            QiuYe UI
-                          </div>
-                          <p className="text-muted-foreground text-sm leading-tight">
-                            基于Shadcn/ui构建的现代化组件库，包含完整的UI组件库和最佳实践。
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    {components.map((component) => (
-                      <ListItem
-                        key={component.title}
-                        title={component.title}
-                        href={component.href}
-                      >
-                        {component.description}
-                      </ListItem>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem> */}
-              <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                  <Link href="/cli" className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:focus:bg-accent data-[state=open]:bg-accent/50 focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1">
-                    CLI 工具
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+          <Link
+            href="/components"
+            className="group inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:focus:bg-accent data-[state=open]:bg-accent/50 focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1"
+          >
+            组件列表
+          </Link>
+          <Link
+            href="/cli"
+            className="group inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:focus:bg-accent data-[state=open]:bg-accent/50 focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1"
+          >
+            CLI 工具
+          </Link>
         </div>
-        
+
         <Button
           variant="ghost"
-          className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
+          onClick={() => {
+            toggleSidebar();
+          }}
+          className="mx-1 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
         >
           <MenuIcon className="h-5 w-5" />
           <span className="sr-only">切换菜单</span>
         </Button>
-        
+
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <div className="w-full flex-1 md:w-auto md:flex-none">
+          {/* TODO: 后续支持搜索功能后再放开 */}
+          {/* <div className="w-full flex-1 md:w-auto md:flex-none">
             <div className="relative">
               <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -121,14 +88,14 @@ export function Header() {
                 className="pl-8 md:w-[200px] lg:w-[300px]"
               />
             </div>
-          </div>
-          <nav className="flex items-center">
+          </div> */}
+          <nav className="flex items-center ml-auto mr-2">
             <ThemeToggle />
           </nav>
         </div>
       </div>
     </header>
-  )
+  );
 }
 
 const ListItem = React.forwardRef<
@@ -153,6 +120,6 @@ const ListItem = React.forwardRef<
         </Link>
       </NavigationMenuLink>
     </li>
-  )
-})
-ListItem.displayName = "ListItem"
+  );
+});
+ListItem.displayName = "ListItem";

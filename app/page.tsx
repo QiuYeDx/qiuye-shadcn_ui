@@ -226,7 +226,7 @@ export default function Home() {
           </motion.div>
 
           <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-            <div className="grid max-w-xl grid-cols-1 gap-8 lg:max-w-none lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-8 lg:max-w-none lg:grid-cols-3">
               {features.map((feature, index) => (
                 <motion.div
                   key={feature.title}

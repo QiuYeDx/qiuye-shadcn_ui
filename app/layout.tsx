@@ -37,7 +37,7 @@ export default function RootLayout({
         style={
           {
             "--removed-body-scroll-bar-size":
-              "0px !important; margin-right: 0 !important; width: auto !important;",
+              "0px !important; margin-right: 0 !important; width: auto !important; overflow: visible !important;",
           } as React.CSSProperties
         }
       >

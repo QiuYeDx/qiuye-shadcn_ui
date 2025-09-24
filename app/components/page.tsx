@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Search, Package, Copy, CheckCircle } from "lucide-react";
 import { motion, stagger, AnimatePresence } from "motion/react";
@@ -95,6 +95,28 @@ export default function ComponentsPage() {
     },
   } as const;
 
+  // ====== 移动端 Tabs 优化：滚动 + 自动滚动到激活项 ======
+  const listRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const container = listRef.current;
+    if (!container) return;
+    const active = container.querySelector<HTMLElement>(
+      '[data-state="active"]'
+    );
+    if (!active) return;
+    active.scrollIntoView({
+      behavior: "smooth",
+      inline: "center",
+      block: "nearest",
+    });
+  }, [selectedCategory]);
+
+  function cn(...classes: (string | false | null | undefined)[]) {
+    return classes.filter(Boolean).join(" ");
+  }
+  // =====================================================
+
   return (
     <div className="container mx-auto px-6 py-8">
       {/* Header */}
@@ -157,16 +179,37 @@ export default function ComponentsPage() {
         </div>
 
         <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1">
-            <TabsTrigger value="all" className="text-xs">
-              全部
-            </TabsTrigger>
-            {categories.map((category) => (
-              <TabsTrigger key={category} value={category} className="text-xs">
-                {category}
+          {/* 让滚动在视觉上与 container 边缘对齐，可按外层 padding 调整 */}
+          <div className="-mx-6 px-6">
+            <TabsList
+              ref={listRef}
+              className={cn(
+                "w-full gap-1",
+                // 小屏：横向滚动的胶囊 Tabs
+                "flex overflow-x-auto scroll-smooth whitespace-nowrap sm:overflow-visible",
+                // 隐藏滚动条（Firefox / Edge / WebKit）
+                "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+                // 大屏：恢复为网格
+                "sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
+              )}
+            >
+              <TabsTrigger
+                value="all"
+                className="text-xs shrink-0 px-3 sm:px-2"
+              >
+                全部
               </TabsTrigger>
-            ))}
-          </TabsList>
+              {categories.map((category) => (
+                <TabsTrigger
+                  key={category}
+                  value={category}
+                  className="text-xs shrink-0 px-3 sm:px-2"
+                >
+                  {category}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
         </Tabs>
       </motion.div>
 
