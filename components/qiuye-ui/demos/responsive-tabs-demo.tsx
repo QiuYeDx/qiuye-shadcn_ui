@@ -44,6 +44,8 @@ export function ResponsiveTabsDemo() {
   const [playLayout, setPlayLayout] = useState<LayoutMode>("responsive");
   const [playEdgeGutter, setPlayEdgeGutter] = useState(false);
   const [playScrollStep, setPlayScrollStep] = useState(200);
+  const [playFadeMasks, setPlayFadeMasks] = useState(true);
+  const [playFadeMaskWidth, setPlayFadeMaskWidth] = useState(32);
   const [playTab, setPlayTab] = useState("t0");
 
   // 动态标签状态
@@ -298,6 +300,77 @@ export function ResponsiveTabsDemo() {
         </CardContent>
       </Card>
 
+      {/* 渐变遮罩演示 */}
+      <Card>
+        <CardHeader>
+          <CardTitle>渐变遮罩效果</CardTitle>
+          <CardDescription>在scroll模式下展示左右渐变遮罩，提示更多内容</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveTabs
+            value={customTab}
+            onValueChange={setCustomTab}
+            items={[
+              { value: "docs", label: "文档" },
+              { value: "components", label: "组件库" },
+              { value: "examples", label: "示例代码" },
+              { value: "tutorials", label: "教程指南" },
+              { value: "api-reference", label: "API参考" },
+              { value: "changelog", label: "更新日志" },
+              { value: "best-practices", label: "最佳实践" },
+              { value: "troubleshooting", label: "故障排除" },
+              { value: "community", label: "社区" },
+              { value: "support", label: "技术支持" },
+              { value: "enterprise", label: "企业版" },
+              { value: "pricing", label: "价格方案" },
+            ]}
+            layout="scroll"
+            fadeMasks={true}
+            fadeMaskWidth={40}
+            edgeGutter={true}
+          >
+            <TabsContent value="docs" className="mt-4">
+              <div className="rounded-lg border p-4">
+                <h3 className="font-semibold">文档</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  注意观察左右两侧的渐变遮罩效果，它们会在有更多内容可滚动时自动显示。
+                </p>
+              </div>
+            </TabsContent>
+            <TabsContent value="components" className="mt-4">
+              <div className="rounded-lg border p-4">
+                <h3 className="font-semibold">组件库</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  渐变遮罩使用 CSS gradient 实现，可以适配深浅色主题。
+                </p>
+              </div>
+            </TabsContent>
+            <TabsContent value="examples" className="mt-4">
+              <div className="rounded-lg border p-4">
+                <h3 className="font-semibold">示例代码</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  通过 fadeMasks 和 fadeMaskWidth 属性控制渐变遮罩的显示和宽度。
+                </p>
+              </div>
+            </TabsContent>
+            {/* 其他tab content */}
+            {[
+              "tutorials", "api-reference", "changelog", "best-practices", 
+              "troubleshooting", "community", "support", "enterprise", "pricing"
+            ].map(value => (
+              <TabsContent key={value} value={value} className="mt-4">
+                <div className="rounded-lg border p-4">
+                  <h3 className="font-semibold capitalize">{value.replace("-", " ")}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {value} 相关内容...
+                  </p>
+                </div>
+              </TabsContent>
+            ))}
+          </ResponsiveTabs>
+        </CardContent>
+      </Card>
+
       {/* 徽标 + 禁用 */}
       <Card>
         <CardHeader>
@@ -448,6 +521,25 @@ export function ResponsiveTabsDemo() {
 
             <Button
               size="sm"
+              variant={playFadeMasks ? "default" : "outline"}
+              onClick={() => setPlayFadeMasks((v) => !v)}
+            >
+              {playFadeMasks ? "渐变遮罩已开" : "渐变遮罩已关"}
+            </Button>
+
+            <span className="text-sm text-muted-foreground">遮罩宽度(px)：</span>
+            <Input
+              className="h-8 w-20"
+              type="number"
+              value={playFadeMaskWidth}
+              onChange={(e) => setPlayFadeMaskWidth(Number(e.target.value || 32))}
+              disabled={!playFadeMasks}
+            />
+
+            <div className="mx-3 h-5 w-px bg-border" />
+
+            <Button
+              size="sm"
               variant="outline"
               onClick={() => setPlayTab(prevOf(playItems, playTab))}
             >
@@ -469,6 +561,8 @@ export function ResponsiveTabsDemo() {
             layout={playLayout}
             edgeGutter={playEdgeGutter}
             scrollStep={playScrollStep}
+            fadeMasks={playFadeMasks}
+            fadeMaskWidth={playFadeMaskWidth}
             gridColsClass="sm:grid-cols-6 xl:grid-cols-8"
             triggerClassName="text-xs"
           >

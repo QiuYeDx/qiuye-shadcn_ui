@@ -35,6 +35,10 @@ export interface ResponsiveTabsProps {
   /** 布局模式：responsive | scroll | grid */
   layout?: LayoutMode;
   className?: string;
+  /** 是否显示左右渐变遮罩（在滚动模式下生效） */
+  fadeMasks?: boolean;
+  /** 渐变遮罩宽度，单位为像素 */
+  fadeMaskWidth?: number;
 }
 
 const ResponsiveTabs = React.forwardRef<
@@ -55,6 +59,8 @@ const ResponsiveTabs = React.forwardRef<
       edgeGutter = true,
       layout = "responsive",
       className,
+      fadeMasks = true,
+      fadeMaskWidth = 32,
       ...props
     },
     ref
@@ -63,19 +69,32 @@ const ResponsiveTabs = React.forwardRef<
     const tabsListRef = useRef<HTMLDivElement>(null);
     const [showLeftButton, setShowLeftButton] = React.useState(false);
     const [showRightButton, setShowRightButton] = React.useState(false);
+    const [showLeftFade, setShowLeftFade] = React.useState(false);
+    const [showRightFade, setShowRightFade] = React.useState(false);
 
     const isScrollAll = layout === "scroll";
     const isGridAll = layout === "grid";
     const isResponsive = layout === "responsive";
 
-    // 检查滚动按钮是否需要显示
+    // 检查滚动按钮和渐变遮罩是否需要显示
     const checkScrollButtons = React.useCallback(() => {
-      if (!scrollContainerRef.current || !scrollButtons) return;
+      if (!scrollContainerRef.current) return;
       const el = scrollContainerRef.current;
       const { scrollLeft, scrollWidth, clientWidth } = el;
-      setShowLeftButton(scrollLeft > 0);
-      setShowRightButton(scrollLeft + clientWidth < scrollWidth - 1);
-    }, [scrollButtons]);
+
+      // 更新滚动按钮状态
+      if (scrollButtons) {
+        setShowLeftButton(scrollLeft > 0);
+        setShowRightButton(scrollLeft + clientWidth < scrollWidth - 1);
+      }
+
+      // 更新渐变遮罩状态 (在滚动模式或响应式模式的小屏下)
+      if (fadeMasks && (isScrollAll || isResponsive)) {
+        const maxScroll = scrollWidth - clientWidth;
+        setShowLeftFade(scrollLeft > 1);
+        setShowRightFade(maxScroll > 0 && scrollLeft < maxScroll - 1);
+      }
+    }, [scrollButtons, fadeMasks, isScrollAll, isResponsive]);
 
     // 左右滚动
     const scrollByDir = (dir: "left" | "right") => {
@@ -243,7 +262,7 @@ const ResponsiveTabs = React.forwardRef<
               variant="ghost"
               size="sm"
               className={cn(
-                "absolute left-0 top-1/2 z-10 h-8 w-8 -translate-y-1/2 rounded-full bg-background/80 p-0 shadow-md backdrop-blur-sm",
+                "absolute left-1 top-1/2 z-10 h-8 w-8 -translate-y-1/2 rounded-full bg-background/80 p-0 shadow-md backdrop-blur-sm",
                 buttonVisibilityClass
               )}
               onClick={() => scrollByDir("left")}
@@ -258,7 +277,7 @@ const ResponsiveTabs = React.forwardRef<
               variant="ghost"
               size="sm"
               className={cn(
-                "absolute right-0 top-1/2 z-10 h-8 w-8 -translate-y-1/2 rounded-full bg-background/80 p-0 shadow-md backdrop-blur-sm",
+                "absolute right-1 top-1/2 z-10 h-8 w-8 -translate-y-1/2 rounded-full bg-background/80 p-0 shadow-md backdrop-blur-sm",
                 buttonVisibilityClass
               )}
               onClick={() => scrollByDir("right")}
@@ -266,6 +285,22 @@ const ResponsiveTabs = React.forwardRef<
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
+          )}
+
+          {/* 左右渐变遮罩 */}
+          {fadeMasks && (isScrollAll || isResponsive) && showLeftFade && (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute left-0 top-0 bottom-0 z-[5] bg-gradient-to-r from-background to-transparent"
+              style={{ width: `${fadeMaskWidth}px` }}
+            />
+          )}
+          {fadeMasks && (isScrollAll || isResponsive) && showRightFade && (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute right-0 top-0 bottom-0 z-[5] bg-gradient-to-l from-background to-transparent"
+              style={{ width: `${fadeMaskWidth}px` }}
+            />
           )}
 
           {/* 滚动/网格容器 */}
