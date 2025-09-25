@@ -25,11 +25,14 @@ export async function generateStaticParams() {
 import { AnimatedButtonDemo } from "@/components/qiuye-ui/demos/animated-button-demo";
 import { GradientCardDemo } from "@/components/qiuye-ui/demos/gradient-card-demo";
 import { TypingTextDemo } from "@/components/qiuye-ui/demos/typing-text-demo";
+import { ResponsiveTabsDemo } from "@/components/qiuye-ui/demos/responsive-tabs-demo";
 
+// TODO: 新增 qiuye-ui 自定义组件时需要完善 demo 文件
 const demoComponents = {
   "animated-button": AnimatedButtonDemo,
   "gradient-card": GradientCardDemo,
   "typing-text": TypingTextDemo,
+  "responsive-tabs": ResponsiveTabsDemo,
 };
 
 interface ComponentDetailPageProps {

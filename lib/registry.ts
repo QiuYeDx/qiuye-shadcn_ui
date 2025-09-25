@@ -170,6 +170,93 @@ export const componentRegistry: ComponentRegistry = {
     tags: ["text", "animation", "typewriter"],
     cliName: "typing-text",
   },
+
+  "responsive-tabs": {
+    name: "Responsive Tabs",
+    description: "响应式标签页组件，移动端支持横向滚动，大屏幕自动切换网格布局，支持图标、徽标、禁用状态等",
+    category: "导航",
+    dependencies: ["react", "lucide-react"],
+    files: {
+      component: "components/qiuye-ui/responsive-tabs.tsx",
+      demo: "components/qiuye-ui/demos/responsive-tabs-demo.tsx",
+    },
+    props: [
+      {
+        name: "value",
+        type: "string",
+        description: "当前激活的标签页值",
+        required: true,
+      },
+      {
+        name: "onValueChange",
+        type: "(value: string) => void",
+        description: "标签页切换回调函数",
+        required: true,
+      },
+      {
+        name: "items",
+        type: "TabItem[]",
+        description: "标签页配置数组",
+        required: true,
+      },
+      {
+        name: "children",
+        type: "React.ReactNode",
+        description: "标签页内容",
+        required: true,
+      },
+      {
+        name: "scrollButtons",
+        type: "boolean",
+        description: "是否显示滚动按钮",
+        required: false,
+        default: "true",
+      },
+      {
+        name: "scrollStep",
+        type: "number",
+        description: "滚动步长（像素）",
+        required: false,
+        default: "220",
+      },
+      {
+        name: "gridColsClass",
+        type: "string",
+        description: "大屏幕网格布局类名",
+        required: false,
+        default: "sm:grid sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8",
+      },
+      {
+        name: "listClassName",
+        type: "string",
+        description: "标签页列表额外类名",
+        required: false,
+      },
+      {
+        name: "triggerClassName",
+        type: "string",
+        description: "标签页触发器额外类名",
+        required: false,
+      },
+      {
+        name: "edgeGutter",
+        type: "boolean",
+        description: "是否添加边缘间距",
+        required: false,
+        default: "true",
+      },
+      {
+        name: "className",
+        type: "string",
+        description: "根容器额外类名",
+        required: false,
+      },
+    ],
+    version: "1.0.0",
+    author: "秋夜",
+    tags: ["tabs", "navigation", "responsive", "mobile", "scroll"],
+    cliName: "responsive-tabs",
+  },
 };
 
 // 获取所有组件分类
