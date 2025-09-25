@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "motion/react";
 
 export interface TabItem {
   value: string;
@@ -254,54 +255,78 @@ const ResponsiveTabs = React.forwardRef<
         className={cn("w-full", className)}
         {...props}
       >
-        {/* 不确定要不要改 */}
         {/* <div className="relative"> */}
         <div className="relative w-full overflow-x-hidden">
-          {scrollButtons && !isGridAll && showLeftButton && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "absolute left-1 top-1/2 z-10 h-8 w-8 -translate-y-1/2 rounded-full bg-background/80 p-0 shadow-md backdrop-blur-sm",
-                buttonVisibilityClass
-              )}
-              onClick={() => scrollByDir("left")}
-              aria-label="向左滚动"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-          )}
-
-          {scrollButtons && !isGridAll && showRightButton && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "absolute right-1 top-1/2 z-10 h-8 w-8 -translate-y-1/2 rounded-full bg-background/80 p-0 shadow-md backdrop-blur-sm",
-                buttonVisibilityClass
-              )}
-              onClick={() => scrollByDir("right")}
-              aria-label="向右滚动"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          )}
+          <AnimatePresence>
+            {scrollButtons && !isGridAll && showLeftButton && (
+              <motion.div
+                className="absolute left-1 top-1/2 z-10 h-8 w-8 -translate-y-1/2 rounded-full bg-background/80 p-0 shadow-md backdrop-blur-sm origin-left"
+                initial={{ opacity: 0, scale: 0, x: -10 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0, x: -10 }}
+                transition={{ duration: 0.15 }}
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn("h-8 w-8 size-8", buttonVisibilityClass)}
+                  onClick={() => scrollByDir("left")}
+                  aria-label="向左滚动"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {scrollButtons && !isGridAll && showRightButton && (
+              <motion.div
+                className="absolute right-1 top-1/2 z-10 h-8 w-8 -translate-y-1/2 rounded-full bg-background/80 p-0 shadow-md backdrop-blur-sm origin-right"
+                initial={{ opacity: 0, scale: 0, x: 10 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0, x: 10 }}
+                transition={{ duration: 0.15 }}
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn("h-8 w-8 size-8", buttonVisibilityClass)}
+                  onClick={() => scrollByDir("right")}
+                  aria-label="向右滚动"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* 左右渐变遮罩 */}
-          {fadeMasks && (isScrollAll || isResponsive) && showLeftFade && (
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute left-0 top-0 bottom-0 z-[5] bg-gradient-to-r from-background to-transparent"
-              style={{ width: `${fadeMaskWidth}px` }}
-            />
-          )}
-          {fadeMasks && (isScrollAll || isResponsive) && showRightFade && (
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute right-0 top-0 bottom-0 z-[5] bg-gradient-to-l from-background to-transparent"
-              style={{ width: `${fadeMaskWidth}px` }}
-            />
-          )}
+          <AnimatePresence>
+            {fadeMasks && (isScrollAll || isResponsive) && showLeftFade && (
+              <motion.div
+                aria-hidden="true"
+                className="pointer-events-none absolute left-0 top-0 bottom-0 z-[5] bg-gradient-to-r from-background to-transparent"
+                style={{ width: `${fadeMaskWidth}px` }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              />
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {fadeMasks && (isScrollAll || isResponsive) && showRightFade && (
+              <motion.div
+                aria-hidden="true"
+                className="pointer-events-none absolute right-0 top-0 bottom-0 z-[5] bg-gradient-to-l from-background to-transparent"
+                style={{ width: `${fadeMaskWidth}px` }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              />
+            )}
+          </AnimatePresence>
 
           {/* 滚动/网格容器 */}
           <div ref={scrollContainerRef} className={containerClass}>
