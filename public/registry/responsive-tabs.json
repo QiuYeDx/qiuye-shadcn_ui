@@ -7,7 +7,7 @@
   "dependencies": [
     "react",
     "lucide-react",
-    "motion/react"
+    "motion"
   ],
   "registryDependencies": [
     "tabs",
