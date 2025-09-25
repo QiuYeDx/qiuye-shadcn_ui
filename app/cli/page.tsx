@@ -17,6 +17,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { useClipboard } from "use-clipboard-copy";
 import { toast } from "sonner";
+import { ComponentId } from "@/lib/component-constants";
 
 export default function CLIPage() {
   const clipboard = useClipboard();
@@ -478,9 +479,9 @@ export default function App() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               {[
                                 // TODO: 后续需要添加更多组件, 或支持动态加载组件列表
-                                "animated-button",
-                                "gradient-card",
-                                "typing-text",
+                                ComponentId.ANIMATED_BUTTON,
+                                ComponentId.GRADIENT_CARD,
+                                ComponentId.TYPING_TEXT,
                               ].map((component) => (
                                 <div
                                   key={component}

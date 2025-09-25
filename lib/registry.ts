@@ -1,3 +1,5 @@
+import { ComponentId, basicUsageExamples, type BasicUsageExample } from './component-constants';
+
 export interface ComponentInfo {
   name: string;
   description: string;
@@ -19,6 +21,7 @@ export interface ComponentInfo {
   author: string;
   tags: string[];
   cliName: string; // CLI 命令中使用的名称
+  basicUsage?: BasicUsageExample; // 基础用法示例
 }
 
 export interface ComponentRegistry {
@@ -27,7 +30,7 @@ export interface ComponentRegistry {
 
 // 组件注册表
 export const componentRegistry: ComponentRegistry = {
-  "animated-button": {
+  [ComponentId.ANIMATED_BUTTON]: {
     name: "Animated Button",
     description: "带有动画效果的按钮组件，支持多种动画风格和悬停效果",
     category: "按钮",
@@ -76,9 +79,10 @@ export const componentRegistry: ComponentRegistry = {
     author: "秋夜",
     tags: ["button", "animation", "interactive"],
     cliName: "animated-button",
+    basicUsage: basicUsageExamples[ComponentId.ANIMATED_BUTTON],
   },
-  
-  "gradient-card": {
+
+  [ComponentId.GRADIENT_CARD]: {
     name: "Gradient Card",
     description: "渐变色卡片组件，支持多种渐变样式和阴影效果",
     category: "卡片",
@@ -119,9 +123,10 @@ export const componentRegistry: ComponentRegistry = {
     author: "秋夜",
     tags: ["card", "gradient", "design"],
     cliName: "gradient-card",
+    basicUsage: basicUsageExamples[ComponentId.GRADIENT_CARD],
   },
 
-  "typing-text": {
+  [ComponentId.TYPING_TEXT]: {
     name: "Typing Text",
     description: "打字机效果文本组件，支持自定义打字速度和光标样式",
     category: "文本",
@@ -169,13 +174,15 @@ export const componentRegistry: ComponentRegistry = {
     author: "秋夜",
     tags: ["text", "animation", "typewriter"],
     cliName: "typing-text",
+    basicUsage: basicUsageExamples[ComponentId.TYPING_TEXT],
   },
 
-  "responsive-tabs": {
+  [ComponentId.RESPONSIVE_TABS]: {
     name: "Responsive Tabs",
-    description: "响应式标签页组件，移动端支持横向滚动，大屏幕自动切换网格布局，支持图标、徽标、禁用状态等",
+    description:
+      "响应式标签页组件：小屏横向滚动、可选左右滚动按钮与渐变遮罩；大屏可切换为网格布局；支持图标、徽标、禁用与自定义样式。",
     category: "导航",
-    dependencies: ["react", "lucide-react"],
+    dependencies: ["react", "lucide-react", "motion/react"],
     files: {
       component: "components/qiuye-ui/responsive-tabs.tsx",
       demo: "components/qiuye-ui/demos/responsive-tabs-demo.tsx",
@@ -196,52 +203,78 @@ export const componentRegistry: ComponentRegistry = {
       {
         name: "items",
         type: "TabItem[]",
-        description: "标签页配置数组",
+        description: "标签页配置数组（支持 label、icon、badge、disabled）",
         required: true,
       },
       {
         name: "children",
         type: "React.ReactNode",
-        description: "标签页内容",
+        description: "与标签页内容区域（Tabs.Content）对应的子节点",
         required: true,
+      },
+      {
+        name: "layout",
+        type: '"responsive" | "scroll" | "grid"',
+        description:
+          "布局模式：responsive（小屏滚动/大屏网格）、scroll（所有断点滚动）、grid（所有断点网格）",
+        required: false,
+        default: "responsive",
       },
       {
         name: "scrollButtons",
         type: "boolean",
-        description: "是否显示滚动按钮",
+        description:
+          "是否显示左右滚动按钮（滚动模式在大屏也显示；responsive 模式下仅小屏显示）",
         required: false,
         default: "true",
       },
       {
         name: "scrollStep",
         type: "number",
-        description: "滚动步长（像素）",
+        description: "点击滚动按钮时的滚动步长（像素）",
         required: false,
         default: "220",
       },
       {
+        name: "fadeMasks",
+        type: "boolean",
+        description:
+          '是否显示左右渐变遮罩（在 layout="scroll" 或 responsive 的小屏下生效）',
+        required: false,
+        default: "true",
+      },
+      {
+        name: "fadeMaskWidth",
+        type: "number",
+        description: "渐变遮罩宽度（像素）",
+        required: false,
+        default: "32",
+      },
+      {
         name: "gridColsClass",
         type: "string",
-        description: "大屏幕网格布局类名",
+        description:
+          '≥sm 的网格列定义（应用在 TabsList；layout="grid" 时可传无断点或自定义断点的类）',
         required: false,
-        default: "sm:grid sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8",
+        default: "sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8",
       },
       {
         name: "listClassName",
         type: "string",
-        description: "标签页列表额外类名",
+        description: "TabsList 的额外类名",
         required: false,
       },
       {
         name: "triggerClassName",
         type: "string",
-        description: "标签页触发器额外类名",
+        description: "TabsTrigger 的额外类名",
         required: false,
       },
       {
         name: "edgeGutter",
         type: "boolean",
-        description: "是否添加边缘间距",
+        description:
+          '小屏滚动时两侧“贴边”内边距；在 layout="scroll" 时所有断点生效',
         required: false,
         default: "true",
       },
@@ -252,17 +285,28 @@ export const componentRegistry: ComponentRegistry = {
         required: false,
       },
     ],
-    version: "1.0.0",
+    version: "1.1.0",
     author: "秋夜",
-    tags: ["tabs", "navigation", "responsive", "mobile", "scroll"],
+    tags: [
+      "tabs",
+      "navigation",
+      "responsive",
+      "mobile",
+      "scroll",
+      "grid",
+      "badge",
+      "icon",
+      "shadcn",
+    ],
     cliName: "responsive-tabs",
+    basicUsage: basicUsageExamples[ComponentId.RESPONSIVE_TABS],
   },
 };
 
 // 获取所有组件分类
 export function getCategories(): string[] {
   const categories = new Set<string>();
-  Object.values(componentRegistry).forEach(component => {
+  Object.values(componentRegistry).forEach((component) => {
     categories.add(component.category);
   });
   return Array.from(categories);
@@ -271,7 +315,7 @@ export function getCategories(): string[] {
 // 根据分类获取组件
 export function getComponentsByCategory(category: string): ComponentInfo[] {
   return Object.values(componentRegistry).filter(
-    component => component.category === category
+    (component) => component.category === category
   );
 }
 
@@ -283,10 +327,11 @@ export function getComponent(id: string): ComponentInfo | undefined {
 // 搜索组件
 export function searchComponents(query: string): ComponentInfo[] {
   const lowercaseQuery = query.toLowerCase();
-  return Object.values(componentRegistry).filter(component => 
-    component.name.toLowerCase().includes(lowercaseQuery) ||
-    component.description.toLowerCase().includes(lowercaseQuery) ||
-    component.tags.some(tag => tag.toLowerCase().includes(lowercaseQuery))
+  return Object.values(componentRegistry).filter(
+    (component) =>
+      component.name.toLowerCase().includes(lowercaseQuery) ||
+      component.description.toLowerCase().includes(lowercaseQuery) ||
+      component.tags.some((tag) => tag.toLowerCase().includes(lowercaseQuery))
   );
 }
 

@@ -6,7 +6,8 @@
   "author": "QiuYeDx <me@qiuyedx.com>",
   "dependencies": [
     "react",
-    "lucide-react"
+    "lucide-react",
+    "motion/react"
   ],
   "registryDependencies": [
     "tabs",
