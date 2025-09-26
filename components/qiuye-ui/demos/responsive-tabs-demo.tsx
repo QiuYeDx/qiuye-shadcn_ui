@@ -42,10 +42,9 @@ export function ResponsiveTabsDemo() {
 
   // Playground 状态
   const [playLayout, setPlayLayout] = useState<LayoutMode>("responsive");
-  const [playEdgeGutter, setPlayEdgeGutter] = useState(false);
   const [playScrollStep, setPlayScrollStep] = useState(200);
   const [playFadeMasks, setPlayFadeMasks] = useState(true);
-  const [playFadeMaskWidth, setPlayFadeMaskWidth] = useState(32);
+  const [playFadeMaskWidth, setPlayFadeMaskWidth] = useState(64);
   const [playTab, setPlayTab] = useState("t0");
 
   // 动态标签状态
@@ -143,7 +142,7 @@ export function ResponsiveTabsDemo() {
       return {
         value: `t${i}`,
         label: long ? `这是一个很长很长很长的标签标题 ${i}` : `标签 ${i + 1}`,
-        icon: <Icon className="h-4 w-4" />,
+        icon: <Icon className="h-3 w-3 size-3" />,
         badge: i % 4 === 0 ? i + 1 : undefined,
       } as TabItem;
     });
@@ -172,7 +171,6 @@ export function ResponsiveTabsDemo() {
             value={basicTab}
             onValueChange={setBasicTab}
             items={basicItems}
-            edgeGutter={false}
           >
             <TabsContent value="all" className="mt-4">
               <div className="rounded-lg border p-4">
@@ -254,7 +252,6 @@ export function ResponsiveTabsDemo() {
             onValueChange={setIconTab}
             items={iconItems}
             gridColsClass="sm:grid-cols-5"
-            edgeGutter={false}
           >
             <TabsContent value="home" className="mt-4">
               <div className="rounded-lg border p-4">
@@ -327,7 +324,6 @@ export function ResponsiveTabsDemo() {
             layout="scroll"
             fadeMasks={true}
             fadeMaskWidth={40}
-            edgeGutter={true}
           >
             <TabsContent value="docs" className="mt-4">
               <div className="rounded-lg border p-4">
@@ -384,7 +380,6 @@ export function ResponsiveTabsDemo() {
             items={badgeItems}
             scrollStep={150}
             gridColsClass="sm:grid-cols-4 lg:grid-cols-6"
-            edgeGutter={false}
           >
             <TabsContent value="forms" className="mt-4">
               <div className="rounded-lg border p-4">
@@ -511,16 +506,6 @@ export function ResponsiveTabsDemo() {
 
             <Button
               size="sm"
-              variant={playEdgeGutter ? "default" : "outline"}
-              onClick={() => setPlayEdgeGutter((v) => !v)}
-            >
-              {playEdgeGutter ? "贴边已开" : "贴边已关"}
-            </Button>
-
-            <div className="mx-3 h-5 w-px bg-border" />
-
-            <Button
-              size="sm"
               variant={playFadeMasks ? "default" : "outline"}
               onClick={() => setPlayFadeMasks((v) => !v)}
             >
@@ -532,7 +517,7 @@ export function ResponsiveTabsDemo() {
               className="h-8 w-20"
               type="number"
               value={playFadeMaskWidth}
-              onChange={(e) => setPlayFadeMaskWidth(Number(e.target.value || 32))}
+              onChange={(e) => setPlayFadeMaskWidth(Number(e.target.value || 64))}
               disabled={!playFadeMasks}
             />
 
@@ -559,7 +544,6 @@ export function ResponsiveTabsDemo() {
             onValueChange={setPlayTab}
             items={playItems}
             layout={playLayout}
-            edgeGutter={playEdgeGutter}
             scrollStep={playScrollStep}
             fadeMasks={playFadeMasks}
             fadeMaskWidth={playFadeMaskWidth}
@@ -598,7 +582,6 @@ export function ResponsiveTabsDemo() {
             onValueChange={setPlayTab}
             items={playItems}
             layout="scroll"
-            edgeGutter={false}
             scrollStep={220}
             triggerClassName="text-xs"
           >
@@ -631,7 +614,6 @@ export function ResponsiveTabsDemo() {
             gridColsClass="grid-cols-6 xl:grid-cols-8"
             listClassName="bg-muted/50"
             triggerClassName="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-            edgeGutter={false}
           >
             <TabsContent value="docs" className="mt-4">
               <div className="rounded-lg border p-4">
@@ -737,7 +719,6 @@ export function ResponsiveTabsDemo() {
             value={dynActive}
             onValueChange={setDynActive}
             items={dynItems}
-            edgeGutter={false}
             scrollStep={180}
             triggerClassName="text-xs"
           >

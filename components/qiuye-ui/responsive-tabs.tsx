@@ -27,12 +27,10 @@ export interface ResponsiveTabsProps {
   scrollButtons?: boolean;
   /** 每次滚动步长 */
   scrollStep?: number;
-  /** ≥sm 的网格列定义（会应用在 TabsList 上；在 layout=\"grid\" 时请提供无断点或自定义断点的类） */
+  /** ≥sm 的网格列定义（会应用在 TabsList 上；在 layout="grid" 时请提供无断点或自定义断点的类） */
   gridColsClass?: string;
   listClassName?: string;
   triggerClassName?: string;
-  /** 小屏滚动时两侧“贴边”内边距；layout=\"scroll\" 时在所有断点生效 */
-  edgeGutter?: boolean;
   /** 布局模式：responsive | scroll | grid */
   layout?: LayoutMode;
   className?: string;
@@ -57,17 +55,19 @@ const ResponsiveTabs = React.forwardRef<
       gridColsClass = "sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8",
       listClassName,
       triggerClassName,
-      edgeGutter = true,
       layout = "responsive",
       className,
       fadeMasks = true,
-      fadeMaskWidth = 32,
+      fadeMaskWidth = 64,
       ...props
     },
     ref
   ) => {
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    // 背景容器（不滚）
     const tabsListRef = useRef<HTMLDivElement>(null);
+    // 可滚动轨道（只滚内容）
+    const scrollerRef = useRef<HTMLDivElement>(null);
+
     const [showLeftButton, setShowLeftButton] = React.useState(false);
     const [showRightButton, setShowRightButton] = React.useState(false);
     const [showLeftFade, setShowLeftFade] = React.useState(false);
@@ -77,19 +77,17 @@ const ResponsiveTabs = React.forwardRef<
     const isGridAll = layout === "grid";
     const isResponsive = layout === "responsive";
 
-    // 检查滚动按钮和渐变遮罩是否需要显示
-    const checkScrollButtons = React.useCallback(() => {
-      if (!scrollContainerRef.current) return;
-      const el = scrollContainerRef.current;
+    // 更新滚动按钮和遮罩状态 —— 基于 scrollerRef
+    const checkScrollAffordance = React.useCallback(() => {
+      const el = scrollerRef.current;
+      if (!el) return;
       const { scrollLeft, scrollWidth, clientWidth } = el;
 
-      // 更新滚动按钮状态
       if (scrollButtons) {
         setShowLeftButton(scrollLeft > 0);
         setShowRightButton(scrollLeft + clientWidth < scrollWidth - 1);
       }
 
-      // 更新渐变遮罩状态 (在滚动模式或响应式模式的小屏下)
       if (fadeMasks && (isScrollAll || isResponsive)) {
         const maxScroll = scrollWidth - clientWidth;
         setShowLeftFade(scrollLeft > 1);
@@ -99,7 +97,7 @@ const ResponsiveTabs = React.forwardRef<
 
     // 左右滚动
     const scrollByDir = (dir: "left" | "right") => {
-      const el = scrollContainerRef.current;
+      const el = scrollerRef.current;
       if (!el) return;
       el.scrollBy({
         left: dir === "left" ? -scrollStep : scrollStep,
@@ -107,47 +105,47 @@ const ResponsiveTabs = React.forwardRef<
       });
     };
 
-    // 滚动到激活项
+    // 滚到激活项（只移动 scroller，不动背景）
     const scrollToActiveTab = React.useCallback(() => {
-      const container = scrollContainerRef.current;
+      const scroller = scrollerRef.current;
       const list = tabsListRef.current;
-      if (!container || !list) return;
+      if (!scroller || !list) return;
 
       const active = list.querySelector<HTMLElement>('[data-state="active"]');
       if (!active) return;
 
-      const cRect = container.getBoundingClientRect();
+      const cRect = scroller.getBoundingClientRect();
       const aRect = active.getBoundingClientRect();
       const fullyVisible =
         aRect.left >= cRect.left && aRect.right <= cRect.right;
 
       if (!fullyVisible) {
         const targetLeft =
-          active.offsetLeft - (container.clientWidth - active.clientWidth) / 2;
-        container.scrollTo({
+          active.offsetLeft - (scroller.clientWidth - active.clientWidth) / 2;
+        scroller.scrollTo({
           left: Math.max(0, targetLeft),
           behavior: "smooth",
         });
       }
     }, []);
 
-    // 监听滚动/尺寸变化
+    // 监听滚动与尺寸变化
     useEffect(() => {
-      const el = scrollContainerRef.current;
+      const el = scrollerRef.current;
       if (!el) return;
 
-      const onScroll = () => checkScrollButtons();
+      const onScroll = () => checkScrollAffordance();
       el.addEventListener("scroll", onScroll, { passive: true });
-      checkScrollButtons();
+      checkScrollAffordance();
 
       const ro = new ResizeObserver(() => {
-        checkScrollButtons();
+        checkScrollAffordance();
         scrollToActiveTab();
       });
       ro.observe(el);
 
       const onWinResize = () => {
-        checkScrollButtons();
+        checkScrollAffordance();
         scrollToActiveTab();
       };
       window.addEventListener("resize", onWinResize);
@@ -157,18 +155,15 @@ const ResponsiveTabs = React.forwardRef<
         ro.disconnect();
         window.removeEventListener("resize", onWinResize);
       };
-    }, [checkScrollButtons, scrollToActiveTab]);
+    }, [checkScrollAffordance, scrollToActiveTab]);
 
-    // 让滚轮纵向 -> 横向（仅在 layout="scroll" 时）
-    // TODO: 滚动体验不好, 待优化
+    // 将纵向滚轮转为横向滚（仅 scroll 模式）
     useEffect(() => {
       if (!isScrollAll) return;
-
-      const el = scrollContainerRef.current;
+      const el = scrollerRef.current;
       if (!el) return;
 
       const onWheel = (e: WheelEvent) => {
-        // 触控板本来就在横向滚/缩放时，不劫持
         if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
         if (e.ctrlKey) return;
 
@@ -179,34 +174,42 @@ const ResponsiveTabs = React.forwardRef<
         const atStart = el.scrollLeft <= 0;
         const atEnd = el.scrollLeft >= max - 1;
 
-        // 只有确实还能滚动时才阻止默认垂直滚动
         const goingLeft = e.deltaY < 0;
         const goingRight = e.deltaY > 0;
 
         if ((goingLeft && !atStart) || (goingRight && !atEnd)) {
           e.preventDefault();
-          // 用 deltaY 作为横向步进，保持触控板/滚轮的自然加速度感
           el.scrollBy({ left: e.deltaY, behavior: "auto" });
-          // 更新左右按钮可见性
-          checkScrollButtons();
+          checkScrollAffordance();
         }
       };
 
       el.addEventListener("wheel", onWheel, { passive: false });
       return () => el.removeEventListener("wheel", onWheel);
-    }, [isScrollAll, checkScrollButtons]);
+    }, [isScrollAll, checkScrollAffordance]);
 
     // value 改变时，确保激活项可见
     useEffect(() => {
-      // 仅在滚动模式下需要定位
       if (isGridAll) return;
       scrollToActiveTab();
     }, [value, isGridAll, scrollToActiveTab]);
 
-    // 按模式计算样式
-    const containerClass = cn(
-      "w-full max-w-full",
-      // 滚动可见性
+    // 类名计算
+    // 外层相对定位容器，仅用于放置按钮/遮罩层（不承担滚动）
+    const outerRelativeClass = "relative w-full overflow-x-hidden";
+
+    // TabsList：固定背景层（圆角灰底通常在这里），不滚动，负责 padding（edge gutter）
+    const listClass = cn(
+      // grid/responsive 的列定义（只在需要 grid 时作用）
+      (isGridAll || isResponsive) && gridColsClass,
+      "h-auto w-full overflow-hidden", // 关键：overflow-hidden，固定背景
+      // 当大屏 grid 时让内部布局切换到 grid（见 rowClass）
+      listClassName
+    );
+
+    // scroller：真正滚动的层
+    const scrollerClass = cn(
+      "w-full p-0.5",
       isGridAll
         ? "overflow-visible"
         : isScrollAll
@@ -215,36 +218,28 @@ const ResponsiveTabs = React.forwardRef<
       // 隐藏滚动条
       !isGridAll &&
         "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
-      // 边缘贴边
-      edgeGutter && (isScrollAll ? "px-6" : "px-6 sm:px-0"),
-      // 阻断 inline 方向的滚动链，防止页面跟着滚
+      // 阻断 inline 方向滚动链
       "overscroll-contain"
     );
 
-    const listClass = cn(
-      // 行为：小屏/全屏滚动 or 网格
+    // row：承载触发器的行；滚动场景下 inline-flex + w-max，grid 场景下切为 grid
+    const rowClass = cn(
       isGridAll
         ? "grid w-full gap-0"
         : isScrollAll
           ? "inline-flex w-max whitespace-nowrap gap-1"
           : "inline-flex w-max whitespace-nowrap gap-1 sm:grid sm:w-full sm:gap-0",
-      // 列定义：仅在有 grid 的模式下生效
-      (isGridAll || isResponsive) && gridColsClass,
-      "h-auto p-1",
-      listClassName
+      (isGridAll || isResponsive) && gridColsClass
     );
 
     const triggerClass = cn(
-      // 滚动模式下防压缩
       !isGridAll && "shrink-0 min-w-fit px-3 py-2",
-      // 网格/响应式大屏：格子里居中
       (isGridAll || isResponsive) &&
         "sm:shrink sm:min-w-0 sm:flex sm:items-center sm:justify-center",
       "data-[state=active]:font-medium",
       triggerClassName
     );
 
-    // 按模式控制滚动按钮在大屏是否显示
     const buttonVisibilityClass = isScrollAll ? "" : "sm:hidden";
 
     return (
@@ -255,8 +250,8 @@ const ResponsiveTabs = React.forwardRef<
         className={cn("w-full", className)}
         {...props}
       >
-        {/* <div className="relative"> */}
-        <div className="relative w-full overflow-x-hidden">
+        <div className={outerRelativeClass}>
+          {/* 左侧按钮 */}
           <AnimatePresence>
             {scrollButtons && !isGridAll && showLeftButton && (
               <motion.div
@@ -269,7 +264,10 @@ const ResponsiveTabs = React.forwardRef<
                 <Button
                   variant="ghost"
                   size="sm"
-                  className={cn("h-8 w-8 size-8", buttonVisibilityClass)}
+                  className={cn(
+                    "h-8 w-8 size-8 rounded-full hover:bg-transparent cursor-pointer",
+                    buttonVisibilityClass
+                  )}
                   onClick={() => scrollByDir("left")}
                   aria-label="向左滚动"
                 >
@@ -278,6 +276,8 @@ const ResponsiveTabs = React.forwardRef<
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* 右侧按钮 */}
           <AnimatePresence>
             {scrollButtons && !isGridAll && showRightButton && (
               <motion.div
@@ -290,7 +290,10 @@ const ResponsiveTabs = React.forwardRef<
                 <Button
                   variant="ghost"
                   size="sm"
-                  className={cn("h-8 w-8 size-8", buttonVisibilityClass)}
+                  className={cn(
+                    "h-8 w-8 size-8 rounded-full hover:bg-transparent cursor-pointer",
+                    buttonVisibilityClass
+                  )}
                   onClick={() => scrollByDir("right")}
                   aria-label="向右滚动"
                 >
@@ -300,60 +303,66 @@ const ResponsiveTabs = React.forwardRef<
             )}
           </AnimatePresence>
 
-          {/* 左右渐变遮罩 */}
-          <AnimatePresence>
-            {fadeMasks && (isScrollAll || isResponsive) && showLeftFade && (
-              <motion.div
-                aria-hidden="true"
-                className="pointer-events-none absolute left-0 top-0 bottom-0 z-[5] bg-gradient-to-r from-background to-transparent"
-                style={{ width: `${fadeMaskWidth}px` }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              />
-            )}
-          </AnimatePresence>
-          <AnimatePresence>
-            {fadeMasks && (isScrollAll || isResponsive) && showRightFade && (
-              <motion.div
-                aria-hidden="true"
-                className="pointer-events-none absolute right-0 top-0 bottom-0 z-[5] bg-gradient-to-l from-background to-transparent"
-                style={{ width: `${fadeMaskWidth}px` }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              />
-            )}
-          </AnimatePresence>
+          {/* 固定背景层 TabsList（不滚动） */}
+          <TabsList ref={tabsListRef} className={listClass}>
+            {/* 仅 scroller 层滚动 */}
+            <div ref={scrollerRef} className={scrollerClass}>
+              {/* 真正承载触发器的行 */}
+              <div className={rowClass}>
+                {items.map((item) => (
+                  <TabsTrigger
+                    key={item.value}
+                    value={item.value}
+                    disabled={item.disabled}
+                    className={triggerClass}
+                  >
+                    <span className="flex items-center gap-2 max-w-full">
+                      {item.icon && (
+                        <span className="shrink-0">{item.icon}</span>
+                      )}
+                      <span className="truncate">{item.label}</span>
+                      {item.badge !== undefined && (
+                        <Badge
+                          variant="secondary"
+                          className="ml-1 h-4 min-w-[20px] px-1 text-xs"
+                        >
+                          {item.badge}
+                        </Badge>
+                      )}
+                    </span>
+                  </TabsTrigger>
+                ))}
+              </div>
+            </div>
 
-          {/* 滚动/网格容器 */}
-          <div ref={scrollContainerRef} className={containerClass}>
-            <TabsList ref={tabsListRef} className={listClass}>
-              {items.map((item) => (
-                <TabsTrigger
-                  key={item.value}
-                  value={item.value}
-                  disabled={item.disabled}
-                  className={triggerClass}
-                >
-                  <span className="flex items-center gap-2 max-w-full">
-                    {item.icon && <span className="shrink-0">{item.icon}</span>}
-                    <span className="truncate">{item.label}</span>
-                    {item.badge !== undefined && (
-                      <Badge
-                        variant="secondary"
-                        className="ml-1 h-5 min-w-[20px] px-1 text-xs"
-                      >
-                        {item.badge}
-                      </Badge>
-                    )}
-                  </span>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </div>
+            {/* 渐变遮罩 */}
+            <AnimatePresence>
+              {fadeMasks && (isScrollAll || isResponsive) && showLeftFade && (
+                <motion.div
+                  aria-hidden="true"
+                  className="rounded-lg pointer-events-none absolute left-0 top-0 bottom-0 z-[5] bg-gradient-to-r from-muted to-transparent"
+                  style={{ width: `${fadeMaskWidth}px` }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                />
+              )}
+            </AnimatePresence>
+            <AnimatePresence>
+              {fadeMasks && (isScrollAll || isResponsive) && showRightFade && (
+                <motion.div
+                  aria-hidden="true"
+                  className="rounded-lg pointer-events-none absolute right-0 top-0 bottom-0 z-[5] bg-gradient-to-l from-muted to-transparent"
+                  style={{ width: `${fadeMaskWidth}px` }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                />
+              )}
+            </AnimatePresence>
+          </TabsList>
         </div>
 
         <div className="mt-4">{children}</div>

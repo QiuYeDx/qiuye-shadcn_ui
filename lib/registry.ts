@@ -271,14 +271,6 @@ export const componentRegistry: ComponentRegistry = {
         required: false,
       },
       {
-        name: "edgeGutter",
-        type: "boolean",
-        description:
-          '小屏滚动时两侧“贴边”内边距；在 layout="scroll" 时所有断点生效',
-        required: false,
-        default: "true",
-      },
-      {
         name: "className",
         type: "string",
         description: "根容器额外类名",
