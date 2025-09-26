@@ -29,6 +29,7 @@ import { toast } from "sonner";
 export default function ComponentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [packageManager, setPackageManager] = useState<"npm" | "pnpm">("pnpm");
   const clipboard = useClipboard();
 
   const allComponents = getAllComponents();
@@ -41,8 +42,16 @@ export default function ComponentsPage() {
       ? allComponents
       : getComponentsByCategory(selectedCategory);
 
+  const getCommandPrefix = () => {
+    return packageManager === "npm" ? "npx" : "pnpm dlx";
+  };
+
+  const generateCommand = (componentId: string) => {
+    return `${getCommandPrefix()} shadcn@latest add @qiuye-ui/${componentId}`;
+  };
+
   const handleCopyCommand = (componentId: string) => {
-    const command = `npx shadcn@latest add @qiuye-ui/${componentId}`;
+    const command = generateCommand(componentId);
     clipboard.copy(command);
     toast.success("复制成功！", {
       description: `已复制命令: ${command}`,
@@ -176,6 +185,16 @@ export default function ComponentsPage() {
               className="pl-10"
             />
           </div>
+          
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">包管理器:</span>
+            <Tabs value={packageManager} onValueChange={(value) => setPackageManager(value as "npm" | "pnpm")}>
+              <TabsList className="grid w-[140px] grid-cols-2 h-9">
+                <TabsTrigger value="npm" className="text-xs">npm</TabsTrigger>
+                <TabsTrigger value="pnpm" className="text-xs">pnpm</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
         </div>
 
         <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
@@ -253,6 +272,7 @@ export default function ComponentsPage() {
                   <ComponentCard
                     component={component}
                     onCopyCommand={handleCopyCommand}
+                    packageManager={packageManager}
                   />
                 </motion.div>
               ))}
@@ -267,11 +287,17 @@ export default function ComponentsPage() {
 interface ComponentCardProps {
   component: ComponentInfo;
   onCopyCommand: (componentId: string) => void;
+  packageManager: "npm" | "pnpm";
 }
 
 // 精简后的子组件：不再包一个 motion.div，动画交给父级
-function ComponentCard({ component, onCopyCommand }: ComponentCardProps) {
+function ComponentCard({ component, onCopyCommand, packageManager }: ComponentCardProps) {
   const [copied, setCopied] = useState(false);
+
+  const generateCommand = (componentId: string) => {
+    const prefix = packageManager === "npm" ? "npx" : "pnpm dlx";
+    return `${prefix} shadcn@latest add @qiuye-ui/${componentId}`;
+  };
 
   const handleCopy = () => {
     onCopyCommand(component.cliName);
@@ -314,7 +340,7 @@ function ComponentCard({ component, onCopyCommand }: ComponentCardProps) {
         <div className="bg-muted/50 rounded-md p-3">
           <div className="flex items-center justify-between">
             <code className="text-sm font-mono">
-              npx shadcn@latest add @qiuye-ui/{component.cliName}
+              {generateCommand(component.cliName)}
             </code>
             <Button
               size="sm"

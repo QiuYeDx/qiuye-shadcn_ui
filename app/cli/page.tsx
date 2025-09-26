@@ -24,6 +24,15 @@ export default function CLIPage() {
   const [copiedStates, setCopiedStates] = useState<{ [key: string]: boolean }>(
     {}
   );
+  const [packageManager, setPackageManager] = useState<"npm" | "pnpm">("pnpm");
+
+  const getCommandPrefix = () => {
+    return packageManager === "npm" ? "npx" : "pnpm dlx";
+  };
+
+  const generateCommand = (command: string) => {
+    return command.replace(/^npx/, getCommandPrefix());
+  };
 
   const handleCopy = (text: string, key: string) => {
     clipboard.copy(text);
@@ -126,18 +135,30 @@ export default function CLIPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <Package className="h-4 w-4" />
-            <span>基于 shadcn/ui CLI</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Package className="h-4 w-4" />
+              <span>基于 shadcn/ui CLI</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span>•</span>
+              <span>官方工具支持</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span>•</span>
+              <span>无需额外安装</span>
+            </div>
           </div>
+          
           <div className="flex items-center gap-2">
-            <span>•</span>
-            <span>官方工具支持</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span>•</span>
-            <span>无需额外安装</span>
+            <span className="text-sm text-muted-foreground">包管理器:</span>
+            <Tabs value={packageManager} onValueChange={(value) => setPackageManager(value as "npm" | "pnpm")}>
+              <TabsList className="grid w-[180px] grid-cols-2 h-8">
+                <TabsTrigger value="npm" className="text-xs">npm</TabsTrigger>
+                <TabsTrigger value="pnpm" className="text-xs">pnpm</TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
         </div>
       </motion.div>
@@ -227,7 +248,7 @@ export default function CLIPage() {
                               确保您的项目已经安装并配置了 shadcn/ui：
                             </p>
                             <CodeBlock
-                              code="npx shadcn@latest init"
+                              code={generateCommand("npx shadcn@latest init")}
                               copyKey="shadcn-init"
                             />
                             <p className="text-sm text-muted-foreground mt-2">
@@ -257,11 +278,25 @@ export default function CLIPage() {
                               language="json"
                               copyKey="registry-config"
                             />
+                            <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
+                              <p className="text-sm text-blue-800 dark:text-blue-200">
+                                <strong>中国大陆用户注意:</strong> 如果访问 vercel.app 域名有困难，可以使用国内镜像域名：
+                              </p>
+                              <CodeBlock
+                                code={`{
+  "registries": {
+    "@qiuye-ui": "https://ui.qiuyedx.com/registry/{name}.json"
+  }
+}`}
+                                language="json"
+                                copyKey="registry-config-cn"
+                              />
+                            </div>
                             <p className="text-sm text-muted-foreground mt-3 mb-3">
                               然后使用简化的命令安装组件：
                             </p>
                             <CodeBlock
-                              code="npx shadcn@latest add @qiuye-ui/animated-button"
+                              code={generateCommand("npx shadcn@latest add @qiuye-ui/animated-button")}
                               copyKey="install-component"
                             />
                           </div>
@@ -275,12 +310,24 @@ export default function CLIPage() {
                             <p className="text-sm text-muted-foreground mb-3">
                               如果不想配置注册表，可以直接使用URL安装组件：
                             </p>
-                            <CodeBlock
-                              code="npx shadcn@latest add https://qiuye-ui.vercel.app/registry/animated-button.json"
-                              copyKey="install-component-url"
-                            />
+                            <div className="space-y-3">
+                              <div>
+                                <p className="text-sm font-medium mb-2">国际域名（推荐）：</p>
+                                <CodeBlock
+                                  code={generateCommand("npx shadcn@latest add https://qiuye-ui.vercel.app/registry/animated-button.json")}
+                                  copyKey="install-component-url"
+                                />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium mb-2">中国大陆镜像域名：</p>
+                                <CodeBlock
+                                  code={generateCommand("npx shadcn@latest add https://ui.qiuyedx.com/registry/animated-button.json")}
+                                  copyKey="install-component-url-cn"
+                                />
+                              </div>
+                            </div>
                             <p className="text-sm text-muted-foreground mt-2">
-                              直接指定组件的注册表JSON文件URL进行安装
+                              直接指定组件的注册表JSON文件URL进行安装，中国大陆用户建议使用镜像域名
                             </p>
                           </div>
                         </CardContent>
@@ -307,11 +354,11 @@ export default function CLIPage() {
                             </p>
                             <div className="space-y-3">
                               <CodeBlock
-                                code="npx shadcn@latest add @qiuye-ui/animated-button"
+                                code={generateCommand("npx shadcn@latest add @qiuye-ui/animated-button")}
                                 copyKey="add-single"
                               />
                               <CodeBlock
-                                code="npx shadcn@latest add @qiuye-ui/gradient-card @qiuye-ui/typing-text"
+                                code={generateCommand("npx shadcn@latest add @qiuye-ui/gradient-card @qiuye-ui/typing-text")}
                                 copyKey="add-multiple"
                               />
                             </div>
@@ -319,10 +366,20 @@ export default function CLIPage() {
                               方式二：直接使用URL（无需配置）
                             </p>
                             <div className="space-y-3">
-                              <CodeBlock
-                                code="npx shadcn@latest add https://qiuye-ui.vercel.app/registry/animated-button.json"
-                                copyKey="add-single-url"
-                              />
+                              <div>
+                                <p className="text-sm font-medium mb-2">国际域名：</p>
+                                <CodeBlock
+                                  code={generateCommand("npx shadcn@latest add https://qiuye-ui.vercel.app/registry/animated-button.json")}
+                                  copyKey="add-single-url"
+                                />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium mb-2">中国大陆镜像：</p>
+                                <CodeBlock
+                                  code={generateCommand("npx shadcn@latest add https://ui.qiuyedx.com/registry/animated-button.json")}
+                                  copyKey="add-single-url-cn"
+                                />
+                              </div>
                             </div>
                             <p className="text-sm text-muted-foreground mt-2">
                               支持单个组件安装或批量安装多个组件
@@ -357,10 +414,22 @@ export default function App() {
                             <p className="text-sm text-muted-foreground mb-3">
                               访问组件浏览器查看所有可用组件和演示：
                             </p>
-                            <CodeBlock
-                              code="https://qiuye-ui.vercel.app/components"
-                              copyKey="component-browser"
-                            />
+                            <div className="space-y-3">
+                              <div>
+                                <p className="text-sm font-medium mb-2">国际域名：</p>
+                                <CodeBlock
+                                  code="https://qiuye-ui.vercel.app/components"
+                                  copyKey="component-browser"
+                                />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium mb-2">中国大陆镜像：</p>
+                                <CodeBlock
+                                  code="https://ui.qiuyedx.com/components"
+                                  copyKey="component-browser-cn"
+                                />
+                              </div>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
@@ -414,35 +483,35 @@ export default function App() {
                           <div className="grid gap-4">
                             {[
                               {
-                                command: "npx shadcn@latest init",
+                                command: `${getCommandPrefix()} shadcn@latest init`,
                                 description: "初始化 shadcn/ui 项目配置",
-                                example: "npx shadcn@latest init",
+                                example: generateCommand("npx shadcn@latest init"),
                               },
                               {
                                 command:
-                                  "npx shadcn@latest add @qiuye-ui/[component]",
+                                  `${getCommandPrefix()} shadcn@latest add @qiuye-ui/[component]`,
                                 description:
                                   "添加 QiuYe UI 组件（需配置注册表）",
                                 example:
-                                  "npx shadcn@latest add @qiuye-ui/animated-button",
+                                  generateCommand("npx shadcn@latest add @qiuye-ui/animated-button"),
                               },
                               {
-                                command: "npx shadcn@latest add [URL]",
+                                command: `${getCommandPrefix()} shadcn@latest add [URL]`,
                                 description: "直接使用URL添加组件",
                                 example:
-                                  "npx shadcn@latest add https://qiuye-ui.vercel.app/registry/animated-button.json",
+                                  generateCommand("npx shadcn@latest add https://qiuye-ui.vercel.app/registry/animated-button.json"),
                               },
                               {
                                 command:
-                                  "npx shadcn@latest add @qiuye-ui/[multiple]",
+                                  `${getCommandPrefix()} shadcn@latest add @qiuye-ui/[multiple]`,
                                 description: "批量添加多个组件",
                                 example:
-                                  "npx shadcn@latest add @qiuye-ui/gradient-card @qiuye-ui/typing-text",
+                                  generateCommand("npx shadcn@latest add @qiuye-ui/gradient-card @qiuye-ui/typing-text"),
                               },
                               {
-                                command: "npx shadcn@latest --help",
+                                command: `${getCommandPrefix()} shadcn@latest --help`,
                                 description: "查看CLI工具帮助信息",
-                                example: "npx shadcn@latest --help",
+                                example: generateCommand("npx shadcn@latest --help"),
                               },
                             ].map((item, index) => (
                               <div
@@ -491,7 +560,7 @@ export default function App() {
                                     @qiuye-ui/{component}
                                   </code>
                                   <CopyButton
-                                    text={`npx shadcn@latest add @qiuye-ui/${component}`}
+                                    text={generateCommand(`npx shadcn@latest add @qiuye-ui/${component}`)}
                                     copyKey={`component-${component}`}
                                   />
                                 </div>
@@ -559,15 +628,32 @@ export default function App() {
                               </code>
                               ：
                             </p>
-                            <CodeBlock
-                              code={`{
+                            <div className="space-y-3">
+                              <div>
+                                <p className="text-sm font-medium mb-2">国际域名（推荐）：</p>
+                                <CodeBlock
+                                  code={`{
   "registries": {
     "@qiuye-ui": "https://qiuye-ui.vercel.app/registry/{name}.json"
   }
 }`}
-                              language="json"
-                              copyKey="registry-config-final"
-                            />
+                                  language="json"
+                                  copyKey="registry-config-final"
+                                />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium mb-2">中国大陆镜像域名：</p>
+                                <CodeBlock
+                                  code={`{
+  "registries": {
+    "@qiuye-ui": "https://ui.qiuyedx.com/registry/{name}.json"
+  }
+}`}
+                                  language="json"
+                                  copyKey="registry-config-final-cn"
+                                />
+                              </div>
+                            </div>
                           </div>
 
                           <Separator />

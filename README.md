@@ -9,7 +9,7 @@
 
 ## ✨ 特性
 
-- 🚀 **一键CLI安装** - 使用 `npx shadcn@latest add @qiuye-ui/[component]` 命令一键安装组件
+- 🚀 **一键CLI安装** - 支持 npm (`npx`) 和 pnpm (`pnpm dlx`) 两种包管理器一键安装组件
 - 🎨 **精美设计** - 精心设计的自定义组件，提升应用视觉效果
 - 📦 **即插即用** - 无需复杂配置，安装后立即可用
 - 🔍 **组件浏览器** - 内置组件浏览页面，可视化查看组件效果
@@ -22,7 +22,10 @@
 
 ### 浏览组件
 
-访问 [组件浏览器](https://qiuye-ui.vercel.app/components) 查看所有可用组件和在线演示。
+访问组件浏览器查看所有可用组件和在线演示：
+
+- **国际域名**：[qiuye-ui.vercel.app/components](https://qiuye-ui.vercel.app/components)
+- **中国大陆镜像**：[ui.qiuyedx.com/components](https://ui.qiuyedx.com/components)
 
 ### 安装组件
 
@@ -30,10 +33,20 @@
 
 首先在 `components.json` 中添加注册表配置：
 
+**国际域名（推荐）：**
 ```json
 {
   "registries": {
     "@qiuye-ui": "https://qiuye-ui.vercel.app/registry/{name}.json"
+  }
+}
+```
+
+**中国大陆镜像域名：**
+```json
+{
+  "registries": {
+    "@qiuye-ui": "https://ui.qiuyedx.com/registry/{name}.json"
   }
 }
 ```
@@ -43,19 +56,33 @@
 ```bash
 # 安装单个组件
 npx shadcn@latest add @qiuye-ui/animated-button
+# 或使用 pnpm
+pnpm dlx shadcn@latest add @qiuye-ui/animated-button
 
 # 安装多个组件
 npx shadcn@latest add @qiuye-ui/animated-button @qiuye-ui/gradient-card @qiuye-ui/typing-text
+# 或使用 pnpm
+pnpm dlx shadcn@latest add @qiuye-ui/animated-button @qiuye-ui/gradient-card @qiuye-ui/typing-text
 ```
 
 #### 方式二：直接URL安装
 
 ```bash
-# 直接使用URL安装组件
+# 国际域名
 npx shadcn@latest add https://qiuye-ui.vercel.app/registry/animated-button.json
+# 或使用 pnpm
+pnpm dlx shadcn@latest add https://qiuye-ui.vercel.app/registry/animated-button.json
+
+# 中国大陆镜像域名
+npx shadcn@latest add https://ui.qiuyedx.com/registry/animated-button.json
+# 或使用 pnpm
+pnpm dlx shadcn@latest add https://ui.qiuyedx.com/registry/animated-button.json
 
 # 查看可用组件（访问在线浏览器）
+# 国际域名
 open https://qiuye-ui.vercel.app/components
+# 中国大陆镜像
+open https://ui.qiuyedx.com/components
 ```
 
 ### 使用组件
@@ -78,9 +105,9 @@ export default function App() {
 
 | 组件名称 | 描述 | 分类 | CLI命令 |
 |---------|------|-----|---------|
-| **Animated Button** | 带动画效果的按钮组件，支持多种动画风格 | 按钮 | `npx shadcn@latest add @qiuye-ui/animated-button` |
-| **Gradient Card** | 渐变色卡片组件，支持多种渐变主题 | 卡片 | `npx shadcn@latest add @qiuye-ui/gradient-card` |
-| **Typing Text** | 打字机效果文本组件，支持循环播放 | 文本 | `npx shadcn@latest add @qiuye-ui/typing-text` |
+| **Animated Button** | 带动画效果的按钮组件，支持多种动画风格 | 按钮 | `npx shadcn@latest add @qiuye-ui/animated-button`<br/>`pnpm dlx shadcn@latest add @qiuye-ui/animated-button` |
+| **Gradient Card** | 渐变色卡片组件，支持多种渐变主题 | 卡片 | `npx shadcn@latest add @qiuye-ui/gradient-card`<br/>`pnpm dlx shadcn@latest add @qiuye-ui/gradient-card` |
+| **Typing Text** | 打字机效果文本组件，支持循环播放 | 文本 | `npx shadcn@latest add @qiuye-ui/typing-text`<br/>`pnpm dlx shadcn@latest add @qiuye-ui/typing-text` |
 
 > 更多组件正在开发中...
 
@@ -91,7 +118,11 @@ export default function App() {
 首先确保您的项目已安装并配置了 shadcn/ui：
 
 ```bash
+# 使用 npm
 npx shadcn@latest init
+
+# 或使用 pnpm
+pnpm dlx shadcn@latest init
 ```
 
 ### 安装方法
@@ -100,10 +131,20 @@ npx shadcn@latest init
 
 在项目的 `components.json` 文件中添加秋夜组件库注册表：
 
+**国际域名（推荐）：**
 ```json
 {
   "registries": {
     "@qiuye-ui": "https://qiuye-ui.vercel.app/registry/{name}.json"
+  }
+}
+```
+
+**中国大陆镜像域名：**
+```json
+{
+  "registries": {
+    "@qiuye-ui": "https://ui.qiuyedx.com/registry/{name}.json"
   }
 }
 ```
@@ -113,9 +154,13 @@ npx shadcn@latest init
 ```bash
 # 安装单个组件
 npx shadcn@latest add @qiuye-ui/animated-button
+# 或使用 pnpm
+pnpm dlx shadcn@latest add @qiuye-ui/animated-button
 
 # 批量安装多个组件
 npx shadcn@latest add @qiuye-ui/animated-button @qiuye-ui/gradient-card @qiuye-ui/typing-text
+# 或使用 pnpm
+pnpm dlx shadcn@latest add @qiuye-ui/animated-button @qiuye-ui/gradient-card @qiuye-ui/typing-text
 ```
 
 #### 方式二：直接URL安装
@@ -123,11 +168,25 @@ npx shadcn@latest add @qiuye-ui/animated-button @qiuye-ui/gradient-card @qiuye-u
 如果不想配置注册表，可以直接使用URL安装组件：
 
 ```bash
-# 直接使用URL安装组件
+# 国际域名
 npx shadcn@latest add https://qiuye-ui.vercel.app/registry/animated-button.json
+# 或使用 pnpm
+pnpm dlx shadcn@latest add https://qiuye-ui.vercel.app/registry/animated-button.json
 
-# 批量安装（多个URL）
+# 中国大陆镜像域名
+npx shadcn@latest add https://ui.qiuyedx.com/registry/animated-button.json
+# 或使用 pnpm
+pnpm dlx shadcn@latest add https://ui.qiuyedx.com/registry/animated-button.json
+
+# 批量安装（多个URL） - 国际域名
 npx shadcn@latest add https://qiuye-ui.vercel.app/registry/gradient-card.json https://qiuye-ui.vercel.app/registry/typing-text.json
+# 或使用 pnpm
+pnpm dlx shadcn@latest add https://qiuye-ui.vercel.app/registry/gradient-card.json https://qiuye-ui.vercel.app/registry/typing-text.json
+
+# 批量安装（多个URL） - 中国大陆镜像
+npx shadcn@latest add https://ui.qiuyedx.com/registry/gradient-card.json https://ui.qiuyedx.com/registry/typing-text.json
+# 或使用 pnpm
+pnpm dlx shadcn@latest add https://ui.qiuyedx.com/registry/gradient-card.json https://ui.qiuyedx.com/registry/typing-text.json
 ```
 
 ### 常用命令
@@ -135,23 +194,46 @@ npx shadcn@latest add https://qiuye-ui.vercel.app/registry/gradient-card.json ht
 ```bash
 # 初始化 shadcn/ui（如果还没有）
 npx shadcn@latest init
+# 或使用 pnpm
+pnpm dlx shadcn@latest init
 
 # 方式一：使用注册表名称安装
 npx shadcn@latest add @qiuye-ui/[component-name]
+# 或使用 pnpm
+pnpm dlx shadcn@latest add @qiuye-ui/[component-name]
 
 # 方式二：使用完整URL安装
 npx shadcn@latest add https://qiuye-ui.vercel.app/registry/[component-name].json
+# 或使用中国大陆镜像
+npx shadcn@latest add https://ui.qiuyedx.com/registry/[component-name].json
+# 或使用 pnpm
+pnpm dlx shadcn@latest add https://qiuye-ui.vercel.app/registry/[component-name].json
+pnpm dlx shadcn@latest add https://ui.qiuyedx.com/registry/[component-name].json
 
 # 查看 CLI 帮助
 npx shadcn@latest --help
+# 或使用 pnpm
+pnpm dlx shadcn@latest --help
 ```
 
 ## 📚 文档
+
+### 国际域名
 
 - 🏠 [官网首页](https://qiuye-ui.vercel.app)
 - 🎨 [组件浏览器](https://qiuye-ui.vercel.app/components)
 - 💻 [CLI 使用指南](https://qiuye-ui.vercel.app/cli)
 - 🔌 [API 文档](https://qiuye-ui.vercel.app/api/components)
+
+### 中国大陆镜像
+
+- 🏠 [官网首页](https://ui.qiuyedx.com)
+- 🎨 [组件浏览器](https://ui.qiuyedx.com/components)
+- 💻 [CLI 使用指南](https://ui.qiuyedx.com/cli)
+- 🔌 [API 文档](https://ui.qiuyedx.com/api/components)
+
+### 其他
+
 - 🛠️ [新增自定义组件指南](#新增自定义组件)
 
 ## 🏗️ 本地开发
@@ -413,6 +495,8 @@ npm run update-registry:dry
 # 在目标项目的 components.json 中添加注册表配置
 # 然后安装您的新组件
 npx shadcn@latest add @qiuye-ui/my-component
+# 或使用 pnpm
+pnpm dlx shadcn@latest add @qiuye-ui/my-component
 
 # 验证文件是否正确生成
 ls src/components/qiuye-ui/my-component.tsx
@@ -423,6 +507,8 @@ ls src/components/qiuye-ui/my-component.tsx
 ```bash
 # 直接使用URL安装
 npx shadcn@latest add https://qiuye-ui.vercel.app/registry/my-component.json
+# 或使用 pnpm
+pnpm dlx shadcn@latest add https://qiuye-ui.vercel.app/registry/my-component.json
 
 # 验证文件是否正确生成
 ls src/components/qiuye-ui/my-component.tsx

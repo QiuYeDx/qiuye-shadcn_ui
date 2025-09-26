@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Copy, CheckCircle, Code } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useClipboard } from "use-clipboard-copy";
 import { toast } from "sonner";
 import { ComponentInfo } from "@/lib/registry";
@@ -33,9 +34,15 @@ interface CopyCommandButtonProps {
 export function CopyCommandButton({ cliName }: CopyCommandButtonProps) {
   const clipboard = useClipboard();
   const [copiedCommand, setCopiedCommand] = useState(false);
+  const [packageManager, setPackageManager] = useState<"npm" | "pnpm">("pnpm");
+
+  const generateCommand = () => {
+    const prefix = packageManager === "npm" ? "npx" : "pnpm dlx";
+    return `${prefix} shadcn@latest add @qiuye-ui/${cliName}`;
+  };
 
   const handleCopyCommand = () => {
-    const command = `npx shadcn@latest add @qiuye-ui/${cliName}`;
+    const command = generateCommand();
     clipboard.copy(command);
     setCopiedCommand(true);
     setTimeout(() => setCopiedCommand(false), 2000);
@@ -45,18 +52,35 @@ export function CopyCommandButton({ cliName }: CopyCommandButtonProps) {
   };
 
   return (
-    <Button 
-      onClick={handleCopyCommand}
-      className="w-full"
-      size="sm"
-    >
-      {copiedCommand ? (
-        <CheckCircle className="h-4 w-4 mr-2" />
-      ) : (
-        <Copy className="h-4 w-4 mr-2" />
-      )}
-      {copiedCommand ? "已复制" : "复制命令"}
-    </Button>
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-muted-foreground">包管理器:</span>
+        <Tabs value={packageManager} onValueChange={(value) => setPackageManager(value as "npm" | "pnpm")}>
+          <TabsList className="grid w-[140px] grid-cols-2 h-8">
+            <TabsTrigger value="npm" className="text-xs">npm</TabsTrigger>
+            <TabsTrigger value="pnpm" className="text-xs">pnpm</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+      
+      <div className="bg-muted/50 rounded-lg p-3">
+        <div className="flex items-center justify-between">
+          <code className="text-sm font-mono">{generateCommand()}</code>
+          <Button 
+            onClick={handleCopyCommand}
+            size="sm"
+            variant="ghost"
+            className="h-6 w-6 p-0"
+          >
+            {copiedCommand ? (
+              <CheckCircle className="h-3 w-3 text-green-500" />
+            ) : (
+              <Copy className="h-3 w-3" />
+            )}
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
 

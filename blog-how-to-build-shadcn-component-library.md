@@ -11,7 +11,7 @@
 ### 关键理解
 
 - **组件库这边**：先在`components/qiuye-ui/xxx.tsx`中写自定义组件，然后在`public/registry/xxx.json`中写这个自定义组件的注册表信息，注意`type`、`path`和`target`一定要写对，可以看下文的示例。最后执行`update-registry.mjs`脚本自动填充`content`。
-- **应用方**：建议在`components.json`中配置`registries`，这样即可使用`npx shadcn@latest add @qiuye-ui/xxx`命令来安装指定的自定义组件；如果不配置`registries`，那么也可以用`npx shadcn@latest add "https://<部署后的域名>/registry/xxx.json`（即`add`后写能访问到指定组件注册表json文件的路径）命令安装。
+- **应用方**：建议在`components.json`中配置`registries`，这样即可使用`npx shadcn@latest add @qiuye-ui/xxx`（或`pnpm dlx shadcn@latest add @qiuye-ui/xxx`）命令来安装指定的自定义组件；如果不配置`registries`，那么也可以用`npx shadcn@latest add "https://<部署后的域名>/registry/xxx.json`（即`add`后写能访问到指定组件注册表json文件的路径）命令安装。
 
 > 配置 registries 示例
 ```json
@@ -128,9 +128,13 @@ shadcn/ui 的 CLI 工具基于**注册表（Registry）**机制工作。每个�
 ```bash
 # 创建 Next.js 项目
 npx create-next-app@latest my-component-library --typescript --tailwind --app
+# 或使用 pnpm
+pnpm create next-app@latest my-component-library --typescript --tailwind --app
 
 # 安装 shadcn/ui
 npx shadcn@latest init
+# 或使用 pnpm
+pnpm dlx shadcn@latest init
 
 # 安装必要依赖
 npm install motion class-variance-authority clsx
@@ -559,9 +563,13 @@ vercel deploy --prod
 ```bash
 # 安装单个组件
 npx shadcn@latest add @your-lib/animated-button
+# 或使用 pnpm
+pnpm dlx shadcn@latest add @your-lib/animated-button
 
 # 批量安装
 npx shadcn@latest add @your-lib/animated-button @your-lib/gradient-card
+# 或使用 pnpm
+pnpm dlx shadcn@latest add @your-lib/animated-button @your-lib/gradient-card
 ```
 
 ### 3. 使用组件

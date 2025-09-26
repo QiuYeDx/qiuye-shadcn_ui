@@ -2,7 +2,7 @@
   "name": "qiuye-ui-components",
   "version": "1.0.0",
   "private": false,
-  "description": "精心设计的自定义UI组件库，基于 Shadcn/ui 构建，支持一键CLI安装",
+  "description": "精心设计的自定义UI组件库，基于 Shadcn/ui 构建，支持一键CLI安装。中国大陆用户可访问 ui.qiuyedx.com",
   "keywords": [
     "ui",
     "components",
@@ -15,7 +15,7 @@
   "homepage": "https://qiuye-ui.vercel.app",
   "repository": {
     "type": "git",
-    "url": "https://github.com/qiuye/qiuye-ui-components.git"
+    "url": "https://github.com/qiuyedx/qiuye-shadcn_ui.git"
   },
   "author": "秋夜 <qiuye@example.com>",
   "license": "MIT",
