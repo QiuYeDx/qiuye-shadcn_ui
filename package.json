@@ -12,12 +12,12 @@
     "shadcn",
     "typescript"
   ],
-  "homepage": "https://qiuye-ui.vercel.app",
+  "homepage": "https://ui.qiuyedx.com",
   "repository": {
     "type": "git",
     "url": "https://github.com/qiuyedx/qiuye-shadcn_ui.git"
   },
-  "author": "秋夜 <qiuye@example.com>",
+  "author": "QiuYeDx <me@qiuyedx.com>",
   "license": "MIT",
   "scripts": {
     "dev": "next dev --turbopack",
