@@ -1,15 +1,8 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import {
-  BookOpenIcon,
-  HomeIcon,
-  PaletteIcon,
-  PackageIcon,
-  CodeIcon,
-  TerminalIcon,
-  GitBranchIcon,
-} from "lucide-react"
+import * as React from "react";
+import Link from "next/link";
+import { HomeIcon, PaletteIcon, PackageIcon, TerminalIcon } from "lucide-react";
 
 import {
   Sidebar,
@@ -23,7 +16,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 // 菜单数据
 const data = {
@@ -49,7 +42,7 @@ const data = {
       description: "命令行工具使用指南",
     },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -65,7 +58,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </div>
         </div>
       </SidebarHeader>
-      
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>主要功能</SidebarGroupLabel>
@@ -74,17 +67,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               {data.navMain.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.description}>
-                    <a href={item.url}>
+                    <Link href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        
+
         <SidebarGroup>
           <SidebarGroupLabel>使用说明</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -92,10 +85,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               {data.navDevelopment.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.description}>
-                    <a href={item.url}>
+                    <Link href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -103,15 +96,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      
+
       <SidebarFooter>
         <div className="p-2 text-xs text-muted-foreground truncate">
           © 2025 QiuYe UI
         </div>
       </SidebarFooter>
-      
+
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }
-
