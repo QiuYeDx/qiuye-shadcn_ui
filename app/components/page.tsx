@@ -118,7 +118,7 @@ export default function ComponentsPage() {
   } as const;
 
   return (
-    <div className="container mx-auto px-6 py-8">
+    <div className="@container container mx-auto px-6 py-8">
       {/* Header */}
       <div className="mb-8">
         <motion.div
@@ -232,7 +232,7 @@ export default function ComponentsPage() {
           // 网格：父先、子后；移除子项时播放 exit
           <motion.div
             key="grid"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 @xl:grid-cols-2 @4xl:grid-cols-3 gap-6"
             variants={gridVariants}
             initial="hidden"
             animate="show"
@@ -293,7 +293,7 @@ function ComponentCard({
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <CardTitle className="text-lg mb-2">{component.name}</CardTitle>
-            <CardDescription className="text-sm line-clamp-2">
+            <CardDescription className="text-sm line-clamp-2 h-[40px]">
               {component.description}
             </CardDescription>
           </div>
