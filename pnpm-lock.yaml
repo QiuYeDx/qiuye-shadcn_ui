@@ -71,6 +71,9 @@ dependencies:
   '@react-spring/web':
     specifier: ^9.7.5
     version: 9.7.5(react-dom@19.1.0)(react@19.1.0)
+  '@vercel/analytics':
+    specifier: ^1.5.0
+    version: 1.5.0(next@15.5.3)(react@19.1.0)
   ahooks:
     specifier: ^3.7.10
     version: 3.9.5(react-dom@19.1.0)(react@19.1.0)
@@ -2276,6 +2279,36 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@vercel/analytics@1.5.0(next@15.5.3)(react@19.1.0):
+    resolution: {integrity: sha512-MYsBzfPki4gthY5HnYN7jgInhAZ7Ac1cYDoRWFomwGHWEX7odTEzbtg9kf/QSo7XEsEAqlQugA6gJ2WS2DEa3g==}
+    peerDependencies:
+      '@remix-run/react': ^2
+      '@sveltejs/kit': ^1 || ^2
+      next: '>= 13'
+      react: ^18 || ^19 || ^19.0.0-rc
+      svelte: '>= 4'
+      vue: ^3
+      vue-router: ^4
+    peerDependenciesMeta:
+      '@remix-run/react':
+        optional: true
+      '@sveltejs/kit':
+        optional: true
+      next:
+        optional: true
+      react:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+      vue-router:
+        optional: true
+    dependencies:
+      next: 15.5.3(react-dom@19.1.0)(react@19.1.0)
+      react: 19.1.0
+    dev: false
 
   /@xobotyi/scrollbar-width@1.9.5:
     resolution: {integrity: sha512-N8tkAACJx2ww8vFMneJmaAgmjAG1tnVBZJRLRcx061tmsLRZHSEZSLuGWnwPtunsSLvSqXQ2wfp7Mgqg1I+2dQ==}

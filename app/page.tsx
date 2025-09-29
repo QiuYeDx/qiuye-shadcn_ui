@@ -214,7 +214,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ amount: 0.5, once: true, margin: "0px 0px -15% 0px" }}
           >
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               为什么选择QiuYe UI？
