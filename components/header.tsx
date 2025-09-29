@@ -42,7 +42,7 @@ export function Header() {
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-      <div className="container flex h-14 items-center">
+      <div className="container flex h-14 items-center max-w-none">
         <div className="mr-4 hidden md:flex items-center">
           <SidebarTrigger className="ml-2 mr-1 size-9 cursor-pointer" />
           <Link
