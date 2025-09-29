@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Search, Package, Copy, CheckCircle } from "lucide-react";
 import { motion, stagger, AnimatePresence } from "motion/react";
@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ResponsiveTabs, type TabItem } from "@/components/qiuye-ui/responsive-tabs";
 import {
   getAllComponents,
   getCategories,
@@ -34,6 +35,15 @@ export default function ComponentsPage() {
 
   const allComponents = getAllComponents();
   const categories = getCategories();
+
+  // 将分类数据转换为 ResponsiveTabs 需要的格式
+  const categoryItems: TabItem[] = [
+    { value: "all", label: "全部" },
+    ...categories.map((category) => ({
+      value: category,
+      label: category,
+    })),
+  ];
 
   // 根据搜索和分类过滤组件
   const filteredComponents = searchQuery
@@ -104,27 +114,6 @@ export default function ComponentsPage() {
     },
   } as const;
 
-  // ====== 移动端 Tabs 优化：滚动 + 自动滚动到激活项 ======
-  const listRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const container = listRef.current;
-    if (!container) return;
-    const active = container.querySelector<HTMLElement>(
-      '[data-state="active"]'
-    );
-    if (!active) return;
-    active.scrollIntoView({
-      behavior: "smooth",
-      inline: "center",
-      block: "nearest",
-    });
-  }, [selectedCategory]);
-
-  function cn(...classes: (string | false | null | undefined)[]) {
-    return classes.filter(Boolean).join(" ");
-  }
-  // =====================================================
 
   return (
     <div className="container mx-auto px-6 py-8">
@@ -197,39 +186,17 @@ export default function ComponentsPage() {
           </div>
         </div>
 
-        <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-          {/* 让滚动在视觉上与 container 边缘对齐，可按外层 padding 调整 */}
-          <div className="-mx-6 px-6">
-            <TabsList
-              ref={listRef}
-              className={cn(
-                "w-full gap-1",
-                // 小屏：横向滚动的胶囊 Tabs
-                "flex overflow-x-auto scroll-smooth whitespace-nowrap sm:overflow-visible",
-                // 隐藏滚动条（Firefox / Edge / WebKit）
-                "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
-                // 大屏：恢复为网格
-                "sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
-              )}
-            >
-              <TabsTrigger
-                value="all"
-                className="text-xs shrink-0 px-3 sm:px-2"
-              >
-                全部
-              </TabsTrigger>
-              {categories.map((category) => (
-                <TabsTrigger
-                  key={category}
-                  value={category}
-                  className="text-xs shrink-0 px-3 sm:px-2"
-                >
-                  {category}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </div>
-        </Tabs>
+        <div className="-mx-6 px-6">
+          <ResponsiveTabs
+            value={selectedCategory}
+            onValueChange={setSelectedCategory}
+            items={categoryItems}
+            gridColsClass="sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
+            triggerClassName="text-xs"
+          >
+            <div></div>
+          </ResponsiveTabs>
+        </div>
       </motion.div>
 
       {/* Components Grid / Empty State 切换：带离场 */}

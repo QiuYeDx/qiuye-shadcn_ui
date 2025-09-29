@@ -70,7 +70,6 @@ const simpleDemoComponents = {
   [ComponentId.RESPONSIVE_TABS]: ResponsiveTabsSimpleDemo,
 };
 
-
 // 简单的演示预览组件
 function DemoPreview({
   componentId,
@@ -104,11 +103,7 @@ function DemoPreview({
 }
 
 // 简单的代码块组件
-function CodeBlock({
-  component,
-}: {
-  component: ComponentInfo;
-}) {
+function CodeBlock({ component }: { component: ComponentInfo }) {
   // 从组件信息中获取基础用法示例
   const example = component.basicUsage;
 
@@ -198,7 +193,7 @@ export default async function ComponentDetailPage({
         </div>
 
         {/* 主体布局：12 栅格 */}
-        <div className="grid gap-6 lg:grid-cols-12">
+        <div className="grid gap-6 grid-cols-1 lg:grid-cols-12">
           {/* 主内容列 */}
           <div className="lg:col-span-8 xl:col-span-9">
             <h1 className="text-3xl lg:text-4xl font-bold tracking-tight mb-3 lg:mb-4">
@@ -240,11 +235,6 @@ export default async function ComponentDetailPage({
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <div className="bg-muted/50 rounded-md p-3">
-                    <code className="text-xs lg:text-sm font-mono break-all">
-                      npx shadcn@latest add @qiuye-ui/{component.cliName}
-                    </code>
-                  </div>
                   <CopyCommandButton cliName={component.cliName} />
                 </CardContent>
               </Card>
