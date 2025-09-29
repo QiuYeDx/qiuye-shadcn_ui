@@ -301,7 +301,9 @@ export function ResponsiveTabsDemo() {
       <Card>
         <CardHeader>
           <CardTitle>渐变遮罩效果</CardTitle>
-          <CardDescription>在scroll模式下展示左右渐变遮罩，提示更多内容</CardDescription>
+          <CardDescription>
+            在scroll模式下展示左右渐变遮罩，提示更多内容
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveTabs
@@ -351,12 +353,21 @@ export function ResponsiveTabsDemo() {
             </TabsContent>
             {/* 其他tab content */}
             {[
-              "tutorials", "api-reference", "changelog", "best-practices", 
-              "troubleshooting", "community", "support", "enterprise", "pricing"
-            ].map(value => (
+              "tutorials",
+              "api-reference",
+              "changelog",
+              "best-practices",
+              "troubleshooting",
+              "community",
+              "support",
+              "enterprise",
+              "pricing",
+            ].map((value) => (
               <TabsContent key={value} value={value} className="mt-4">
                 <div className="rounded-lg border p-4">
-                  <h3 className="font-semibold capitalize">{value.replace("-", " ")}</h3>
+                  <h3 className="font-semibold capitalize">
+                    {value.replace("-", " ")}
+                  </h3>
                   <p className="mt-2 text-sm text-muted-foreground">
                     {value} 相关内容...
                   </p>
@@ -512,12 +523,16 @@ export function ResponsiveTabsDemo() {
               {playFadeMasks ? "渐变遮罩已开" : "渐变遮罩已关"}
             </Button>
 
-            <span className="text-sm text-muted-foreground">遮罩宽度(px)：</span>
+            <span className="text-sm text-muted-foreground">
+              遮罩宽度(px)：
+            </span>
             <Input
               className="h-8 w-20"
               type="number"
               value={playFadeMaskWidth}
-              onChange={(e) => setPlayFadeMaskWidth(Number(e.target.value || 64))}
+              onChange={(e) =>
+                setPlayFadeMaskWidth(Number(e.target.value || 64))
+              }
               disabled={!playFadeMasks}
             />
 

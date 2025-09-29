@@ -16,7 +16,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ResponsiveTabs, type TabItem } from "@/components/qiuye-ui/responsive-tabs";
+import {
+  ResponsiveTabs,
+  type TabItem,
+} from "@/components/qiuye-ui/responsive-tabs";
 import {
   getAllComponents,
   getCategories,
@@ -114,7 +117,6 @@ export default function ComponentsPage() {
     },
   } as const;
 
-
   return (
     <div className="container mx-auto px-6 py-8">
       {/* Header */}
@@ -174,13 +176,22 @@ export default function ComponentsPage() {
               className="pl-10"
             />
           </div>
-          
+
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">包管理器:</span>
-            <Tabs value={packageManager} onValueChange={(value) => setPackageManager(value as "npm" | "pnpm")}>
+            <Tabs
+              value={packageManager}
+              onValueChange={(value) =>
+                setPackageManager(value as "npm" | "pnpm")
+              }
+            >
               <TabsList className="grid w-[140px] grid-cols-2 h-9">
-                <TabsTrigger value="npm" className="text-xs">npm</TabsTrigger>
-                <TabsTrigger value="pnpm" className="text-xs">pnpm</TabsTrigger>
+                <TabsTrigger value="npm" className="text-xs">
+                  npm
+                </TabsTrigger>
+                <TabsTrigger value="pnpm" className="text-xs">
+                  pnpm
+                </TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
@@ -258,7 +269,11 @@ interface ComponentCardProps {
 }
 
 // 精简后的子组件：不再包一个 motion.div，动画交给父级
-function ComponentCard({ component, onCopyCommand, packageManager }: ComponentCardProps) {
+function ComponentCard({
+  component,
+  onCopyCommand,
+  packageManager,
+}: ComponentCardProps) {
   const [copied, setCopied] = useState(false);
 
   const generateCommand = (componentId: string) => {

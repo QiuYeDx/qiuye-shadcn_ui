@@ -12,7 +12,7 @@ import { ComponentInfo } from "@/lib/registry";
 // 返回按钮组件
 export function BackButton() {
   const router = useRouter();
-  
+
   return (
     <Button
       variant="ghost"
@@ -55,18 +55,25 @@ export function CopyCommandButton({ cliName }: CopyCommandButtonProps) {
     <div className="space-y-3">
       <div className="flex items-center gap-2">
         <span className="text-sm text-muted-foreground">包管理器:</span>
-        <Tabs value={packageManager} onValueChange={(value) => setPackageManager(value as "npm" | "pnpm")}>
+        <Tabs
+          value={packageManager}
+          onValueChange={(value) => setPackageManager(value as "npm" | "pnpm")}
+        >
           <TabsList className="grid w-[140px] grid-cols-2 h-8">
-            <TabsTrigger value="npm" className="text-xs">npm</TabsTrigger>
-            <TabsTrigger value="pnpm" className="text-xs">pnpm</TabsTrigger>
+            <TabsTrigger value="npm" className="text-xs">
+              npm
+            </TabsTrigger>
+            <TabsTrigger value="pnpm" className="text-xs">
+              pnpm
+            </TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
-      
+
       <div className="bg-muted/50 rounded-lg p-3">
         <div className="flex items-center justify-between">
           <code className="text-sm font-mono">{generateCommand()}</code>
-          <Button 
+          <Button
             onClick={handleCopyCommand}
             size="sm"
             variant="ghost"
@@ -90,7 +97,10 @@ interface CopyCodeButtonProps {
   cliName: string;
 }
 
-export function CopyCodeButton({ componentName, cliName }: CopyCodeButtonProps) {
+export function CopyCodeButton({
+  componentName,
+  cliName,
+}: CopyCodeButtonProps) {
   const clipboard = useClipboard();
   const [copiedCode, setCopiedCode] = useState(false);
 
@@ -105,7 +115,7 @@ export function CopyCodeButton({ componentName, cliName }: CopyCodeButtonProps) 
   };
 
   return (
-    <Button 
+    <Button
       onClick={handleCopyCode}
       variant="outline"
       className="w-full"
@@ -126,7 +136,9 @@ interface CopyDependencyButtonProps {
   dependency: string;
 }
 
-export function CopyDependencyButton({ dependency }: CopyDependencyButtonProps) {
+export function CopyDependencyButton({
+  dependency,
+}: CopyDependencyButtonProps) {
   const clipboard = useClipboard();
 
   const handleCopyDependency = () => {
@@ -137,11 +149,7 @@ export function CopyDependencyButton({ dependency }: CopyDependencyButtonProps) 
   };
 
   return (
-    <Button
-      variant="ghost"
-      size="sm"
-      onClick={handleCopyDependency}
-    >
+    <Button variant="ghost" size="sm" onClick={handleCopyDependency}>
       <Copy className="h-4 w-4" />
     </Button>
   );
@@ -152,7 +160,9 @@ interface CopyAllDependenciesButtonProps {
   dependencies: string[];
 }
 
-export function CopyAllDependenciesButton({ dependencies }: CopyAllDependenciesButtonProps) {
+export function CopyAllDependenciesButton({
+  dependencies,
+}: CopyAllDependenciesButtonProps) {
   const clipboard = useClipboard();
 
   const handleCopyAllDependencies = () => {
@@ -164,10 +174,7 @@ export function CopyAllDependenciesButton({ dependencies }: CopyAllDependenciesB
   };
 
   return (
-    <Button
-      variant="outline"
-      onClick={handleCopyAllDependencies}
-    >
+    <Button variant="outline" onClick={handleCopyAllDependencies}>
       <Copy className="h-4 w-4 mr-2" />
       复制安装命令
     </Button>

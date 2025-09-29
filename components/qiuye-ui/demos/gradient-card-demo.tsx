@@ -1,7 +1,13 @@
 "use client";
 
 import { GradientCard } from "../gradient-card";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -11,9 +17,7 @@ export function GradientCardDemo() {
       <Card>
         <CardHeader>
           <CardTitle>渐变主题</CardTitle>
-          <CardDescription>
-            不同颜色的渐变卡片
-          </CardDescription>
+          <CardDescription>不同颜色的渐变卡片</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <GradientCard gradient="blue">
@@ -23,7 +27,7 @@ export function GradientCardDemo() {
             </p>
             <Badge variant="secondary">科技感</Badge>
           </GradientCard>
-          
+
           <GradientCard gradient="purple">
             <h3 className="text-lg font-semibold mb-2">紫色主题</h3>
             <p className="text-sm text-muted-foreground mb-4">
@@ -31,7 +35,7 @@ export function GradientCardDemo() {
             </p>
             <Badge variant="secondary">创意</Badge>
           </GradientCard>
-          
+
           <GradientCard gradient="pink">
             <h3 className="text-lg font-semibold mb-2">粉色主题</h3>
             <p className="text-sm text-muted-foreground mb-4">
@@ -39,7 +43,7 @@ export function GradientCardDemo() {
             </p>
             <Badge variant="secondary">时尚</Badge>
           </GradientCard>
-          
+
           <GradientCard gradient="orange">
             <h3 className="text-lg font-semibold mb-2">橙色主题</h3>
             <p className="text-sm text-muted-foreground mb-4">
@@ -47,7 +51,7 @@ export function GradientCardDemo() {
             </p>
             <Badge variant="secondary">活力</Badge>
           </GradientCard>
-          
+
           <GradientCard gradient="green">
             <h3 className="text-lg font-semibold mb-2">绿色主题</h3>
             <p className="text-sm text-muted-foreground mb-4">
@@ -61,9 +65,7 @@ export function GradientCardDemo() {
       <Card>
         <CardHeader>
           <CardTitle>渐变强度</CardTitle>
-          <CardDescription>
-            同一主题下不同强度的渐变效果
-          </CardDescription>
+          <CardDescription>同一主题下不同强度的渐变效果</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <GradientCard gradient="blue" intensity="light">
@@ -71,23 +73,29 @@ export function GradientCardDemo() {
             <p className="text-sm text-muted-foreground mb-4">
               subtle 和柔和的渐变效果，适合简约设计。
             </p>
-            <Button variant="outline" size="sm">查看详情</Button>
+            <Button variant="outline" size="sm">
+              查看详情
+            </Button>
           </GradientCard>
-          
+
           <GradientCard gradient="blue" intensity="medium">
             <h3 className="text-lg font-semibold mb-2">中度渐变</h3>
             <p className="text-sm text-muted-foreground mb-4">
               平衡的渐变效果，大多数场景的最佳选择。
             </p>
-            <Button variant="outline" size="sm">查看详情</Button>
+            <Button variant="outline" size="sm">
+              查看详情
+            </Button>
           </GradientCard>
-          
+
           <GradientCard gradient="blue" intensity="strong">
             <h3 className="text-lg font-semibold mb-2">强烈渐变</h3>
             <p className="text-sm text-muted-foreground mb-4">
               鲜明的渐变效果，适合需要突出显示的内容。
             </p>
-            <Button variant="outline" size="sm">查看详情</Button>
+            <Button variant="outline" size="sm">
+              查看详情
+            </Button>
           </GradientCard>
         </CardContent>
       </Card>
@@ -95,9 +103,7 @@ export function GradientCardDemo() {
       <Card>
         <CardHeader>
           <CardTitle>实际应用场景</CardTitle>
-          <CardDescription>
-            在真实项目中的使用示例
-          </CardDescription>
+          <CardDescription>在真实项目中的使用示例</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <GradientCard gradient="purple" className="p-8">
@@ -112,7 +118,7 @@ export function GradientCardDemo() {
               <Button className="w-full">立即体验</Button>
             </div>
           </GradientCard>
-          
+
           <GradientCard gradient="green" className="p-8">
             <div className="text-center">
               <div className="w-12 h-12 bg-white/20 rounded-full mx-auto mb-4 flex items-center justify-center">

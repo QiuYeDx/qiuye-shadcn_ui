@@ -1,4 +1,8 @@
-import { ComponentId, basicUsageExamples, type BasicUsageExample } from './component-constants';
+import {
+  ComponentId,
+  basicUsageExamples,
+  type BasicUsageExample,
+} from "./component-constants";
 
 export interface ComponentInfo {
   name: string;

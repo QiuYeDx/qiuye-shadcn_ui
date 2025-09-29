@@ -6,10 +6,10 @@
 // 组件 ID 枚举
 // TODO: 新增自定义组件时需要更新这里
 export enum ComponentId {
-  ANIMATED_BUTTON = 'animated-button',
-  GRADIENT_CARD = 'gradient-card',
-  TYPING_TEXT = 'typing-text',
-  RESPONSIVE_TABS = 'responsive-tabs',
+  ANIMATED_BUTTON = "animated-button",
+  GRADIENT_CARD = "gradient-card",
+  TYPING_TEXT = "typing-text",
+  RESPONSIVE_TABS = "responsive-tabs",
 }
 
 // 组件 ID 数组，方便遍历
@@ -69,6 +69,8 @@ return (
 };
 
 // 获取基础使用示例的辅助函数
-export function getBasicUsageExample(componentId: string): BasicUsageExample | null {
+export function getBasicUsageExample(
+  componentId: string
+): BasicUsageExample | null {
   return basicUsageExamples[componentId as ComponentId] || null;
 }

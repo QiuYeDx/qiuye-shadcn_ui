@@ -28,8 +28,7 @@ import {
 const features = [
   {
     title: "一键CLI安装",
-    description:
-      "支持 npm 和 pnpm 两种包管理器，一键安装组件到您的项目",
+    description: "支持 npm 和 pnpm 两种包管理器，一键安装组件到您的项目",
     icon: CodeIcon,
   },
   {

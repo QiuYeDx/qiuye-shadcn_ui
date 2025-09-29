@@ -10,9 +10,7 @@ import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
 export function AnimatedButtonSimpleDemo() {
   return (
     <div className="flex justify-center">
-      <AnimatedButton animation="bounce">
-        点击我试试
-      </AnimatedButton>
+      <AnimatedButton animation="bounce">点击我试试</AnimatedButton>
     </div>
   );
 }
@@ -37,8 +35,8 @@ export function GradientCardSimpleDemo() {
 export function TypingTextSimpleDemo() {
   return (
     <div className="flex justify-center">
-      <TypingText 
-        text="Hello, 这是打字效果演示！" 
+      <TypingText
+        text="Hello, 这是打字效果演示！"
         className="text-lg font-mono"
         speed={150}
       />
@@ -54,7 +52,7 @@ export function ResponsiveTabsSimpleDemo() {
     { value: "tab2", label: "标签二" },
     { value: "tab3", label: "标签三" },
   ];
-  
+
   return (
     <ResponsiveTabs value={value} onValueChange={setValue} items={items}>
       <div className="p-4 border rounded-md">
