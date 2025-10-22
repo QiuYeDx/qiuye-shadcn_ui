@@ -6,14 +6,13 @@ import {
   CodeIcon,
   LayersIcon,
   PaletteIcon,
-  RocketIcon,
   SparklesIcon,
   StarIcon,
   ZapIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { motion, useInView } from "motion/react";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getAllComponents } from "@/lib/registry";
 
 const features = [
   {
@@ -56,13 +56,6 @@ const features = [
     description: "完整的TypeScript类型定义，提供优秀的开发体验",
     icon: LayersIcon,
   },
-];
-
-const stats = [
-  { label: "自定义组件", value: "3+", numericValue: 3 },
-  { label: "CLI支持", value: "✓", numericValue: null },
-  { label: "TypeScript", value: "100%", numericValue: 100 },
-  { label: "开源免费", value: "✓", numericValue: null },
 ];
 
 // 计数器组件
@@ -102,6 +95,22 @@ function Counter({
 }
 
 export default function Home() {
+  // 动态获取组件数量
+  const componentCount = useMemo(() => getAllComponents().length, []);
+  const stats = useMemo(
+    () => [
+      {
+        label: "自定义组件",
+        value: `${componentCount}+`,
+        numericValue: componentCount,
+      },
+      { label: "CLI支持", value: "✓", numericValue: null },
+      { label: "TypeScript", value: "100%", numericValue: 100 },
+      { label: "开源免费", value: "✓", numericValue: null },
+    ],
+    [componentCount]
+  );
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}

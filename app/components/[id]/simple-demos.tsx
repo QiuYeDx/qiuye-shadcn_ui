@@ -88,18 +88,13 @@ export function ScrollableDialogSimpleDemo() {
 
         <ScrollableDialogContent>
           <div className="space-y-4">
-            <p>这是对话框的内容区域。</p>
-            <p>当内容超过设定高度时会出现滚动条。</p>
-            <p>头部和底部始终保持可见。</p>
-            <p>这是对话框的内容区域。</p>
-            <p>当内容超过设定高度时会出现滚动条。</p>
-            <p>头部和底部始终保持可见。</p>
-            <p>这是对话框的内容区域。</p>
-            <p>当内容超过设定高度时会出现滚动条。</p>
-            <p>头部和底部始终保持可见。</p>
-            <p>这是对话框的内容区域。</p>
-            <p>当内容超过设定高度时会出现滚动条。</p>
-            <p>头部和底部始终保持可见。</p>
+            {Array.from({ length: 10 }).map((_, index) => (
+              <React.Fragment key={index}>
+                <p>这是对话框的内容区域。</p>
+                <p>当内容超过设定高度时会出现滚动条。</p>
+                <p>头部和底部始终保持可见。</p>
+              </React.Fragment>
+            ))}
           </div>
         </ScrollableDialogContent>
 
