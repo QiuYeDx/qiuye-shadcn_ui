@@ -10,6 +10,7 @@ export enum ComponentId {
   GRADIENT_CARD = "gradient-card",
   TYPING_TEXT = "typing-text",
   RESPONSIVE_TABS = "responsive-tabs",
+  SCROLLABLE_DIALOG = "scrollable-dialog",
 }
 
 // 组件 ID 数组，方便遍历
@@ -64,6 +65,40 @@ return (
       {value === "tab2" && <div>标签二的内容</div>}
     </div>
   </ResponsiveTabs>
+);`,
+  },
+  [ComponentId.SCROLLABLE_DIALOG]: {
+    import: `import {
+  ScrollableDialog,
+  ScrollableDialogHeader,
+  ScrollableDialogContent,
+  ScrollableDialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/qiuye-ui/scrollable-dialog";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";`,
+    usage: `const [open, setOpen] = useState(false);
+
+return (
+  <>
+    <Button onClick={() => setOpen(true)}>打开对话框</Button>
+    <ScrollableDialog open={open} onOpenChange={setOpen}>
+      <ScrollableDialogHeader>
+        <DialogTitle>标题</DialogTitle>
+        <DialogDescription>描述</DialogDescription>
+      </ScrollableDialogHeader>
+      
+      <ScrollableDialogContent>
+        {/* 可滚动的内容 */}
+        <p>这里是对话框的内容</p>
+      </ScrollableDialogContent>
+      
+      <ScrollableDialogFooter>
+        <Button onClick={() => setOpen(false)}>确认</Button>
+      </ScrollableDialogFooter>
+    </ScrollableDialog>
+  </>
 );`,
   },
 };

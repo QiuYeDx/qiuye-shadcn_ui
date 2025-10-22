@@ -297,6 +297,68 @@ export const componentRegistry: ComponentRegistry = {
     cliName: "responsive-tabs",
     basicUsage: basicUsageExamples[ComponentId.RESPONSIVE_TABS],
   },
+
+  [ComponentId.SCROLLABLE_DIALOG]: {
+    name: "Scrollable Dialog",
+    description:
+      "可滚动对话框组件：头部和底部固定，内容区域可滚动，支持自定义高度，适用于需要展示大量内容的场景。",
+    category: "弹窗",
+    dependencies: ["react"],
+    files: {
+      component: "components/qiuye-ui/scrollable-dialog.tsx",
+      demo: "components/qiuye-ui/demos/scrollable-dialog-demo.tsx",
+    },
+    props: [
+      {
+        name: "open",
+        type: "boolean",
+        description: "对话框是否打开",
+        required: true,
+      },
+      {
+        name: "onOpenChange",
+        type: "(open: boolean) => void",
+        description: "对话框打开状态改变的回调函数",
+        required: true,
+      },
+      {
+        name: "children",
+        type: "React.ReactNode",
+        description: "对话框内容（通常包含 Header、Content、Footer）",
+        required: false,
+      },
+      {
+        name: "className",
+        type: "string",
+        description: "内部容器的额外类名",
+        required: false,
+      },
+      {
+        name: "contentClassName",
+        type: "string",
+        description: "DialogContent 的额外类名",
+        required: false,
+      },
+      {
+        name: "onOpenAutoFocus",
+        type: "(e: Event) => void",
+        description: "对话框打开时自动聚焦的回调",
+        required: false,
+      },
+      {
+        name: "maxHeight (ScrollableDialogContent)",
+        type: "string",
+        description: "内容区域的最大高度",
+        required: false,
+        default: "440px",
+      },
+    ],
+    version: "1.0.0",
+    author: "QiuYeDx",
+    tags: ["dialog", "modal", "scrollable", "popup", "overlay", "shadcn"],
+    cliName: "scrollable-dialog",
+    basicUsage: basicUsageExamples[ComponentId.SCROLLABLE_DIALOG],
+  },
 };
 
 // 获取所有组件分类

@@ -45,6 +45,7 @@ import { AnimatedButtonDemo } from "@/components/qiuye-ui/demos/animated-button-
 import { GradientCardDemo } from "@/components/qiuye-ui/demos/gradient-card-demo";
 import { TypingTextDemo } from "@/components/qiuye-ui/demos/typing-text-demo";
 import { ResponsiveTabsDemo } from "@/components/qiuye-ui/demos/responsive-tabs-demo";
+import { ScrollableDialogDemo } from "@/components/qiuye-ui/demos/scrollable-dialog-demo";
 
 // TODO: 新增 qiuye-ui 自定义组件时需要完善 demo 文件
 const demoComponents = {
@@ -52,6 +53,7 @@ const demoComponents = {
   [ComponentId.GRADIENT_CARD]: GradientCardDemo,
   [ComponentId.TYPING_TEXT]: TypingTextDemo,
   [ComponentId.RESPONSIVE_TABS]: ResponsiveTabsDemo,
+  [ComponentId.SCROLLABLE_DIALOG]: ScrollableDialogDemo,
 };
 
 // 导入简单演示组件
@@ -60,6 +62,7 @@ import {
   GradientCardSimpleDemo,
   TypingTextSimpleDemo,
   ResponsiveTabsSimpleDemo,
+  ScrollableDialogSimpleDemo,
 } from "./simple-demos";
 
 // 精简的单例演示组件
@@ -68,6 +71,7 @@ const simpleDemoComponents = {
   [ComponentId.GRADIENT_CARD]: GradientCardSimpleDemo,
   [ComponentId.TYPING_TEXT]: TypingTextSimpleDemo,
   [ComponentId.RESPONSIVE_TABS]: ResponsiveTabsSimpleDemo,
+  [ComponentId.SCROLLABLE_DIALOG]: ScrollableDialogSimpleDemo,
 };
 
 // 简单的演示预览组件
