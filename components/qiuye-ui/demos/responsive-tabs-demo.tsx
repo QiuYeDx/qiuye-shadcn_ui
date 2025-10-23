@@ -31,8 +31,164 @@ import {
   Plus,
   Minus,
 } from "lucide-react";
+import { ViewSourceButton } from "@/components/view-source-button";
 
 type LayoutMode = "responsive" | "scroll" | "grid";
+
+// 源码数据
+const sourceCodes = {
+  basic: `const basicItems: TabItem[] = [
+  { value: "all", label: "全部" },
+  { value: "forms", label: "表单组件" },
+  { value: "data", label: "数据展示" },
+  // ...更多项
+];
+
+<ResponsiveTabs
+  value={basicTab}
+  onValueChange={setBasicTab}
+  items={basicItems}
+>
+  <TabsContent value="all" className="mt-4">
+    <div className="rounded-lg border p-4">
+      <h3 className="font-semibold">全部组件</h3>
+      <p className="mt-2 text-sm text-muted-foreground">
+        这里显示所有可用的组件...
+      </p>
+    </div>
+  </TabsContent>
+  {/* 更多 TabsContent */}
+</ResponsiveTabs>`,
+
+  withIcon: `const iconItems: TabItem[] = [
+  { value: "home", label: "首页", icon: <Home className="h-4 w-4" /> },
+  { value: "profile", label: "个人资料", icon: <User className="h-4 w-4" /> },
+  { value: "settings", label: "设置", icon: <Settings className="h-4 w-4" /> },
+  // ...更多项
+];
+
+<ResponsiveTabs
+  value={iconTab}
+  onValueChange={setIconTab}
+  items={iconItems}
+  gridColsClass="sm:grid-cols-5"
+>
+  {/* TabsContent */}
+</ResponsiveTabs>`,
+
+  fadeMasks: `<ResponsiveTabs
+  value={customTab}
+  onValueChange={setCustomTab}
+  items={[
+    { value: "docs", label: "文档" },
+    { value: "components", label: "组件库" },
+    // ...更多项
+  ]}
+  layout="scroll"
+  fadeMasks={true}
+  fadeMaskWidth={40}
+>
+  <TabsContent value="docs" className="mt-4">
+    <div className="rounded-lg border p-4">
+      <h3 className="font-semibold">文档</h3>
+      <p className="mt-2 text-sm text-muted-foreground">
+        注意观察左右两侧的渐变遮罩效果
+      </p>
+    </div>
+  </TabsContent>
+</ResponsiveTabs>`,
+
+  withBadge: `const badgeItems: TabItem[] = [
+  { value: "forms", label: "表单", badge: 12 },
+  { value: "data", label: "数据", badge: "新", icon: <Star className="h-4 w-4" /> },
+  { value: "layout", label: "布局", disabled: true },
+  // ...更多项
+];
+
+<ResponsiveTabs
+  value={badgeTab}
+  onValueChange={setBadgeTab}
+  items={badgeItems}
+  scrollStep={150}
+  gridColsClass="sm:grid-cols-4 lg:grid-cols-6"
+>
+  {/* TabsContent */}
+</ResponsiveTabs>`,
+
+  playground: `// 动态配置演示
+<ResponsiveTabs
+  value={playTab}
+  onValueChange={setPlayTab}
+  items={playItems}
+  layout={playLayout}          // "responsive" | "scroll" | "grid"
+  scrollStep={playScrollStep}   // 滚动步长
+  fadeMasks={playFadeMasks}     // 渐变遮罩
+  fadeMaskWidth={playFadeMaskWidth}
+  gridColsClass="sm:grid-cols-6 xl:grid-cols-8"
+  triggerClassName="text-xs"
+>
+  {/* 内容 */}
+</ResponsiveTabs>`,
+
+  scrollLayout: `// 桌面也保持横向滚动
+<ResponsiveTabs
+  value={playTab}
+  onValueChange={setPlayTab}
+  items={playItems}
+  layout="scroll"
+  scrollStep={220}
+  triggerClassName="text-xs"
+>
+  {/* 内容 */}
+</ResponsiveTabs>`,
+
+  gridLayout: `// 始终使用网格布局
+<ResponsiveTabs
+  value={customTab}
+  onValueChange={setCustomTab}
+  items={customItems}
+  layout="grid"
+  gridColsClass="grid-cols-6 xl:grid-cols-8"
+  listClassName="bg-muted/50"
+  triggerClassName="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+>
+  {/* 内容 */}
+</ResponsiveTabs>`,
+
+  dynamic: `// 动态增删标签
+const [dynItems, setDynItems] = useState<TabItem[]>([...]);
+const [dynActive, setDynActive] = useState("d0");
+
+// 新增标签
+const addTab = () => {
+  const id = \`d\${dynItems.length}\`;
+  setDynItems(arr => [...arr, { 
+    value: id, 
+    label: \`动态标签 \${arr.length + 1}\` 
+  }]);
+  setDynActive(id);
+};
+
+// 删除当前标签
+const deleteTab = () => {
+  const next = dynItems.filter(i => i.value !== dynActive);
+  setDynItems(next);
+  if (next.length > 0) {
+    const idx = dynItems.findIndex(i => i.value === dynActive);
+    setDynActive(next[Math.max(0, idx - 1)].value);
+  }
+};
+
+<ResponsiveTabs
+  layout="scroll"
+  value={dynActive}
+  onValueChange={setDynActive}
+  items={dynItems}
+  scrollStep={180}
+>
+  {/* 内容 */}
+</ResponsiveTabs>`,
+};
 
 export function ResponsiveTabsDemo() {
   const [basicTab, setBasicTab] = useState("all");
@@ -163,8 +319,13 @@ export function ResponsiveTabsDemo() {
       {/* 基本使用 */}
       <Card>
         <CardHeader>
-          <CardTitle>基本使用</CardTitle>
-          <CardDescription>移动端横向滚动，≥sm 网格布局</CardDescription>
+          <div className="flex items-start justify-between">
+            <div className="space-y-1.5">
+              <CardTitle>基本使用</CardTitle>
+              <CardDescription>移动端横向滚动，≥sm 网格布局</CardDescription>
+            </div>
+            <ViewSourceButton code={sourceCodes.basic} title="基本使用 - 源码" />
+          </div>
         </CardHeader>
         <CardContent>
           <ResponsiveTabs
@@ -243,8 +404,13 @@ export function ResponsiveTabsDemo() {
       {/* 带图标 */}
       <Card>
         <CardHeader>
-          <CardTitle>带图标的标签页</CardTitle>
-          <CardDescription>每个标签页都可以配置图标</CardDescription>
+          <div className="flex items-start justify-between">
+            <div className="space-y-1.5">
+              <CardTitle>带图标的标签页</CardTitle>
+              <CardDescription>每个标签页都可以配置图标</CardDescription>
+            </div>
+            <ViewSourceButton code={sourceCodes.withIcon} title="带图标 - 源码" />
+          </div>
         </CardHeader>
         <CardContent>
           <ResponsiveTabs
@@ -300,10 +466,15 @@ export function ResponsiveTabsDemo() {
       {/* 渐变遮罩演示 */}
       <Card>
         <CardHeader>
-          <CardTitle>渐变遮罩效果</CardTitle>
-          <CardDescription>
-            在scroll模式下展示左右渐变遮罩，提示更多内容
-          </CardDescription>
+          <div className="flex items-start justify-between">
+            <div className="space-y-1.5">
+              <CardTitle>渐变遮罩效果</CardTitle>
+              <CardDescription>
+                在scroll模式下展示左右渐变遮罩，提示更多内容
+              </CardDescription>
+            </div>
+            <ViewSourceButton code={sourceCodes.fadeMasks} title="渐变遮罩 - 源码" />
+          </div>
         </CardHeader>
         <CardContent>
           <ResponsiveTabs
@@ -381,8 +552,13 @@ export function ResponsiveTabsDemo() {
       {/* 徽标 + 禁用 */}
       <Card>
         <CardHeader>
-          <CardTitle>徽标与状态</CardTitle>
-          <CardDescription>支持徽标显示和禁用状态</CardDescription>
+          <div className="flex items-start justify-between">
+            <div className="space-y-1.5">
+              <CardTitle>徽标与状态</CardTitle>
+              <CardDescription>支持徽标显示和禁用状态</CardDescription>
+            </div>
+            <ViewSourceButton code={sourceCodes.withBadge} title="徽标与状态 - 源码" />
+          </div>
         </CardHeader>
         <CardContent>
           <ResponsiveTabs
@@ -473,8 +649,13 @@ export function ResponsiveTabsDemo() {
       {/* 布局模式 Playground */}
       <Card>
         <CardHeader>
-          <CardTitle>布局模式 Playground</CardTitle>
-          <CardDescription>切换布局/步长/贴边，观察行为变化</CardDescription>
+          <div className="flex items-start justify-between">
+            <div className="space-y-1.5">
+              <CardTitle>布局模式 Playground</CardTitle>
+              <CardDescription>切换布局/步长/贴边，观察行为变化</CardDescription>
+            </div>
+            <ViewSourceButton code={sourceCodes.playground} title="Playground - 源码" />
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-wrap items-center gap-2">
@@ -483,6 +664,7 @@ export function ResponsiveTabsDemo() {
               size="sm"
               variant={playLayout === "responsive" ? "default" : "outline"}
               onClick={() => setPlayLayout("responsive")}
+              className="cursor-pointer"
             >
               responsive
             </Button>
@@ -490,6 +672,7 @@ export function ResponsiveTabsDemo() {
               size="sm"
               variant={playLayout === "scroll" ? "default" : "outline"}
               onClick={() => setPlayLayout("scroll")}
+              className="cursor-pointer"
             >
               scroll
             </Button>
@@ -497,6 +680,7 @@ export function ResponsiveTabsDemo() {
               size="sm"
               variant={playLayout === "grid" ? "default" : "outline"}
               onClick={() => setPlayLayout("grid")}
+              className="cursor-pointer"
             >
               grid
             </Button>
@@ -519,6 +703,7 @@ export function ResponsiveTabsDemo() {
               size="sm"
               variant={playFadeMasks ? "default" : "outline"}
               onClick={() => setPlayFadeMasks((v) => !v)}
+              className="cursor-pointer"
             >
               {playFadeMasks ? "渐变遮罩已开" : "渐变遮罩已关"}
             </Button>
@@ -542,6 +727,7 @@ export function ResponsiveTabsDemo() {
               size="sm"
               variant="outline"
               onClick={() => setPlayTab(prevOf(playItems, playTab))}
+              className="cursor-pointer"
             >
               <ArrowLeft className="mr-1 h-4 w-4" /> 上一项
             </Button>
@@ -549,6 +735,7 @@ export function ResponsiveTabsDemo() {
               size="sm"
               variant="outline"
               onClick={() => setPlayTab(nextOf(playItems, playTab))}
+              className="cursor-pointer"
             >
               下一项 <ArrowRight className="ml-1 h-4 w-4" />
             </Button>
@@ -588,8 +775,13 @@ export function ResponsiveTabsDemo() {
       {/* 桌面也滚动（长标题/多项） */}
       <Card>
         <CardHeader>
-          <CardTitle>桌面也滚动（layout=&quot;scroll&quot;）</CardTitle>
-          <CardDescription>测试长标题截断与左右按钮</CardDescription>
+          <div className="flex items-start justify-between">
+            <div className="space-y-1.5">
+              <CardTitle>桌面也滚动（layout=&quot;scroll&quot;）</CardTitle>
+              <CardDescription>测试长标题截断与左右按钮</CardDescription>
+            </div>
+            <ViewSourceButton code={sourceCodes.scrollLayout} title="滚动布局 - 源码" />
+          </div>
         </CardHeader>
         <CardContent>
           <ResponsiveTabs
@@ -617,8 +809,13 @@ export function ResponsiveTabsDemo() {
       {/* 始终网格 */}
       <Card>
         <CardHeader>
-          <CardTitle>始终网格（layout=&quot;grid&quot;）</CardTitle>
-          <CardDescription>均匀分布，信息密集展示</CardDescription>
+          <div className="flex items-start justify-between">
+            <div className="space-y-1.5">
+              <CardTitle>始终网格（layout=&quot;grid&quot;）</CardTitle>
+              <CardDescription>均匀分布，信息密集展示</CardDescription>
+            </div>
+            <ViewSourceButton code={sourceCodes.gridLayout} title="网格布局 - 源码" />
+          </div>
         </CardHeader>
         <CardContent>
           <ResponsiveTabs
@@ -672,8 +869,13 @@ export function ResponsiveTabsDemo() {
       {/* 动态增删 + 外部控制 */}
       <Card>
         <CardHeader>
-          <CardTitle>动态增删标签 + 外部控制</CardTitle>
-          <CardDescription>验证滚动定位与受控切换</CardDescription>
+          <div className="flex items-start justify-between">
+            <div className="space-y-1.5">
+              <CardTitle>动态增删标签 + 外部控制</CardTitle>
+              <CardDescription>验证滚动定位与受控切换</CardDescription>
+            </div>
+            <ViewSourceButton code={sourceCodes.dynamic} title="动态增删 - 源码" />
+          </div>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">
@@ -681,6 +883,7 @@ export function ResponsiveTabsDemo() {
               size="sm"
               variant="outline"
               onClick={() => setDynActive((v) => prevOf(dynItems, v))}
+              className="cursor-pointer"
             >
               <ArrowLeft className="mr-1 h-4 w-4" />
               上一项
@@ -689,6 +892,7 @@ export function ResponsiveTabsDemo() {
               size="sm"
               variant="outline"
               onClick={() => setDynActive((v) => nextOf(dynItems, v))}
+              className="cursor-pointer"
             >
               下一项
               <ArrowRight className="ml-1 h-4 w-4" />
@@ -706,6 +910,7 @@ export function ResponsiveTabsDemo() {
                 ]);
                 setDynActive(`d${dynItems.length}`);
               }}
+              className="cursor-pointer"
             >
               <Plus className="mr-1 h-4 w-4" />
               新增
@@ -723,6 +928,7 @@ export function ResponsiveTabsDemo() {
                 const newIdx = Math.max(0, idx - 1);
                 setDynActive(next[newIdx].value);
               }}
+              className="cursor-pointer"
             >
               <Minus className="mr-1 h-4 w-4" />
               删除当前

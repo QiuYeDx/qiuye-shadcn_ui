@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { AnimatePresence, motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +20,8 @@ interface ScrollableDialogProps {
   className?: string;
   contentClassName?: string;
   onOpenAutoFocus?: (e: Event) => void;
+  /** 对话框最大宽度，默认 'sm:max-w-md' */
+  maxWidth?: string;
 }
 
 interface ScrollableDialogHeaderProps {
@@ -34,6 +36,8 @@ interface ScrollableDialogContentProps {
   fadeMasks?: boolean;
   /** 渐变遮罩高度，单位为像素 */
   fadeMaskHeight?: number;
+  /** 是否启用横向滚动，默认 false */
+  horizontalScroll?: boolean;
 }
 
 interface ScrollableDialogFooterProps {
@@ -49,6 +53,7 @@ interface ScrollableDialogFooterProps {
  * - Content 区域可滚动查看
  * - 支持上下渐变遮罩效果，提示用户有更多内容
  *
+ * @note 如果内容很宽, 需要手动设置 maxWidth 为合适的值, 如 "sm:max-w-[calc(100%-2rem)]" "sm:max-w-[600px] md:max-w-[728px] lg:max-w-4xl xl:max-w-5xl"等
  * @example
  * ```tsx
  * <ScrollableDialog open={isOpen} onOpenChange={setIsOpen}>
@@ -74,12 +79,16 @@ function ScrollableDialog({
   className,
   contentClassName,
   onOpenAutoFocus = (e) => e.preventDefault(),
+  maxWidth = "sm:max-w-md", 
+  // ! 如果内容很宽, 需要手动设置 maxWidth 为合适的值
+  // ! 如 "sm:max-w-[calc(100%-2rem)]" "sm:max-w-[600px] md:max-w-[728px] lg:max-w-4xl xl:max-w-5xl"等
 }: ScrollableDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className={cn(
-          "p-0 max-h-[85vh] w-[calc(100vw-2rem)] sm:w-full sm:max-w-md grid grid-rows-[auto_1fr_auto] gap-0 overflow-hidden",
+          "p-0 max-h-[85vh] w-[calc(100vw-2rem)] sm:w-full grid grid-rows-[auto_1fr_auto] gap-0 overflow-hidden",
+          maxWidth,
           contentClassName
         )}
         onOpenAutoFocus={onOpenAutoFocus}
@@ -106,12 +115,15 @@ function ScrollableDialogHeader({
 
 /**
  * 可滚动对话框的可滚动内容区域
+ * 
+ * @note 如果内容很宽, 需要手动设置 horizontalScroll 为 true, 如 "horizontalScroll={true}"
  */
 function ScrollableDialogContent({
   children,
   className,
   fadeMasks = true,
   fadeMaskHeight = 40,
+  horizontalScroll = false, // ! 是否启用横向滚动，默认 false, 内部有大的固定宽度元素时需要开启
 }: ScrollableDialogContentProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [showTopFade, setShowTopFade] = React.useState(false);
@@ -174,7 +186,13 @@ function ScrollableDialogContent({
         className
       )}
     >
-      <div className="px-4 py-4">{children}</div>
+      <div className={cn("px-4 py-4 w-full", horizontalScroll && "min-w-max")}>
+      {/* <div className={cn("px-4 py-4 w-full")}> */}
+        {children}
+      </div>
+
+      {/* 横向滚动条 */}
+      {horizontalScroll && <ScrollBar orientation="horizontal" />}
 
       {/* 顶部渐变遮罩 */}
       <AnimatePresence>
