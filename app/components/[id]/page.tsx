@@ -320,13 +320,81 @@ export default async function ComponentDetailPage({
 
           {/* API Tab */}
           <TabsContent value="api" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Props API</CardTitle>
-                <CardDescription>组件支持的属性和参数</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {component.props && component.props.length > 0 ? (
+            {/* 多组件 Props 展示 */}
+            {component.propsInfo && component.propsInfo.length > 0 ? (
+              component.propsInfo.map((propsInfo, index) => (
+                <Card key={propsInfo.componentName}>
+                  <CardHeader>
+                    <CardTitle>
+                      {propsInfo.componentName}
+                      {index === 0 && (
+                        <span className="text-sm font-normal text-muted-foreground ml-2">
+                          (主组件)
+                        </span>
+                      )}
+                    </CardTitle>
+                    <CardDescription>
+                      {propsInfo.componentName} 组件支持的属性和参数
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>属性名</TableHead>
+                            <TableHead>类型</TableHead>
+                            <TableHead>描述</TableHead>
+                            <TableHead>必需</TableHead>
+                            <TableHead>默认值</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {propsInfo.props.map((prop) => (
+                            <TableRow key={prop.name}>
+                              <TableCell className="font-mono text-sm">
+                                {prop.name}
+                              </TableCell>
+                              <TableCell className="font-mono text-sm text-muted-foreground">
+                                {prop.type}
+                              </TableCell>
+                              <TableCell>{prop.description}</TableCell>
+                              <TableCell>
+                                {prop.required ? (
+                                  <Badge
+                                    variant="destructive"
+                                    className="text-xs"
+                                  >
+                                    必需
+                                  </Badge>
+                                ) : (
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs"
+                                  >
+                                    可选
+                                  </Badge>
+                                )}
+                              </TableCell>
+                              <TableCell className="font-mono text-sm">
+                                {prop.default || "-"}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : component.props && component.props.length > 0 ? (
+              /* 单组件 Props 展示（兼容旧格式） */
+              <Card>
+                <CardHeader>
+                  <CardTitle>Props API</CardTitle>
+                  <CardDescription>组件支持的属性和参数</CardDescription>
+                </CardHeader>
+                <CardContent>
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
@@ -370,13 +438,21 @@ export default async function ComponentDetailPage({
                       </TableBody>
                     </Table>
                   </div>
-                ) : (
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Props API</CardTitle>
+                  <CardDescription>组件支持的属性和参数</CardDescription>
+                </CardHeader>
+                <CardContent>
                   <div className="text-center py-8 text-muted-foreground">
                     该组件暂无API文档
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           {/* Dependencies Tab */}

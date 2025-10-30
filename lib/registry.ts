@@ -4,6 +4,19 @@ import {
   type BasicUsageExample,
 } from "./component-constants";
 
+export interface PropDefinition {
+  name: string;
+  type: string;
+  description: string;
+  required: boolean;
+  default?: string;
+}
+
+export interface ComponentPropsInfo {
+  componentName: string;
+  props: PropDefinition[];
+}
+
 export interface ComponentInfo {
   name: string;
   description: string;
@@ -14,13 +27,11 @@ export interface ComponentInfo {
     demo?: string;
     types?: string;
   };
-  props?: Array<{
-    name: string;
-    type: string;
-    description: string;
-    required: boolean;
-    default?: string;
-  }>;
+  // 支持单组件和多组件两种格式
+  // 单组件：props 为 PropDefinition 数组
+  // 多组件：propsInfo 为 ComponentPropsInfo 数组
+  props?: PropDefinition[];
+  propsInfo?: ComponentPropsInfo[];
   version: string;
   author: string;
   tags: string[];
@@ -308,49 +319,127 @@ export const componentRegistry: ComponentRegistry = {
       component: "components/qiuye-ui/scrollable-dialog.tsx",
       demo: "components/qiuye-ui/demos/scrollable-dialog-demo.tsx",
     },
-    props: [
+    propsInfo: [
       {
-        name: "open",
-        type: "boolean",
-        description: "对话框是否打开",
-        required: true,
+        componentName: "ScrollableDialog",
+        props: [
+          {
+            name: "open",
+            type: "boolean",
+            description: "对话框是否打开",
+            required: true,
+          },
+          {
+            name: "onOpenChange",
+            type: "(open: boolean) => void",
+            description: "对话框打开状态改变的回调函数",
+            required: true,
+          },
+          {
+            name: "children",
+            type: "React.ReactNode",
+            description: "对话框内容（通常包含 Header、Content、Footer）",
+            required: false,
+          },
+          {
+            name: "className",
+            type: "string",
+            description: "内部容器的额外类名",
+            required: false,
+          },
+          {
+            name: "contentClassName",
+            type: "string",
+            description: "DialogContent 的额外类名",
+            required: false,
+          },
+          {
+            name: "onOpenAutoFocus",
+            type: "(e: Event) => void",
+            description: "对话框打开时自动聚焦的回调",
+            required: false,
+            default: "(e) => e.preventDefault()",
+          },
+          {
+            name: "maxWidth",
+            type: "string",
+            description: "对话框最大宽度",
+            required: false,
+            default: "sm:max-w-md",
+          },
+        ],
       },
       {
-        name: "onOpenChange",
-        type: "(open: boolean) => void",
-        description: "对话框打开状态改变的回调函数",
-        required: true,
+        componentName: "ScrollableDialogHeader",
+        props: [
+          {
+            name: "children",
+            type: "React.ReactNode",
+            description: "头部内容",
+            required: true,
+          },
+          {
+            name: "className",
+            type: "string",
+            description: "额外的 CSS 类名",
+            required: false,
+          },
+        ],
       },
       {
-        name: "children",
-        type: "React.ReactNode",
-        description: "对话框内容（通常包含 Header、Content、Footer）",
-        required: false,
+        componentName: "ScrollableDialogContent",
+        props: [
+          {
+            name: "children",
+            type: "React.ReactNode",
+            description: "可滚动的内容",
+            required: true,
+          },
+          {
+            name: "className",
+            type: "string",
+            description: "额外的 CSS 类名",
+            required: false,
+          },
+          {
+            name: "fadeMasks",
+            type: "boolean",
+            description: "是否显示上下渐变遮罩",
+            required: false,
+            default: "true",
+          },
+          {
+            name: "fadeMaskHeight",
+            type: "number",
+            description: "渐变遮罩高度（像素）",
+            required: false,
+            default: "40",
+          },
+          {
+            name: "horizontalScroll",
+            type: "boolean",
+            description: "是否启用横向滚动",
+            required: false,
+            default: "false",
+          },
+        ],
       },
       {
-        name: "className",
-        type: "string",
-        description: "内部容器的额外类名",
-        required: false,
-      },
-      {
-        name: "contentClassName",
-        type: "string",
-        description: "DialogContent 的额外类名",
-        required: false,
-      },
-      {
-        name: "onOpenAutoFocus",
-        type: "(e: Event) => void",
-        description: "对话框打开时自动聚焦的回调",
-        required: false,
-      },
-      {
-        name: "maxHeight (ScrollableDialogContent)",
-        type: "string",
-        description: "内容区域的最大高度",
-        required: false,
-        default: "440px",
+        componentName: "ScrollableDialogFooter",
+        props: [
+          {
+            name: "children",
+            type: "React.ReactNode",
+            description: "底部内容",
+            required: true,
+          },
+          {
+            name: "className",
+            type: "string",
+            description: "额外的 CSS 类名",
+            required: false,
+          },
+        ],
       },
     ],
     version: "1.0.0",
