@@ -486,21 +486,32 @@ export default function App() {
                             <h4 className="font-semibold mb-2">配置文件示例</h4>
                             <CodeBlock
                               code={`{
+  "$schema": "https://ui.shadcn.com/schema.json",
   "style": "new-york",
-  "rsc": true,
+  "rsc": false, // 是否启用 React Server Components
   "tsx": true,
   "tailwind": {
-    "config": "tailwind.config.js",
-    "css": "app/globals.css",
-    "baseColor": "slate",
-    "cssVariables": true
+    "config": "",
+    "css": "src/index.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
   },
+  "iconLibrary": "lucide",
   "aliases": {
     "components": "@/components",
     "utils": "@/lib/utils",
-    "qiuye-ui": "@/components/qiuye-ui"
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks",
+    // 可选自定义组件库安装路径，如果不配置，则使用默认的 shadcn/ui 组件库安装路径
+    // "qiuye-ui": "@/components/qiuye-ui"
+  },
+  "registries": {
+    "@qiuye-ui": "https://ui.qiuyedx.com/registry/{name}.json"
   }
-}`}
+}
+`}
                               language="json"
                               copyKey="config-example"
                             />
