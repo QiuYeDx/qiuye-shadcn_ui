@@ -49,7 +49,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Animated Button",
     description: "带有动画效果的按钮组件，支持多种动画风格和悬停效果",
     category: "按钮",
-    dependencies: ["motion", "class-variance-authority", "clsx"],
+    dependencies: ["motion", "class-variance-authority"],
     files: {
       component: "components/qiuye-ui/animated-button.tsx",
       demo: "components/qiuye-ui/demos/animated-button-demo.tsx",
@@ -101,7 +101,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Gradient Card",
     description: "渐变色卡片组件，支持多种渐变样式和阴影效果",
     category: "卡片",
-    dependencies: ["class-variance-authority", "clsx"],
+    dependencies: ["class-variance-authority"],
     files: {
       component: "components/qiuye-ui/gradient-card.tsx",
       demo: "components/qiuye-ui/demos/gradient-card-demo.tsx",
@@ -145,7 +145,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Typing Text",
     description: "打字机效果文本组件，支持自定义打字速度和光标样式",
     category: "文本",
-    dependencies: ["react", "ahooks"],
+    dependencies: [],
     files: {
       component: "components/qiuye-ui/typing-text.tsx",
       demo: "components/qiuye-ui/demos/typing-text-demo.tsx",
@@ -197,7 +197,7 @@ export const componentRegistry: ComponentRegistry = {
     description:
       "响应式标签页组件：小屏横向滚动、可选左右滚动按钮与渐变遮罩；大屏可切换为网格布局；支持图标、徽标、禁用与自定义样式。",
     category: "导航",
-    dependencies: ["react", "lucide-react", "motion/react"],
+    dependencies: ["lucide-react", "motion"],
     files: {
       component: "components/qiuye-ui/responsive-tabs.tsx",
       demo: "components/qiuye-ui/demos/responsive-tabs-demo.tsx",
@@ -314,7 +314,7 @@ export const componentRegistry: ComponentRegistry = {
     description:
       "可滚动对话框组件：头部和底部固定，内容区域可滚动，支持自定义高度，适用于需要展示大量内容的场景。",
     category: "弹窗",
-    dependencies: ["react"],
+    dependencies: ["motion"],
     files: {
       component: "components/qiuye-ui/scrollable-dialog.tsx",
       demo: "components/qiuye-ui/demos/scrollable-dialog-demo.tsx",
