@@ -353,6 +353,120 @@ pnpm start
 
 如果你用了自定义域名，强烈建议让 registry URL 稳定（不要轻易改路径），否则用户端的 `components.json` 配置会失效。
 
+## Step 7（可选）：给组件库加 MCP 支持（让 Cursor/Claude 直接“懂你的组件库”）
+
+MCP（Model Context Protocol）可以让 IDE/AI 客户端通过标准协议调用你的 **工具（tools）** 与 **资源（resources）**。
+
+对于自定义 shadcn 组件库，它最实用的价值是：让 AI 直接读取你**部署出来的** registry（`/registry/*.json`），从而能更准确地回答：
+
+- 有哪些组件可以装？
+- 该用哪条 `shadcn add` 命令？
+- 依赖（npm dependencies / registryDependencies）是什么？
+- 组件源码是什么（`files[].content`）？
+
+更重要的是：想要“别人也能用”，理想方案应该像 shadcn 官方一样：
+
+```json
+{
+  "mcpServers": {
+    "shadcn": {
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
+    }
+  }
+}
+```
+
+也就是说：把 MCP Server **做成一个 npm CLI 包**，让用户在任何项目里通过 `npx <pkg>@latest mcp` 直接启动（不需要 clone 你的组件库仓库）。
+
+> 注意：这一步**不影响** shadcn CLI 的安装流程，只是给 AI “加上下文”，让它能更准确地帮你选组件、写用法、排查依赖问题。
+
+### 7.1 让 registry 可“枚举”：提供 /registry/index.json（推荐）
+
+发布到 npm 的 MCP Server 运行时只拿得到“用户项目目录”，拿不到你的组件库仓库文件，因此它必须通过网络读取 registry。
+
+为了支持“列出组件/搜索组件”，强烈建议额外提供一个索引文件：
+
+- `https://你的域名/registry/index.json`
+
+本仓库已在 `scripts/update-registry.mjs` 里集成 index 生成逻辑：你运行 `pnpm run update-registry` 时，会自动生成 `public/registry/index.json`（部署后即可通过 `/registry/index.json` 访问）。
+
+### 7.2 本仓库的 npm MCP 实现
+
+本仓库把 MCP Server 做成了一个可发布的 npm 包（CLI）：
+
+- 目录：`packages/qiuye-ui-cli`
+- 包名（建议）：`@qiuye-ui/cli`
+- 命令：`qiuye-ui mcp`
+
+它默认从 `QIUIYE_UI_REGISTRY_BASE`（默认 `https://ui.qiuyedx.com/registry`）拉取：
+
+- `/index.json`（用于 list/search）
+- `/<name>.json`（用于读取 registry item 与源码）
+
+#### 7.2.1 发布到 npm（一次性）
+
+```bash
+# 推荐：pnpm（在仓库根目录执行）
+pnpm -C packages/qiuye-ui-cli publish --access public
+
+# 或：直接在 packages 目录发布
+cd packages/qiuye-ui-cli
+npm publish --access public
+```
+
+> 发布前记得更新 `packages/qiuye-ui-cli/package.json` 的 `version`；发布后用户即可通过 `npx -y --package @qiuye-ui/cli@latest qiuye-ui mcp` 启动 MCP Server。
+
+### 7.3 在 Cursor 中启用（项目级，npx 一键启动）
+
+在任意项目里创建 `.cursor/mcp.json`，写入（与 shadcn 的用法一致）：
+
+```json
+{
+  "mcpServers": {
+    "qiuye-ui": {
+      "command": "npx",
+      "args": ["-y", "--package", "@qiuye-ui/cli@latest", "qiuye-ui", "mcp"],
+      "env": {
+        "QIUIYE_UI_REGISTRY_BASE": "https://ui.qiuyedx.com/registry"
+      }
+    }
+  }
+}
+```
+
+然后重启/Reload 项目，确认 MCP Servers 里出现 `qiuye-ui`。
+
+> 本仓库也提供了可直接复制的示例文件：`mcp.cursor.example.json`
+
+### 7.4 MCP 能力清单
+
+- **Tools（更适合对话式调用）**
+  - `qiuye_ui_list_registry_items`：列出可安装组件
+  - `qiuye_ui_search_registry_items`：按关键词搜索
+  - `qiuye_ui_get_registry_item`：读取某个 registry JSON（可选包含 `files[].content`）
+  - `qiuye_ui_get_registry_file_content`：直接拿到源码字符串（来自 `files[].content`）
+  - `qiuye_ui_get_shadcn_add_command`：生成安装命令（npx/pnpm）
+- **Resources（更适合“让模型读资料”）**
+  - `qiuye-ui://registry/index`
+  - `qiuye-ui://registry/<name>`
+
+### 7.5 自检/调试（可选）
+
+```bash
+# 自检（会拉取 index + 随机取一个 item 验证结构）
+npx -y @qiuye-ui/cli@latest --check
+
+# 指定你自己的 registry base（例如本地调试站点）
+npx -y @qiuye-ui/cli@latest --check --registry-base http://localhost:3000/registry
+```
+
+### 7.6 示例提问（可直接复制）
+
+- “列出 QiuYe UI 目前有哪些可用组件，并给出各自的 npx 安装命令”
+- “responsive-tabs 的 dependencies 与 registryDependencies 分别是什么？为什么要这样分？”
+- “读取 typing-text 的源码，帮我总结 props 并写一个最小用法示例”
+
 ## 新增一个自定义组件：维护清单（按本仓库约定）
 
 当你新增 `components/qiuye-ui/new-thing.tsx` 时，建议按这个顺序走：

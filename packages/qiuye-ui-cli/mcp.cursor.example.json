@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "qiuye-ui": {
+      "command": "npx",
+      "args": ["-y", "--package", "@qiuye-ui/cli@latest", "qiuye-ui", "mcp"],
+      "env": {
+        "QIUIYE_UI_REGISTRY_BASE": "https://ui.qiuyedx.com/registry"
+      }
+    }
+  }
+}
