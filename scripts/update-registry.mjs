@@ -1,10 +1,6 @@
 // scripts/update-registry.mjs
 import fs from "fs/promises";
 import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 /**
  * CLI:
@@ -145,6 +141,61 @@ async function processRegistryJson(jsonPath) {
   return { updated: changed, details };
 }
 
+function toIndexItem(data) {
+  const files = Array.isArray(data.files)
+    ? data.files.map((f) => ({
+        type: f?.type ?? null,
+        path: f?.path ?? null,
+        target: f?.target ?? null,
+      }))
+    : [];
+
+  return {
+    name: data?.name ?? "",
+    title: data?.title ?? "",
+    type: data?.type ?? "",
+    author: data?.author ?? "",
+    dependencies: Array.isArray(data?.dependencies) ? data.dependencies : [],
+    registryDependencies: Array.isArray(data?.registryDependencies)
+      ? data.registryDependencies
+      : [],
+    fileCount: files.length,
+    files,
+  };
+}
+
+async function buildRegistryIndex(absRegistryDir) {
+  const items = [];
+
+  for await (const p of walk(absRegistryDir)) {
+    if (!p.endsWith(".json")) continue;
+    if (path.basename(p) === "index.json") continue;
+
+    const data = await readJSON(p);
+    if (!isRegistryItemLike(data)) continue;
+
+    items.push(toIndexItem(data));
+  }
+
+  items.sort((a, b) => a.name.localeCompare(b.name));
+  return items;
+}
+
+async function writeRegistryIndex(absRegistryDir) {
+  const indexPath = path.join(absRegistryDir, "index.json");
+  const index = await buildRegistryIndex(absRegistryDir);
+
+  if (DRY_RUN) {
+    console.log(`\n🧾 将要生成: ${path.relative(process.cwd(), indexPath)}`);
+    console.log(`- items: ${index.length}`);
+    return;
+  }
+
+  await fs.writeFile(indexPath, JSON.stringify(index, null, 2) + "\n", "utf-8");
+  console.log(`\n🧾 已生成: ${path.relative(process.cwd(), indexPath)}`);
+  console.log(`- items: ${index.length}`);
+}
+
 (async function main() {
   const absRegistryDir = path.resolve(process.cwd(), REGISTRY_DIR);
   const absBase = path.resolve(process.cwd(), COMPONENT_BASE);
@@ -158,6 +209,7 @@ async function processRegistryJson(jsonPath) {
   try {
     for await (const p of walk(absRegistryDir)) {
       if (!p.endsWith(".json")) continue;
+      if (path.basename(p) === "index.json") continue;
       total++;
       const rel = path.relative(process.cwd(), p);
       try {
@@ -173,6 +225,13 @@ async function processRegistryJson(jsonPath) {
     console.error(`\n❌ 扫描失败：${e.message}`);
     process.exitCode = 1;
     return;
+  }
+
+  try {
+    await writeRegistryIndex(absRegistryDir);
+  } catch (e) {
+    console.error(`\n❌ 生成 index.json 失败：${e.message}`);
+    process.exitCode = 1;
   }
 
   console.log(`\n—— 完成 ——`);

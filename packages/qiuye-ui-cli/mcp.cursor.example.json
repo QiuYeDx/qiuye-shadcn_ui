@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "qiuye-ui": {
+      "command": "npx",
+      "args": ["-y", "qiuye-ui-mcp@latest", "mcp"]
+    }
+  }
+}

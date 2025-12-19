@@ -1,0 +1,25 @@
+{
+  "name": "qiuye-ui-mcp",
+  "version": "0.1.0",
+  "description": "QiuYe UI MCP Server for Cursor/Claude",
+  "license": "MIT",
+  "author": "QiuYeDx <me@qiuyedx.com>",
+  "homepage": "https://ui.qiuyedx.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qiuyedx/qiuye-shadcn_ui.git",
+    "directory": "packages/qiuye-ui-cli"
+  },
+  "type": "module",
+  "bin": "./bin/qiuye-ui-mcp.mjs",
+  "files": [
+    "bin/"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.25.1",
+    "zod": "^4.2.1"
+  }
+}

@@ -1,0 +1,103 @@
+[
+  {
+    "name": "animated-button",
+    "title": "AnimatedButton",
+    "type": "registry:component",
+    "author": "QiuYeDx <me@qiuyedx.com>",
+    "dependencies": [
+      "motion",
+      "class-variance-authority",
+      "clsx"
+    ],
+    "registryDependencies": [],
+    "fileCount": 1,
+    "files": [
+      {
+        "type": "registry:component",
+        "path": "components/qiuye-ui/animated-button.tsx",
+        "target": "src/components/qiuye-ui/animated-button.tsx"
+      }
+    ]
+  },
+  {
+    "name": "gradient-card",
+    "title": "GradientCard",
+    "type": "registry:component",
+    "author": "QiuYeDx <me@qiuyedx.com>",
+    "dependencies": [
+      "class-variance-authority",
+      "clsx"
+    ],
+    "registryDependencies": [],
+    "fileCount": 1,
+    "files": [
+      {
+        "type": "registry:component",
+        "path": "components/qiuye-ui/gradient-card.tsx",
+        "target": "src/components/qiuye-ui/gradient-card.tsx"
+      }
+    ]
+  },
+  {
+    "name": "responsive-tabs",
+    "title": "ResponsiveTabs",
+    "type": "registry:component",
+    "author": "QiuYeDx <me@qiuyedx.com>",
+    "dependencies": [
+      "react",
+      "lucide-react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "tabs",
+      "badge",
+      "button"
+    ],
+    "fileCount": 1,
+    "files": [
+      {
+        "type": "registry:component",
+        "path": "components/qiuye-ui/responsive-tabs.tsx",
+        "target": "src/components/qiuye-ui/responsive-tabs.tsx"
+      }
+    ]
+  },
+  {
+    "name": "scrollable-dialog",
+    "title": "ScrollableDialog",
+    "type": "registry:component",
+    "author": "QiuYeDx <me@qiuyedx.com>",
+    "dependencies": [
+      "react"
+    ],
+    "registryDependencies": [
+      "dialog"
+    ],
+    "fileCount": 1,
+    "files": [
+      {
+        "type": "registry:component",
+        "path": "components/qiuye-ui/scrollable-dialog.tsx",
+        "target": "src/components/qiuye-ui/scrollable-dialog.tsx"
+      }
+    ]
+  },
+  {
+    "name": "typing-text",
+    "title": "TypingText",
+    "type": "registry:component",
+    "author": "QiuYeDx <me@qiuyedx.com>",
+    "dependencies": [
+      "react"
+    ],
+    "registryDependencies": [],
+    "fileCount": 1,
+    "files": [
+      {
+        "type": "registry:component",
+        "path": "components/qiuye-ui/typing-text.tsx",
+        "target": "src/components/qiuye-ui/typing-text.tsx"
+      }
+    ]
+  }
+]
