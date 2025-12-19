@@ -1,6 +1,6 @@
 {
   "name": "@qiuye-ui/mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "QiuYe UI MCP Server for Cursor/Claude",
   "license": "MIT",
   "author": "QiuYeDx <me@qiuyedx.com>",
@@ -11,7 +11,9 @@
     "directory": "packages/qiuye-ui-cli"
   },
   "type": "module",
-  "bin": "./bin/qiuye-ui-mcp.mjs",
+  "bin": {
+    "qiuye-ui-mcp": "./bin/qiuye-ui-mcp.mjs"
+  },
   "files": [
     "bin/",
     "README.md"
