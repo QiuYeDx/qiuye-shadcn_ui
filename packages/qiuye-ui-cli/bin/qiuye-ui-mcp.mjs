@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-// packages/qiuye-ui-cli/bin/qiuye-ui.mjs
-// QiuYe UI CLI (currently only provides `mcp` subcommand)
+// packages/qiuye-ui-cli/bin/qiuye-ui-mcp.mjs
+// QiuYe UI MCP Server for Cursor/Claude
 
 import {
   McpServer,
