@@ -396,8 +396,8 @@ MCP（Model Context Protocol）可以让 IDE/AI 客户端通过标准协议调�
 本仓库把 MCP Server 做成了一个可发布的 npm 包：
 
 - 目录：`packages/qiuye-ui-cli`
-- 包名：`qiuye-ui-mcp`
-- 命令：`qiuye-ui-mcp mcp`
+- 包名：`@qiuye-ui/mcp`
+- 命令：`qiuye-ui-mcp`（不带参数默认启动 MCP Server）
 
 它默认从 `QIUIYE_UI_REGISTRY_BASE`（默认 `https://ui.qiuyedx.com/registry`）拉取：
 
@@ -408,25 +408,25 @@ MCP（Model Context Protocol）可以让 IDE/AI 客户端通过标准协议调�
 
 ```bash
 # 推荐：pnpm（在仓库根目录执行）
-pnpm -C packages/qiuye-ui-cli publish
+pnpm -C packages/qiuye-ui-cli publish --access public
 
 # 或：直接在 packages 目录发布
 cd packages/qiuye-ui-cli
-npm publish
+npm publish --access public
 ```
 
-> 发布前记得更新 `packages/qiuye-ui-cli/package.json` 的 `version`；发布后用户即可通过 `npx -y qiuye-ui-mcp@latest mcp` 启动 MCP Server。
+> 发布前记得更新 `packages/qiuye-ui-cli/package.json` 的 `version`；发布后用户即可通过 `npx -y --package @qiuye-ui/mcp@latest qiuye-ui-mcp` 启动 MCP Server。
 
 ### 7.3 在 Cursor 中启用（项目级，npx 一键启动）
 
-在任意项目里创建 `.cursor/mcp.json`，写入（与 shadcn 的用法一致）：
+在任意项目里创建 `.cursor/mcp.json`，写入：
 
 ```json
 {
   "mcpServers": {
     "qiuye-ui": {
       "command": "npx",
-      "args": ["-y", "qiuye-ui-mcp@latest", "mcp"]
+      "args": ["-y", "--package", "@qiuye-ui/mcp@latest", "qiuye-ui-mcp"]
     }
   }
 }
@@ -452,10 +452,10 @@ npm publish
 
 ```bash
 # 自检（会拉取 index + 随机取一个 item 验证结构）
-npx -y qiuye-ui-mcp@latest --check
+npx -y --package @qiuye-ui/mcp@latest qiuye-ui-mcp --check
 
 # 指定你自己的 registry base（例如本地调试站点）
-npx -y qiuye-ui-mcp@latest --check --registry-base http://localhost:3000/registry
+npx -y --package @qiuye-ui/mcp@latest qiuye-ui-mcp --check --registry-base http://localhost:3000/registry
 ```
 
 ### 7.6 示例提问（可直接复制）

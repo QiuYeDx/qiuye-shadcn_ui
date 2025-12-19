@@ -1,5 +1,5 @@
 {
-  "name": "qiuye-ui-mcp",
+  "name": "@qiuye-ui/mcp",
   "version": "0.1.0",
   "description": "QiuYe UI MCP Server for Cursor/Claude",
   "license": "MIT",
