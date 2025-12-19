@@ -34,6 +34,7 @@
 首先在 `components.json` 中添加注册表配置：
 
 **国际域名（推荐）：**
+
 ```json
 {
   "registries": {
@@ -43,6 +44,7 @@
 ```
 
 **中国大陆镜像域名：**
+
 ```json
 {
   "registries": {
@@ -60,9 +62,9 @@ npx shadcn@latest add @qiuye-ui/animated-button
 pnpm dlx shadcn@latest add @qiuye-ui/animated-button
 
 # 安装多个组件
-npx shadcn@latest add @qiuye-ui/animated-button @qiuye-ui/gradient-card @qiuye-ui/typing-text
+npx shadcn@latest add @qiuye-ui/animated-button @qiuye-ui/gradient-card @qiuye-ui/typing-text @qiuye-ui/responsive-tabs @qiuye-ui/scrollable-dialog
 # 或使用 pnpm
-pnpm dlx shadcn@latest add @qiuye-ui/animated-button @qiuye-ui/gradient-card @qiuye-ui/typing-text
+pnpm dlx shadcn@latest add @qiuye-ui/animated-button @qiuye-ui/gradient-card @qiuye-ui/typing-text @qiuye-ui/responsive-tabs @qiuye-ui/scrollable-dialog
 ```
 
 #### 方式二：直接URL安装
@@ -103,13 +105,15 @@ export default function App() {
 
 ## 📦 可用组件
 
-| 组件名称 | 描述 | 分类 | CLI命令 |
-|---------|------|-----|---------|
-| **Animated Button** | 带动画效果的按钮组件，支持多种动画风格 | 按钮 | `npx shadcn@latest add @qiuye-ui/animated-button`<br/>`pnpm dlx shadcn@latest add @qiuye-ui/animated-button` |
-| **Gradient Card** | 渐变色卡片组件，支持多种渐变主题 | 卡片 | `npx shadcn@latest add @qiuye-ui/gradient-card`<br/>`pnpm dlx shadcn@latest add @qiuye-ui/gradient-card` |
-| **Typing Text** | 打字机效果文本组件，支持循环播放 | 文本 | `npx shadcn@latest add @qiuye-ui/typing-text`<br/>`pnpm dlx shadcn@latest add @qiuye-ui/typing-text` |
+| 组件名称              | 描述                                                       | 分类 | CLI命令                                                                                                          |
+| --------------------- | ---------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------------------- |
+| **Animated Button**   | 带动画效果的按钮组件，支持多种动画风格                     | 按钮 | `npx shadcn@latest add @qiuye-ui/animated-button`<br/>`pnpm dlx shadcn@latest add @qiuye-ui/animated-button`     |
+| **Gradient Card**     | 渐变色卡片组件，支持多种渐变主题                           | 卡片 | `npx shadcn@latest add @qiuye-ui/gradient-card`<br/>`pnpm dlx shadcn@latest add @qiuye-ui/gradient-card`         |
+| **Typing Text**       | 打字机效果文本组件，支持循环播放                           | 文本 | `npx shadcn@latest add @qiuye-ui/typing-text`<br/>`pnpm dlx shadcn@latest add @qiuye-ui/typing-text`             |
+| **Responsive Tabs**   | 响应式标签页：小屏滚动/大屏网格，可选滚动按钮与渐变遮罩    | 导航 | `npx shadcn@latest add @qiuye-ui/responsive-tabs`<br/>`pnpm dlx shadcn@latest add @qiuye-ui/responsive-tabs`     |
+| **Scrollable Dialog** | 可滚动对话框：头尾固定、内容滚动，支持渐变遮罩与横向滚动条 | 弹窗 | `npx shadcn@latest add @qiuye-ui/scrollable-dialog`<br/>`pnpm dlx shadcn@latest add @qiuye-ui/scrollable-dialog` |
 
-> 更多组件正在开发中...
+> 更多组件持续更新中...
 
 ## 🛠️ CLI 工具
 
@@ -132,6 +136,7 @@ pnpm dlx shadcn@latest init
 在项目的 `components.json` 文件中添加秋夜组件库注册表：
 
 **国际域名（推荐）：**
+
 ```json
 {
   "registries": {
@@ -141,6 +146,7 @@ pnpm dlx shadcn@latest init
 ```
 
 **中国大陆镜像域名：**
+
 ```json
 {
   "registries": {
@@ -158,9 +164,9 @@ npx shadcn@latest add @qiuye-ui/animated-button
 pnpm dlx shadcn@latest add @qiuye-ui/animated-button
 
 # 批量安装多个组件
-npx shadcn@latest add @qiuye-ui/animated-button @qiuye-ui/gradient-card @qiuye-ui/typing-text
+npx shadcn@latest add @qiuye-ui/animated-button @qiuye-ui/gradient-card @qiuye-ui/typing-text @qiuye-ui/responsive-tabs @qiuye-ui/scrollable-dialog
 # 或使用 pnpm
-pnpm dlx shadcn@latest add @qiuye-ui/animated-button @qiuye-ui/gradient-card @qiuye-ui/typing-text
+pnpm dlx shadcn@latest add @qiuye-ui/animated-button @qiuye-ui/gradient-card @qiuye-ui/typing-text @qiuye-ui/responsive-tabs @qiuye-ui/scrollable-dialog
 ```
 
 #### 方式二：直接URL安装
@@ -223,18 +229,19 @@ pnpm dlx shadcn@latest --help
 - 🏠 [官网首页](https://qiuye-ui.vercel.app)
 - 🎨 [组件浏览器](https://qiuye-ui.vercel.app/components)
 - 💻 [CLI 使用指南](https://qiuye-ui.vercel.app/cli)
-- 🔌 [API 文档](https://qiuye-ui.vercel.app/api/components)
+- 📦 [Registry 示例（typing-text）](https://qiuye-ui.vercel.app/registry/typing-text.json)
 
 ### 中国大陆镜像
 
 - 🏠 [官网首页](https://ui.qiuyedx.com)
 - 🎨 [组件浏览器](https://ui.qiuyedx.com/components)
 - 💻 [CLI 使用指南](https://ui.qiuyedx.com/cli)
-- 🔌 [API 文档](https://ui.qiuyedx.com/api/components)
+- 📦 [Registry 示例（typing-text）](https://ui.qiuyedx.com/registry/typing-text.json)
 
 ### 其他
 
 - 🛠️ [新增自定义组件指南](#新增自定义组件)
+- 📝 [博客：基于 Next.js 15 + shadcn/ui 打造可 CLI 安装的组件库](./blog-how-to-build-shadcn-component-library.md)
 
 ## 🏗️ 本地开发
 
@@ -247,8 +254,8 @@ pnpm dlx shadcn@latest --help
 
 ```bash
 # 1. 克隆项目
-git clone https://github.com/qiuye/qiuye-ui-components.git
-cd qiuye-ui-components
+git clone https://github.com/qiuyedx/qiuye-shadcn_ui.git
+cd qiuye-shadcn_ui
 
 # 2. 安装依赖
 pnpm install
@@ -263,21 +270,26 @@ pnpm dev
 ### 项目结构
 
 ```text
-qiuye-ui-components/
+qiuye-shadcn_ui/
 ├── app/                        # Next.js 应用目录
 │   ├── components/            # 组件浏览页面
 │   ├── cli/                   # CLI 使用指南页面
-│   ├── api/                   # API 端点
 │   └── page.tsx               # 首页
 ├── components/
 │   ├── qiuye-ui/             # 自定义组件库
 │   │   ├── animated-button.tsx
 │   │   ├── gradient-card.tsx
 │   │   ├── typing-text.tsx
+│   │   ├── responsive-tabs.tsx
+│   │   ├── scrollable-dialog.tsx
 │   │   └── demos/            # 组件演示
 │   └── ui/                   # Shadcn/ui 基础组件
 ├── lib/
 │   └── registry.ts           # 组件注册表
+├── public/
+│   └── registry/             # shadcn/ui CLI 使用的静态 registry
+└── scripts/
+    └── update-registry.mjs   # 自动回填 registry 的 files[].content
 └── ...
 ```
 
@@ -318,7 +330,7 @@ qiuye-ui-components/
 
 ### 部署到 Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/qiuye/qiuye-ui-components)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/qiuyedx/qiuye-shadcn_ui)
 
 ### 自定义部署
 
@@ -347,8 +359,7 @@ pnpm start
 import React from "react";
 import { cn } from "@/lib/utils";
 
-export interface MyComponentProps 
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface MyComponentProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "primary" | "secondary";
 }
 
@@ -390,15 +401,9 @@ import { MyComponent } from "../my-component";
 export function MyComponentDemo() {
   return (
     <div className="space-y-4">
-      <MyComponent variant="default">
-        默认样式
-      </MyComponent>
-      <MyComponent variant="primary">
-        主要样式
-      </MyComponent>
-      <MyComponent variant="secondary">
-        次要样式
-      </MyComponent>
+      <MyComponent variant="default">默认样式</MyComponent>
+      <MyComponent variant="primary">主要样式</MyComponent>
+      <MyComponent variant="secondary">次要样式</MyComponent>
     </div>
   );
 }
@@ -415,10 +420,7 @@ export function MyComponentDemo() {
   "title": "MyComponent",
   "type": "registry:component",
   "author": "您的名字 <your-email@example.com>",
-  "dependencies": [
-    "react",
-    "clsx"
-  ],
+  "dependencies": ["react", "clsx"],
   "registryDependencies": [],
   "files": [
     {
@@ -558,9 +560,9 @@ MIT License © 2025 秋夜
 
 如果这个项目对您有帮助，请给它一个 ⭐️！
 
-- 🐛 [报告问题](https://github.com/qiuye/qiuye-ui-components/issues)
-- 💡 [功能建议](https://github.com/qiuye/qiuye-ui-components/discussions)
-- 🤝 [贡献代码](https://github.com/qiuye/qiuye-ui-components/pulls)
+- 🐛 [报告问题](https://github.com/qiuyedx/qiuye-shadcn_ui/issues)
+- 💡 [功能建议](https://github.com/qiuyedx/qiuye-shadcn_ui/discussions)
+- 🤝 [贡献代码](https://github.com/qiuyedx/qiuye-shadcn_ui/pulls)
 
 ---
 
