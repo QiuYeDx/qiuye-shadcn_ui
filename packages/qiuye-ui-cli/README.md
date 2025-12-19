@@ -66,7 +66,7 @@ npx -y --package @qiuye-ui/mcp@latest qiuye-ui-mcp --check
 ## 发布说明
 
 ```bash
-pnpm -C packages/qiuye-ui-cli publish --access public
+pnpm publish --access public
 ```
 
 ## 相关链接
