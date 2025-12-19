@@ -397,14 +397,35 @@ MCP（Model Context Protocol）可以让 IDE/AI 客户端通过标准协议调�
 
 - 目录：`packages/qiuye-ui-cli`
 - 包名：`@qiuye-ui/mcp`
-- 命令：`qiuye-ui-mcp`（不带参数默认启动 MCP Server）
+- 命令：`qiuye-ui-mcp`（不带参数或带 `mcp` 子命令均可启动 MCP Server）
 
 它默认从 `QIUIYE_UI_REGISTRY_BASE`（默认 `https://ui.qiuyedx.com/registry`）拉取：
 
 - `/index.json`（用于 list/search）
 - `/<name>.json`（用于读取 registry item 与源码）
 
-#### 7.2.1 发布到 npm（一次性）
+#### 7.2.1 CLI 用法
+
+```bash
+# 启动 MCP Server（默认）
+npx -y --package @qiuye-ui/mcp@latest qiuye-ui-mcp
+
+# 或显式指定 mcp 子命令
+npx -y --package @qiuye-ui/mcp@latest qiuye-ui-mcp mcp
+
+# 自检（验证 registry 连通性）
+npx -y --package @qiuye-ui/mcp@latest qiuye-ui-mcp --check
+
+# 查看帮助
+npx -y --package @qiuye-ui/mcp@latest qiuye-ui-mcp --help
+
+# 自定义 registry base
+npx -y --package @qiuye-ui/mcp@latest qiuye-ui-mcp --registry-base http://localhost:3000/registry
+# 或使用短参数
+npx -y --package @qiuye-ui/mcp@latest qiuye-ui-mcp --base http://localhost:3000/registry
+```
+
+#### 7.2.2 发布到 npm（一次性）
 
 ```bash
 # 推荐：pnpm（在仓库根目录执行）
@@ -424,7 +445,7 @@ npm publish --access public
 ```json
 {
   "mcpServers": {
-    "qiuye-ui": {
+    "@qiuye-ui/mcp": {
       "command": "npx",
       "args": ["-y", "--package", "@qiuye-ui/mcp@latest", "qiuye-ui-mcp"]
     }
@@ -432,21 +453,37 @@ npm publish --access public
 }
 ```
 
-然后重启/Reload 项目，确认 MCP Servers 里出现 `qiuye-ui`。
+然后重启/Reload 项目，确认 MCP Servers 里出现 `@qiuye-ui/mcp`。
 
 > 本仓库也提供了可直接复制的示例文件：`packages/qiuye-ui-cli/mcp.cursor.example.json`
 
 ### 7.4 MCP 能力清单
 
-- **Tools（更适合对话式调用）**
-  - `qiuye_ui_list_registry_items`：列出可安装组件
-  - `qiuye_ui_search_registry_items`：按关键词搜索
-  - `qiuye_ui_get_registry_item`：读取某个 registry JSON（可选包含 `files[].content`）
-  - `qiuye_ui_get_registry_file_content`：直接拿到源码字符串（来自 `files[].content`）
-  - `qiuye_ui_get_shadcn_add_command`：生成安装命令（npx/pnpm）
-- **Resources（更适合“让模型读资料”）**
-  - `qiuye-ui://registry/index`
-  - `qiuye-ui://registry/<name>`
+#### Tools（更适合对话式调用）
+
+| 名称 | 描述 | 参数 |
+|------|------|------|
+| `qiuye_ui_list_registry_items` | 列出所有可用组件 | `includeFiles?`: 是否包含 files 的 path/target |
+| `qiuye_ui_search_registry_items` | 按关键词搜索组件 | `query`: 搜索关键词, `includeFiles?`: 同上 |
+| `qiuye_ui_get_registry_item` | 读取指定组件的 registry JSON | `name`: 组件名, `includeContent?`: 是否包含源码 |
+| `qiuye_ui_get_registry_file_content` | 读取组件源码 | `name`: 组件名, `index?`: files[] 下标（默认 0） |
+| `qiuye_ui_get_shadcn_add_command` | 生成 shadcn 安装命令 | `name`: 组件名, `pm?`: npx/pnpm, `alias?`: registry alias |
+
+#### Resources（更适合"让模型读资料"）
+
+| URI | 描述 |
+|-----|------|
+| `qiuye-ui://registry/index` | 组件索引（JSON） |
+| `qiuye-ui://registry/{name}` | 指定组件的 registry JSON（包含 files[].content） |
+
+#### 组件名支持格式
+
+以下格式均可被识别：
+
+- `typing-text` - 组件名
+- `typing-text.json` - 带 `.json` 后缀
+- `@qiuye-ui/typing-text` - 带 registry alias 前缀
+- `https://ui.qiuyedx.com/registry/typing-text.json` - 完整 URL
 
 ### 7.5 自检/调试（可选）
 
@@ -456,13 +493,16 @@ npx -y --package @qiuye-ui/mcp@latest qiuye-ui-mcp --check
 
 # 指定你自己的 registry base（例如本地调试站点）
 npx -y --package @qiuye-ui/mcp@latest qiuye-ui-mcp --check --registry-base http://localhost:3000/registry
+# 或使用短参数
+npx -y --package @qiuye-ui/mcp@latest qiuye-ui-mcp --check --base http://localhost:3000/registry
 ```
 
 ### 7.6 示例提问（可直接复制）
 
-- “列出 QiuYe UI 目前有哪些可用组件，并给出各自的 npx 安装命令”
-- “responsive-tabs 的 dependencies 与 registryDependencies 分别是什么？为什么要这样分？”
-- “读取 typing-text 的源码，帮我总结 props 并写一个最小用法示例”
+- "列出 QiuYe UI 目前有哪些可用组件，并给出各自的 npx 安装命令"
+- "responsive-tabs 的 dependencies 与 registryDependencies 分别是什么？为什么要这样分？"
+- "读取 typing-text 的源码，帮我总结 props 并写一个最小用法示例"
+- "搜索 QiuYe UI 中与动画相关的组件"
 
 ## 新增一个自定义组件：维护清单（按本仓库约定）
 

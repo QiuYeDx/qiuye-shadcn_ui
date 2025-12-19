@@ -474,7 +474,7 @@ async function runMcp(flags) {
 }
 
 function printHelp() {
-  console.log(`qiuye-ui (CLI)\n\nUsage:\n  qiuye-ui mcp [--registry-base <url>]\n  qiuye-ui --check [--registry-base <url>]\n\nEnv:\n  QIUIYE_UI_REGISTRY_BASE=...\n\nExamples:\n  qiuye-ui mcp\n  qiuye-ui mcp --registry-base http://localhost:3000/registry\n  qiuye-ui --check\n`);
+  console.log(`qiuye-ui-mcp (CLI)\n\nUsage:\n  qiuye-ui-mcp mcp [--registry-base <url>]\n  qiuye-ui-mcp --check [--registry-base <url>]\n\nEnv:\n  QIUIYE_UI_REGISTRY_BASE=...\n\nExamples:\n  qiuye-ui-mcp mcp\n  qiuye-ui-mcp mcp --registry-base http://localhost:3000/registry\n  qiuye-ui-mcp --check\n`);
 }
 
 (async function main() {
@@ -501,6 +501,6 @@ function printHelp() {
   printHelp();
   process.exitCode = 1;
 })().catch((e) => {
-  console.error("❌ qiuye-ui CLI error:", e);
+  console.error("❌ qiuye-ui-mcp CLI error:", e);
   process.exit(1);
 });
