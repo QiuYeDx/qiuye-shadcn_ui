@@ -607,6 +607,9 @@ export default function App() {
                                 ComponentId.ANIMATED_BUTTON,
                                 ComponentId.GRADIENT_CARD,
                                 ComponentId.TYPING_TEXT,
+                                ComponentId.RESPONSIVE_TABS,
+                                ComponentId.SCROLLABLE_DIALOG,
+                                ComponentId.DOT_GLASS,
                               ].map((component) => (
                                 <div
                                   key={component}

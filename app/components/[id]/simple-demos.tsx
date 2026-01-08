@@ -13,7 +13,9 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/qiuye-ui/scrollable-dialog";
+import { DotGlass } from "@/components/qiuye-ui/dot-glass";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 // AnimatedButton 简单演示
 export function AnimatedButtonSimpleDemo() {
@@ -105,6 +107,85 @@ export function ScrollableDialogSimpleDemo() {
           <Button onClick={() => setOpen(false)}>确认</Button>
         </ScrollableDialogFooter>
       </ScrollableDialog>
+    </div>
+  );
+}
+
+// DotGlass 简单演示
+export function DotGlassSimpleDemo() {
+  const split = 50;
+
+  return (
+    <div className="space-y-4">
+      {/* 白底黑字 */}
+      <div className="relative h-[200px] w-full overflow-hidden rounded-xl border border-black/10 bg-white text-zinc-900">
+        <div className="absolute inset-0 p-5">
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-semibold">白底黑字</div>
+            <div className="text-xs text-zinc-500">左侧 {split}% 覆盖</div>
+          </div>
+          <div className="mt-3 space-y-2">
+            <div className="h-2 w-5/6 rounded bg-black/10" />
+            <div className="h-2 w-4/6 rounded bg-black/5" />
+            <div className="h-2 w-3/6 rounded bg-black/5" />
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            <div className="h-10 rounded-lg bg-cyan-500/35" />
+            <div className="h-10 rounded-lg bg-fuchsia-500/30" />
+            <div className="h-10 rounded-lg bg-amber-500/30" />
+          </div>
+        </div>
+
+        <DotGlass
+          absolute
+          className="left-0 inset-y-0 pointer-events-none"
+          style={{ width: `${split}%` }}
+          dotSize={3}
+          dotGap={6}
+          dotFade={0}
+          blur={4}
+          saturation={140}
+          glassAlpha={0.45}
+          coverColor="#ffffff"
+        />
+        <div className="absolute inset-y-0 left-1/2 w-px bg-black/15" />
+      </div>
+
+      <Separator className="my-4" />
+
+      {/* 黑底白字 */}
+      <div className="relative h-[200px] w-full overflow-hidden rounded-xl border border-white/10 bg-black text-white">
+        <div className="absolute inset-0 p-5">
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-semibold">黑底白字</div>
+            <div className="text-xs text-white/70">左侧 {split}% 覆盖</div>
+          </div>
+          <div className="mt-3 space-y-2">
+            <div className="h-2 w-5/6 rounded bg-white/15" />
+            <div className="h-2 w-4/6 rounded bg-white/10" />
+            <div className="h-2 w-3/6 rounded bg-white/5" />
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            <div className="h-10 rounded-lg bg-cyan-400/30" />
+            <div className="h-10 rounded-lg bg-fuchsia-400/25" />
+            <div className="h-10 rounded-lg bg-amber-400/25" />
+          </div>
+        </div>
+
+        <DotGlass
+          absolute
+          className="left-0 inset-y-0 pointer-events-none"
+          style={{ width: `${split}%` }}
+          dotSize={3}
+          dotGap={6}
+          dotFade={0}
+          blur={4}
+          saturation={140}
+          glassAlpha={0.45}
+          coverColor="#000000"
+        />
+        <div className="absolute inset-y-0 left-1/2 w-px bg-white/20" />
+      </div>
     </div>
   );
 }

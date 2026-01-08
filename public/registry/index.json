@@ -20,6 +20,22 @@
     ]
   },
   {
+    "name": "dot-glass",
+    "title": "DotGlass",
+    "type": "registry:component",
+    "author": "QiuYeDx <me@qiuyedx.com>",
+    "dependencies": [],
+    "registryDependencies": [],
+    "fileCount": 1,
+    "files": [
+      {
+        "type": "registry:component",
+        "path": "components/qiuye-ui/dot-glass.tsx",
+        "target": "src/components/qiuye-ui/dot-glass.tsx"
+      }
+    ]
+  },
+  {
     "name": "gradient-card",
     "title": "GradientCard",
     "type": "registry:component",

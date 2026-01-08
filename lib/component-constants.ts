@@ -11,6 +11,7 @@ export enum ComponentId {
   TYPING_TEXT = "typing-text",
   RESPONSIVE_TABS = "responsive-tabs",
   SCROLLABLE_DIALOG = "scrollable-dialog",
+  DOT_GLASS = "dot-glass",
 }
 
 // 组件 ID 数组，方便遍历
@@ -100,6 +101,18 @@ return (
     </ScrollableDialog>
   </>
 );`,
+  },
+  [ComponentId.DOT_GLASS]: {
+    import: `import { DotGlass } from "@/components/qiuye-ui/dot-glass";`,
+    usage: `<DotGlass
+  className="absolute inset-0 left-1/2"
+  dotSize={3}
+  dotGap={6}
+  blur={4}
+  saturation={140}
+  glassAlpha={0.45}
+  coverColor={"#ffffff"}
+></DotGlass>`,
   },
 };
 
