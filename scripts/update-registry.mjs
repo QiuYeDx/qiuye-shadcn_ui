@@ -8,6 +8,10 @@ import path from "path";
  * --base  组件源码所在根目录，默认项目根 "."
  * --dry   仅打印不写入
  *
+ * 说明：
+ * - 更新每个 registry item 的 files[].content
+ * - 同步生成 registry.json（官方 registry 清单）
+ *
  * 示例：
  * node scripts/update-registry.mjs --dir registry --base .
  * node scripts/update-registry.mjs --dir ./my-registry --base . --dry
@@ -16,6 +20,11 @@ const argv = parseArgs(process.argv.slice(2));
 const REGISTRY_DIR = argv.dir ?? "registry";
 const COMPONENT_BASE = argv.base ?? ".";
 const DRY_RUN = hasFlag(argv, "dry");
+const REGISTRY_MANIFEST_NAME = "registry.json";
+const REGISTRY_SCHEMA = "https://ui.shadcn.com/schema/registry.json";
+const DEFAULT_REGISTRY_NAME = "qiuye-ui";
+const DEFAULT_REGISTRY_HOMEPAGE = "https://ui.qiuyedx.com";
+const SKIP_FILE_NAMES = new Set(["index.json", REGISTRY_MANIFEST_NAME]);
 
 function parseArgs(args) {
   const out = {};
@@ -53,6 +62,29 @@ async function readJSON(p) {
     return JSON.parse(raw);
   } catch (e) {
     throw new Error(`JSON 解析失败: ${p}\n${e.message}`);
+  }
+}
+
+async function getRegistryMeta() {
+  const fallback = {
+    name: DEFAULT_REGISTRY_NAME,
+    homepage: DEFAULT_REGISTRY_HOMEPAGE,
+  };
+
+  try {
+    const pkgPath = path.resolve(process.cwd(), "package.json");
+    const pkg = await readJSON(pkgPath);
+    const name =
+      typeof pkg?.registryName === "string" && pkg.registryName.trim().length > 0
+        ? pkg.registryName.trim()
+        : fallback.name;
+    const homepage =
+      typeof pkg?.homepage === "string" && pkg.homepage.trim().length > 0
+        ? pkg.homepage.trim()
+        : fallback.homepage;
+    return { name, homepage };
+  } catch {
+    return fallback;
   }
 }
 
@@ -141,59 +173,84 @@ async function processRegistryJson(jsonPath) {
   return { updated: changed, details };
 }
 
-function toIndexItem(data) {
+function stripRegistryFileContent(file) {
+  if (!file || typeof file !== "object") return file;
+  const out = { ...file };
+  delete out.content;
+  return out;
+}
+
+function toRegistryManifestItem(data) {
   const files = Array.isArray(data.files)
-    ? data.files.map((f) => ({
-        type: f?.type ?? null,
-        path: f?.path ?? null,
-        target: f?.target ?? null,
-      }))
+    ? data.files.map(stripRegistryFileContent)
     : [];
 
-  return {
+  const item = {
     name: data?.name ?? "",
-    title: data?.title ?? "",
     type: data?.type ?? "",
+    title: data?.title ?? "",
     author: data?.author ?? "",
     dependencies: Array.isArray(data?.dependencies) ? data.dependencies : [],
     registryDependencies: Array.isArray(data?.registryDependencies)
       ? data.registryDependencies
       : [],
-    fileCount: files.length,
     files,
   };
+
+  if (typeof data?.description === "string" && data.description.trim()) {
+    item.description = data.description;
+  }
+
+  if (Array.isArray(data?.devDependencies) && data.devDependencies.length > 0) {
+    item.devDependencies = data.devDependencies;
+  }
+
+  return item;
 }
 
-async function buildRegistryIndex(absRegistryDir) {
+async function buildRegistryManifestItems(absRegistryDir) {
   const items = [];
 
   for await (const p of walk(absRegistryDir)) {
     if (!p.endsWith(".json")) continue;
-    if (path.basename(p) === "index.json") continue;
+    if (SKIP_FILE_NAMES.has(path.basename(p))) continue;
 
     const data = await readJSON(p);
     if (!isRegistryItemLike(data)) continue;
 
-    items.push(toIndexItem(data));
+    items.push(toRegistryManifestItem(data));
   }
 
   items.sort((a, b) => a.name.localeCompare(b.name));
   return items;
 }
 
-async function writeRegistryIndex(absRegistryDir) {
-  const indexPath = path.join(absRegistryDir, "index.json");
-  const index = await buildRegistryIndex(absRegistryDir);
+async function writeRegistryManifest(absRegistryDir) {
+  const manifestPath = path.join(absRegistryDir, REGISTRY_MANIFEST_NAME);
+  const meta = await getRegistryMeta();
+  const items = await buildRegistryManifestItems(absRegistryDir);
+  const manifest = {
+    $schema: REGISTRY_SCHEMA,
+    name: meta.name,
+    homepage: meta.homepage,
+    items,
+  };
 
   if (DRY_RUN) {
-    console.log(`\n🧾 将要生成: ${path.relative(process.cwd(), indexPath)}`);
-    console.log(`- items: ${index.length}`);
+    console.log(
+      `\n🧾 将要生成: ${path.relative(process.cwd(), manifestPath)}`
+    );
+    console.log(`- items: ${items.length}`);
     return;
   }
 
-  await fs.writeFile(indexPath, JSON.stringify(index, null, 2) + "\n", "utf-8");
-  console.log(`\n🧾 已生成: ${path.relative(process.cwd(), indexPath)}`);
-  console.log(`- items: ${index.length}`);
+  await fs.writeFile(
+    manifestPath,
+    JSON.stringify(manifest, null, 2) + "\n",
+    "utf-8"
+  );
+  console.log(`\n🧾 已生成: ${path.relative(process.cwd(), manifestPath)}`);
+  console.log(`- items: ${items.length}`);
 }
 
 (async function main() {
@@ -209,7 +266,7 @@ async function writeRegistryIndex(absRegistryDir) {
   try {
     for await (const p of walk(absRegistryDir)) {
       if (!p.endsWith(".json")) continue;
-      if (path.basename(p) === "index.json") continue;
+      if (SKIP_FILE_NAMES.has(path.basename(p))) continue;
       total++;
       const rel = path.relative(process.cwd(), p);
       try {
@@ -228,9 +285,9 @@ async function writeRegistryIndex(absRegistryDir) {
   }
 
   try {
-    await writeRegistryIndex(absRegistryDir);
+    await writeRegistryManifest(absRegistryDir);
   } catch (e) {
-    console.error(`\n❌ 生成 index.json 失败：${e.message}`);
+    console.error(`\n❌ 生成 registry.json 失败：${e.message}`);
     process.exitCode = 1;
   }
 

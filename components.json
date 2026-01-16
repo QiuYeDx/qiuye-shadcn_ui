@@ -17,8 +17,5 @@
     "ui": "@/components/ui",
     "lib": "@/lib",
     "hooks": "@/hooks"
-  },
-  "registries": {
-    "@qiuye-ui": "http://localhost:3000/registry/{name}.json"
   }
 }

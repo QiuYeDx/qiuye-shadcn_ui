@@ -1,0 +1,112 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "qiuye-ui",
+  "homepage": "https://ui.qiuyedx.com",
+  "items": [
+    {
+      "name": "animated-button",
+      "type": "registry:component",
+      "title": "AnimatedButton",
+      "author": "QiuYeDx <me@qiuyedx.com>",
+      "dependencies": [
+        "motion",
+        "class-variance-authority",
+        "clsx"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/animated-button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "dot-glass",
+      "type": "registry:component",
+      "title": "DotGlass",
+      "author": "QiuYeDx <me@qiuyedx.com>",
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/dot-glass.tsx"
+        }
+      ]
+    },
+    {
+      "name": "gradient-card",
+      "type": "registry:component",
+      "title": "GradientCard",
+      "author": "QiuYeDx <me@qiuyedx.com>",
+      "dependencies": [
+        "class-variance-authority",
+        "clsx"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/gradient-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "responsive-tabs",
+      "type": "registry:component",
+      "title": "ResponsiveTabs",
+      "author": "QiuYeDx <me@qiuyedx.com>",
+      "dependencies": [
+        "react",
+        "lucide-react",
+        "motion"
+      ],
+      "registryDependencies": [
+        "tabs",
+        "badge",
+        "button"
+      ],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/responsive-tabs.tsx"
+        }
+      ]
+    },
+    {
+      "name": "scrollable-dialog",
+      "type": "registry:component",
+      "title": "ScrollableDialog",
+      "author": "QiuYeDx <me@qiuyedx.com>",
+      "dependencies": [
+        "react"
+      ],
+      "registryDependencies": [
+        "dialog"
+      ],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/scrollable-dialog.tsx"
+        }
+      ]
+    },
+    {
+      "name": "typing-text",
+      "type": "registry:component",
+      "title": "TypingText",
+      "author": "QiuYeDx <me@qiuyedx.com>",
+      "dependencies": [
+        "react"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/typing-text.tsx"
+        }
+      ]
+    }
+  ]
+}

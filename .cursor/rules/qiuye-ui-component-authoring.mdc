@@ -30,9 +30,9 @@ description: 用于 QiuYe UI（基于 shadcn/ui + Next.js App Router）的自定
   - 组件 ID/基础用法：`lib/component-constants.ts`
   - 组件元信息注册表：`lib/registry.ts`
 - **shadcn Registry（给 shadcn CLI 安装用）**：
-  - `public/registry/<name>.json`：单组件 registry item（包含源码 content）
-  - `public/registry/index.json`：索引（由脚本生成，避免手改）
-  - 更新脚本：`scripts/update-registry.mjs`（仓库脚本：`pnpm update-registry`）
+ - `public/registry/<name>.json`：单组件 registry item（包含源码 content）
+ - `public/registry/registry.json`：registry 清单（由脚本生成，避免手改）
+ - 更新脚本：`scripts/update-registry.mjs`（仓库脚本：`pnpm update-registry`）
 - **shadcn CLI Registry 配置**：`components.json`
   - 本地开发默认：`"@qiuye-ui": "http://localhost:3000/registry/{name}.json"`
 
@@ -124,15 +124,15 @@ description: 用于 QiuYe UI（基于 shadcn/ui + Next.js App Router）的自定
 - `"author": "QiuYeDx <me@qiuyedx.com>"`（或保持当前作者格式）
 - `"dependencies": [...]`（npm 包）
 - `"registryDependencies": [...]`（shadcn 组件名）
-- `"files": [{ "type": "registry:component", "path": "components/qiuye-ui/<id>.tsx", "target": "src/components/qiuye-ui/<id>.tsx" }]`
+- `"files": [{ "type": "registry:component", "path": "components/qiuye-ui/<id>.tsx" }]`
 
 注意：
 - 不要手动维护 `files[].content`（容易过期），后续用脚本自动写入。
-- `public/registry/index.json` **不要手改**，由脚本生成。
+- `public/registry/registry.json` **不要手改**，由脚本生成。
 - 如果组件需要**拆分多个文件**（例如 `types.ts` / `utils.ts` / 多个导出文件），必须把这些文件都加入 `files[]`，否则用户通过 shadcn CLI 安装后会缺文件。
   - 为了让 `pnpm update-registry` 能自动写入源码内容，建议这些条目的 `type` 也使用 `registry:component`。
 
-### 7）更新 registry 内容与索引（必须）
+### 7）更新 registry 内容与清单（必须）
 
 在仓库根目录执行：
 
@@ -140,7 +140,7 @@ description: 用于 QiuYe UI（基于 shadcn/ui + Next.js App Router）的自定
 
 该命令会：
 - 把 `public/registry/*.json` 中 `files[].content` 更新为 `components/qiuye-ui/*` 的真实源码
-- 重新生成 `public/registry/index.json`
+- 重新生成 `public/registry/registry.json`
 
 ### 8）本地验证（必须做完再结束）
 
@@ -159,7 +159,7 @@ description: 用于 QiuYe UI（基于 shadcn/ui + Next.js App Router）的自定
 ## 修改约束（避免破坏现有行为）
 
 - 不要随意改变已有组件导出名/文件名（这会破坏 registry/文档/安装路径）。
-- `public/registry/index.json` 不手工编辑；通过 `pnpm update-registry` 生成。
+- `public/registry/registry.json` 不手工编辑；通过 `pnpm update-registry` 生成。
 - 新增依赖时：
   - 用 `pnpm add <pkg>`（或 `pnpm add -D <pkg>`）
   - **必须**同步更新 `public/registry/<id>.json` 的 `"dependencies"` / `"registryDependencies"`（这是 shadcn CLI 安装时依赖解析的依据）
@@ -169,7 +169,7 @@ description: 用于 QiuYe UI（基于 shadcn/ui + Next.js App Router）的自定
 
 ## 可选：发布/工具链补齐（做库发布时建议同步）
 
-- 如果你要发布/更新 MCP Server（`packages/qiuye-ui-cli`）并希望在远端缺少 `index.json` 时也能列出新组件：
+- 如果你要发布/更新 MCP Server（`packages/qiuye-ui-cli`）并希望在远端缺少 `registry.json` 时也能列出新组件：
   - 更新 `packages/qiuye-ui-cli/bin/qiuye-ui-mcp.mjs` 里的 `DEFAULT_COMPONENT_NAMES`（兜底列表）
 
 ---

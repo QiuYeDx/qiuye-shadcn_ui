@@ -22,7 +22,7 @@ shadcn/ui 的核心理念是“把组件源码拷进你的项目里”，而不�
 3. **把组件源码写进 registry JSON 的 `files[].content` 字段**（本仓库用脚本自动回填）
 4. **把整个站点部署成静态站点**，让 `https://你的域名/registry/<name>.json` 可访问
 
-shadcn CLI 的工作就是：下载这个 JSON → 按 `target` 写文件到用户项目 → 安装依赖。
+shadcn CLI 的工作就是：下载这个 JSON → 按 `files[].target`（若提供）或 `components.json` 的 aliases 计算落盘位置 → 写文件 → 安装依赖。
 
 ## 在线示例（本项目）
 
@@ -79,21 +79,21 @@ qiuye-ui-components/
 - `dependencies`: `["react","lucide-react","motion"]`
 - `registryDependencies`: `["tabs","badge","button"]`
 
-### 2) `files[].path` / `files[].target` 是最容易写错的两行
+### 2) `files[].path` 必填，`files[].target` 可选
 
 - `path`：**你组件库仓库里**的真实路径，例如 `components/qiuye-ui/typing-text.tsx`
-- `target`：安装到用户项目的落地路径，例如 `src/components/qiuye-ui/typing-text.tsx`
+- `target`：可选，仅在需要**固定落盘位置**时使用（如 `registry:page` / `registry:file`）
 
-这两个字段写错，CLI 会报错或生成到奇怪的位置。
+组件类文件不建议写 `target`，否则会绕过 `components.json` 的 aliases，导致 `src/` 与非 `src/` 目录无法自动适配。
 
-### 3) `target` 里的 `src/` 是否要加？取决于你的“用户画像”
+### 3) 不用纠结 `src/`：让 aliases 自动适配
 
-本仓库选择把文件安装到 `src/components/...`，适配 **shadcn init 选择了 srcDir 的项目**。
+组件类文件**不要写 `target`**，交给用户项目的 `components.json` aliases 去解析：
 
-如果你的用户项目普遍没有 `src/`，你有两种选择：
+- aliases 会根据 `@/*` 指向自动落到 `src/components` 或 `components`
+- 你的 registry 里只需要保证 `files[].path` 在仓库内是正确的相对路径
 
-- **方案 A（推荐）**：把 registry 的 `target` 改成 `components/qiuye-ui/...`
-- **方案 B**：提供两套 registry（例如 `xxx.json` 和 `xxx-root.json`），在文档里告诉用户怎么选
+只有当你需要**固定写入位置**（如 `registry:page` / `registry:file`）时，才应该写 `target`。
 
 ### 4) 组件里只要用了 hooks / 事件 / 状态，就要写 `"use client"`
 
@@ -127,13 +127,13 @@ shadcn CLI 支持的 registry item schema 见：
 - `registryDependencies`：需要安装的 shadcn/ui 组件
 - `files`：要写入用户项目的文件列表
   - `path`：组件库仓库里的文件路径（给维护脚本用）
-  - `target`：写入到用户项目的目标路径（给 CLI 用）
+  - `target`：可选；仅在需要固定落盘位置时使用
   - `content`：文件内容（源码字符串）
 
 CLI 流程（简化）：
 
 1. 拉取 `https://你的域名/registry/<name>.json`
-2. 解析 `files[].content` → 写入 `files[].target`
+2. 解析 `files[].content` → 按 `files[].target`（若提供）或 aliases 计算落盘位置并写入
 3. 根据 `dependencies` 安装 npm 包
 4. 根据 `registryDependencies` 安装 shadcn/ui 基础组件
 
@@ -206,12 +206,14 @@ pnpm add class-variance-authority clsx
     {
       "type": "registry:component",
       "path": "components/qiuye-ui/my-component.tsx",
-      "target": "src/components/qiuye-ui/my-component.tsx",
       "content": ""
     }
   ]
 }
 ```
+
+组件类文件建议不写 `target`，交给 `components.json` 的 aliases 自动解析（可同时兼容 `src/` 与非 `src/` 目录）。
+只有 `registry:page` / `registry:file` 这类需要固定落盘位置的文件才写 `target`。
 
 ### 2.2 再看一个“真实可用”的示例（本仓库）
 
@@ -381,15 +383,15 @@ MCP（Model Context Protocol）可以让 IDE/AI 客户端通过标准协议调�
 
 > 注意：这一步**不影响** shadcn CLI 的安装流程，只是给 AI “加上下文”，让它能更准确地帮你选组件、写用法、排查依赖问题。
 
-### 7.1 让 registry 可“枚举”：提供 /registry/index.json（推荐）
+### 7.1 让 registry 可“枚举”：提供 /registry/registry.json（推荐）
 
 发布到 npm 的 MCP Server 运行时只拿得到“用户项目目录”，拿不到你的组件库仓库文件，因此它必须通过网络读取 registry。
 
 为了支持“列出组件/搜索组件”，强烈建议额外提供一个索引文件：
 
-- `https://你的域名/registry/index.json`
+- `https://你的域名/registry/registry.json`
 
-本仓库已在 `scripts/update-registry.mjs` 里集成 index 生成逻辑：你运行 `pnpm run update-registry` 时，会自动生成 `public/registry/index.json`（部署后即可通过 `/registry/index.json` 访问）。
+本仓库已在 `scripts/update-registry.mjs` 里集成 registry 清单生成逻辑：你运行 `pnpm run update-registry` 时，会自动生成 `public/registry/registry.json`（部署后即可通过 `/registry/registry.json` 访问）。
 
 ### 7.2 本仓库的 npm MCP 实现
 
@@ -401,7 +403,7 @@ MCP（Model Context Protocol）可以让 IDE/AI 客户端通过标准协议调�
 
 它默认从 `QIUIYE_UI_REGISTRY_BASE`（默认 `https://ui.qiuyedx.com/registry`）拉取：
 
-- `/index.json`（用于 list/search）
+- `/registry.json`（用于 list/search）
 - `/<name>.json`（用于读取 registry item 与源码）
 
 #### 7.2.1 CLI 用法
@@ -463,7 +465,7 @@ npm publish --access public
 
 | 名称 | 描述 | 参数 |
 |------|------|------|
-| `qiuye_ui_list_registry_items` | 列出所有可用组件 | `includeFiles?`: 是否包含 files 的 path/target |
+| `qiuye_ui_list_registry_items` | 列出所有可用组件 | `includeFiles?`: 是否包含 files 的 path/target（target 可选） |
 | `qiuye_ui_search_registry_items` | 按关键词搜索组件 | `query`: 搜索关键词, `includeFiles?`: 同上 |
 | `qiuye_ui_get_registry_item` | 读取指定组件的 registry JSON | `name`: 组件名, `includeContent?`: 是否包含源码 |
 | `qiuye_ui_get_registry_file_content` | 读取组件源码 | `name`: 组件名, `index?`: files[] 下标（默认 0） |

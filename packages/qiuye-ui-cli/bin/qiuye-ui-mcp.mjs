@@ -122,11 +122,18 @@ function stripRegistryFilesContent(item) {
 }
 
 function toIndexItem(item) {
-  const files = toArray(item?.files).map((f) => ({
-    type: f?.type,
-    path: f?.path,
-    target: f?.target,
-  }));
+  const files = toArray(item?.files).map((f) => {
+    const file = {
+      type: f?.type,
+      path: f?.path,
+    };
+
+    if (typeof f?.target === "string" && f.target.length > 0) {
+      file.target = f.target;
+    }
+
+    return file;
+  });
 
   return {
     name: item?.name ?? "",
@@ -187,25 +194,48 @@ async function getRegistryItemByName(base, name) {
   return { name: normalized, url, item };
 }
 
-async function fetchIndexFromRemote(base) {
-  const indexUrl = joinUrl(base, "index.json");
-  const data = await fetchJson(indexUrl);
-
-  if (!Array.isArray(data)) {
-    throw new Error("index.json 不是数组结构");
-  }
-
-  // 兼容：如果 index 项本身是 registry item，则转换
-  const normalized = data
+function normalizeIndexItems(items) {
+  return items
     .map((x) => {
-      if (x && typeof x === "object" && typeof x.name === "string" && Array.isArray(x.files)) {
+      if (
+        x &&
+        typeof x === "object" &&
+        typeof x.name === "string" &&
+        Array.isArray(x.files)
+      ) {
         return toIndexItem(x);
       }
       return x;
     })
     .filter((x) => x && typeof x === "object" && typeof x.name === "string");
+}
 
-  return normalized;
+async function fetchIndexFromRemote(base) {
+  const registryUrl = joinUrl(base, "registry.json");
+
+  try {
+    const data = await fetchJson(registryUrl);
+    const items = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.items)
+        ? data.items
+        : null;
+
+    if (!items) {
+      throw new Error("registry.json 缺少 items 数组");
+    }
+
+    return normalizeIndexItems(items);
+  } catch {
+    const indexUrl = joinUrl(base, "index.json");
+    const data = await fetchJson(indexUrl);
+
+    if (!Array.isArray(data)) {
+      throw new Error("index.json 不是数组结构");
+    }
+
+    return normalizeIndexItems(data);
+  }
 }
 
 async function buildIndexFallback(base) {
@@ -228,7 +258,7 @@ async function getIndex(base) {
     const index = await fetchIndexFromRemote(base);
     return index.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   } catch {
-    // 远端没提供 index.json 时，使用内置组件列表兜底
+    // 远端没提供 registry.json/index.json 时，使用内置组件列表兜底
     return await buildIndexFallback(base);
   }
 }
@@ -262,13 +292,13 @@ async function runMcp(flags) {
     {
       title: "List QiuYe UI registry items",
       description:
-        "列出 QiuYe UI registry（从远端 /registry/index.json 拉取；若不存在则用内置列表兜底）。",
+        "列出 QiuYe UI registry（从远端 /registry/registry.json 拉取；若不存在则用内置列表兜底）。",
       inputSchema: z
         .object({
           includeFiles: z
             .boolean()
             .optional()
-            .describe("是否包含 files 的 path/target（仍不包含 content）"),
+            .describe("是否包含 files 的 path/target（target 可选）"),
         })
         .strict(),
       annotations: { readOnlyHint: true },
@@ -298,7 +328,7 @@ async function runMcp(flags) {
           includeFiles: z
             .boolean()
             .optional()
-            .describe("是否包含 files 的 path/target（仍不包含 content）"),
+            .describe("是否包含 files 的 path/target（target 可选）"),
         })
         .strict(),
       annotations: { readOnlyHint: true },

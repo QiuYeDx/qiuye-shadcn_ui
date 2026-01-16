@@ -4,7 +4,7 @@ QiuYe UI 组件库的 MCP Server，让 Cursor/Claude 能够直接读取组件库
 
 ## 功能
 
-- 列出所有可用组件（从远端 `/registry/index.json` 拉取，若不存在则用内置列表兜底）
+- 列出所有可用组件（从远端 `/registry/registry.json` 拉取，若不存在则用内置列表兜底）
 - 搜索组件（按名称、分类、作者、依赖等）
 - 读取组件的 registry JSON（包含源码）
 - 生成 shadcn CLI 安装命令（支持 npx / pnpm）
@@ -63,7 +63,7 @@ QIUIYE_UI_REGISTRY_BASE=http://localhost:3000/registry npx -y --package @qiuye-u
 
 | 名称 | 描述 | 参数 |
 |------|------|------|
-| `qiuye_ui_list_registry_items` | 列出所有可用组件 | `includeFiles?`: 是否包含 files 的 path/target |
+| `qiuye_ui_list_registry_items` | 列出所有可用组件 | `includeFiles?`: 是否包含 files 的 path/target（target 可选） |
 | `qiuye_ui_search_registry_items` | 按关键词搜索组件 | `query`: 搜索关键词, `includeFiles?`: 同上 |
 | `qiuye_ui_get_registry_item` | 读取指定组件的 registry JSON | `name`: 组件名, `includeContent?`: 是否包含源码 |
 | `qiuye_ui_get_registry_file_content` | 读取组件源码 | `name`: 组件名, `index?`: files[] 下标（默认 0） |

@@ -426,14 +426,13 @@ export function MyComponentDemo() {
     {
       "type": "registry:component",
       "path": "components/qiuye-ui/my-component.tsx",
-      "target": "src/components/qiuye-ui/my-component.tsx",
       "content": ""
     }
   ]
 }
 ```
 
-**注意**：初始创建时 `content` 字段留空，稍后通过脚本自动填充。
+**注意**：初始创建时 `content` 字段留空，稍后通过脚本自动填充；组件类文件通常不需要写 `target`。
 
 #### 4. 注册表 JSON 文件结构说明
 
@@ -449,8 +448,11 @@ export function MyComponentDemo() {
 - **`files`**: 组件文件配置数组
   - **`type`**: 文件类型，通常为 `"registry:component"`
   - **`path`**: 组件在本项目中的相对路径
-  - **`target`**: 安装到目标项目时的路径
+  - **`target`**: 可选；仅在 `registry:page` / `registry:file` 等需要固定落盘位置时使用
   - **`content`**: 组件的源代码内容（通过脚本自动填充）
+
+**推荐做法**：组件类文件不写 `target`，交给用户项目的 `components.json` 的 aliases 去解析，
+可自动适配 `src/` 与非 `src/` 目录结构。
 
 #### 5. 自动填充源代码内容
 
@@ -500,8 +502,9 @@ npx shadcn@latest add @qiuye-ui/my-component
 # 或使用 pnpm
 pnpm dlx shadcn@latest add @qiuye-ui/my-component
 
-# 验证文件是否正确生成
+# 验证文件是否正确生成（以 aliases.components 为准，可能在 src/ 或根目录）
 ls src/components/qiuye-ui/my-component.tsx
+ls components/qiuye-ui/my-component.tsx
 ```
 
 ##### 方式二：直接URL测试
@@ -512,8 +515,9 @@ npx shadcn@latest add https://qiuye-ui.vercel.app/registry/my-component.json
 # 或使用 pnpm
 pnpm dlx shadcn@latest add https://qiuye-ui.vercel.app/registry/my-component.json
 
-# 验证文件是否正确生成
+# 验证文件是否正确生成（以 aliases.components 为准，可能在 src/ 或根目录）
 ls src/components/qiuye-ui/my-component.tsx
+ls components/qiuye-ui/my-component.tsx
 ```
 
 #### 8. 开发规范
