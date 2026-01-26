@@ -47,6 +47,7 @@ import { TypingTextDemo } from "@/components/qiuye-ui/demos/typing-text-demo";
 import { ResponsiveTabsDemo } from "@/components/qiuye-ui/demos/responsive-tabs-demo";
 import { ScrollableDialogDemo } from "@/components/qiuye-ui/demos/scrollable-dialog-demo";
 import { DotGlassDemo } from "@/components/qiuye-ui/demos/dot-glass-demo";
+import { ImageViewerDemo } from "@/components/qiuye-ui/demos/image-viewer-demo";
 
 // TODO: 新增 qiuye-ui 自定义组件时需要完善 demo 文件
 const demoComponents = {
@@ -56,6 +57,7 @@ const demoComponents = {
   [ComponentId.RESPONSIVE_TABS]: ResponsiveTabsDemo,
   [ComponentId.SCROLLABLE_DIALOG]: ScrollableDialogDemo,
   [ComponentId.DOT_GLASS]: DotGlassDemo,
+  [ComponentId.IMAGE_VIEWER]: ImageViewerDemo,
 };
 
 // 导入简单演示组件
@@ -66,6 +68,7 @@ import {
   ResponsiveTabsSimpleDemo,
   ScrollableDialogSimpleDemo,
   DotGlassSimpleDemo,
+  ImageViewerSimpleDemo,
 } from "./simple-demos";
 
 // 精简的单例演示组件
@@ -76,6 +79,7 @@ const simpleDemoComponents = {
   [ComponentId.RESPONSIVE_TABS]: ResponsiveTabsSimpleDemo,
   [ComponentId.SCROLLABLE_DIALOG]: ScrollableDialogSimpleDemo,
   [ComponentId.DOT_GLASS]: DotGlassSimpleDemo,
+  [ComponentId.IMAGE_VIEWER]: ImageViewerSimpleDemo,
 };
 
 // 简单的演示预览组件

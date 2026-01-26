@@ -14,6 +14,7 @@ import {
   DialogDescription,
 } from "@/components/qiuye-ui/scrollable-dialog";
 import { DotGlass } from "@/components/qiuye-ui/dot-glass";
+import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -186,6 +187,19 @@ export function DotGlassSimpleDemo() {
         />
         <div className="absolute inset-y-0 left-1/2 w-px bg-white/20" />
       </div>
+    </div>
+  );
+}
+
+// ImageViewer 简单演示
+export function ImageViewerSimpleDemo() {
+  return (
+    <div className="max-w-2xl mx-auto">
+      <ImageViewer
+        src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"
+        alt="森林清晨"
+        className="w-full"
+      />
     </div>
   );
 }

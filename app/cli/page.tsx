@@ -610,6 +610,7 @@ export default function App() {
                                 ComponentId.RESPONSIVE_TABS,
                                 ComponentId.SCROLLABLE_DIALOG,
                                 ComponentId.DOT_GLASS,
+                                ComponentId.IMAGE_VIEWER,
                               ].map((component) => (
                                 <div
                                   key={component}

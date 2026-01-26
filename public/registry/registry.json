@@ -53,6 +53,27 @@
       ]
     },
     {
+      "name": "image-viewer",
+      "type": "registry:component",
+      "title": "ImageViewer",
+      "author": "QiuYeDx <me@qiuyedx.com>",
+      "dependencies": [
+        "motion",
+        "lucide-react"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/image-viewer.tsx"
+        },
+        {
+          "type": "registry:component",
+          "path": "hooks/use-prevent-scroll.ts"
+        }
+      ]
+    },
+    {
       "name": "responsive-tabs",
       "type": "registry:component",
       "title": "ResponsiveTabs",

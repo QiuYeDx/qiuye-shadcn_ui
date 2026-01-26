@@ -558,6 +558,97 @@ export const componentRegistry: ComponentRegistry = {
     cliName: "dot-glass",
     basicUsage: basicUsageExamples[ComponentId.DOT_GLASS],
   },
+
+  [ComponentId.IMAGE_VIEWER]: {
+    name: "Image Viewer",
+    description:
+      "带灯箱预览的图片查看器，支持点击放大、滚轮/触控缩放与拖拽平移。",
+    category: "媒体",
+    dependencies: ["motion", "lucide-react"],
+    files: {
+      component: "components/qiuye-ui/image-viewer.tsx",
+      demo: "components/qiuye-ui/demos/image-viewer-demo.tsx",
+    },
+    props: [
+      {
+        name: "src",
+        type: "string | Blob",
+        description: "图片地址或 Blob 对象",
+        required: false,
+      },
+      {
+        name: "alt",
+        type: "string",
+        description: "图片替代文本",
+        required: false,
+      },
+      {
+        name: "rounded",
+        type:
+          '"none" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "full"',
+        description: "主图圆角大小",
+        required: false,
+        default: "lg",
+      },
+      {
+        name: "lightboxRounded",
+        type:
+          '"none" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "full"',
+        description: "灯箱图片圆角大小（默认跟随 rounded）",
+        required: false,
+      },
+      {
+        name: "wrapperClassName",
+        type: "string",
+        description: "外层包裹容器类名",
+        required: false,
+      },
+      {
+        name: "className",
+        type: "string",
+        description: "图片元素类名",
+        required: false,
+      },
+      {
+        name: "lightboxClassName",
+        type: "string",
+        description: "灯箱图片类名",
+        required: false,
+      },
+      {
+        name: "overlayClassName",
+        type: "string",
+        description: "灯箱遮罩类名",
+        required: false,
+      },
+      {
+        name: "overlayBlur",
+        type: "boolean",
+        description: "遮罩是否启用模糊效果",
+        required: false,
+        default: "false",
+      },
+      {
+        name: "lightboxPadding",
+        type: "number",
+        description: "灯箱边距（像素）",
+        required: false,
+        default: "32",
+      },
+      {
+        name: "enableLightbox",
+        type: "boolean",
+        description: "是否启用灯箱预览",
+        required: false,
+        default: "true",
+      },
+    ],
+    version: "1.0.0",
+    author: "QiuYeDx",
+    tags: ["image", "viewer", "lightbox", "zoom", "gesture", "preview"],
+    cliName: "image-viewer",
+    basicUsage: basicUsageExamples[ComponentId.IMAGE_VIEWER],
+  },
 };
 
 // 获取所有组件分类

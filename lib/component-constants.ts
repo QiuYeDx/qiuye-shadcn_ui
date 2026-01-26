@@ -12,6 +12,7 @@ export enum ComponentId {
   RESPONSIVE_TABS = "responsive-tabs",
   SCROLLABLE_DIALOG = "scrollable-dialog",
   DOT_GLASS = "dot-glass",
+  IMAGE_VIEWER = "image-viewer",
 }
 
 // 组件 ID 数组，方便遍历
@@ -113,6 +114,14 @@ return (
   glassAlpha={0.45}
   coverColor={"#ffffff"}
 ></DotGlass>`,
+  },
+  [ComponentId.IMAGE_VIEWER]: {
+    import: `import { ImageViewer } from "@/components/qiuye-ui/image-viewer";`,
+    usage: `<ImageViewer
+  src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"
+  alt="森林清晨"
+  className="w-full"
+/>`,
   },
 };
 
