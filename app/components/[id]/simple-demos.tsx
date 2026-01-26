@@ -194,11 +194,13 @@ export function DotGlassSimpleDemo() {
 // ImageViewer 简单演示
 export function ImageViewerSimpleDemo() {
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="flex justify-center items-center">
       <ImageViewer
         src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"
-        alt="森林清晨"
+        alt="荒漠公路"
+        maxHeight={400}
         className="w-full"
+        wrapperClassName="flex justify-center items-center"
       />
     </div>
   );

@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -29,8 +28,7 @@ import {
   BackButton,
   CopyCommandButton,
   CopyCodeButton,
-  CopyDependencyButton,
-  CopyAllDependenciesButton,
+  DependenciesSection,
 } from "./client-interactions";
 
 // 生成静态参数，用于静态站点生成
@@ -471,39 +469,7 @@ export default async function ComponentDetailPage({
                 <CardDescription>使用此组件需要安装的依赖包</CardDescription>
               </CardHeader>
               <CardContent>
-                {component.dependencies.length > 0 ? (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {component.dependencies.map((dep) => (
-                        <div
-                          key={dep}
-                          className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
-                        >
-                          <code className="font-mono text-sm">{dep}</code>
-                          <CopyDependencyButton dependency={dep} />
-                        </div>
-                      ))}
-                    </div>
-
-                    <Separator />
-
-                    <div>
-                      <h4 className="font-semibold mb-2">一键安装所有依赖</h4>
-                      <div className="bg-muted/50 rounded-md p-3 mb-3">
-                        <code className="text-sm font-mono">
-                          npm install {component.dependencies.join(" ")}
-                        </code>
-                      </div>
-                      <CopyAllDependenciesButton
-                        dependencies={component.dependencies}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    该组件无额外依赖
-                  </div>
-                )}
+                <DependenciesSection dependencies={component.dependencies} />
               </CardContent>
             </Card>
           </TabsContent>

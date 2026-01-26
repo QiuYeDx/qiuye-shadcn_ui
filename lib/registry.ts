@@ -642,6 +642,18 @@ export const componentRegistry: ComponentRegistry = {
         required: false,
         default: "true",
       },
+      {
+        name: "maxHeight",
+        type: "number | string",
+        description: "非灯箱模式下图片的最大高度（数字为像素，字符串支持CSS值如'50vh'）",
+        required: false,
+      },
+      {
+        name: "maxWidth",
+        type: "number | string",
+        description: "非灯箱模式下图片的最大宽度（数字为像素，字符串支持CSS值）",
+        required: false,
+      },
     ],
     version: "1.0.0",
     author: "QiuYeDx",

@@ -23,7 +23,7 @@ const sourceCodes = {
 
 <ImageViewer
   src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"
-  alt="森林清晨"
+  alt="荒漠公路"
   className="w-full"
 />`,
   lightbox: `import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
@@ -36,6 +36,29 @@ const sourceCodes = {
   overlayBlur
   lightboxPadding={24}
   className="w-full"
+/>`,
+  sizeLimit: `import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
+
+// 限制最大高度（数字会自动转为像素）
+<ImageViewer
+  src="..."
+  alt="限制最大高度"
+  maxHeight={300}
+/>
+
+// 使用 CSS 字符串
+<ImageViewer
+  src="..."
+  alt="使用视口单位"
+  maxHeight="50vh"
+/>
+
+// 同时限制宽高
+<ImageViewer
+  src="..."
+  alt="固定尺寸范围"
+  maxWidth={400}
+  maxHeight={300}
 />`,
   states: `import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
 
@@ -68,7 +91,7 @@ export function ImageViewerDemo() {
           <div className="max-w-3xl mx-auto">
             <ImageViewer
               src={demoImages.landscape}
-              alt="森林清晨"
+              alt="荒漠公路"
               className="w-full"
             />
           </div>
@@ -101,6 +124,56 @@ export function ImageViewerDemo() {
               lightboxPadding={24}
               className="w-full"
             />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="space-y-1.5">
+              <CardTitle>尺寸限制</CardTitle>
+              <CardDescription>
+                限制图片最大高度/宽度，防止竖向比例长的图片占据过多页面空间
+              </CardDescription>
+            </div>
+            <ViewSourceButton
+              code={sourceCodes.sizeLimit}
+              title="尺寸限制 - 源码"
+            />
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="secondary">maxHeight</Badge>
+            <Badge variant="secondary">maxWidth</Badge>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="space-y-3">
+              <Badge variant="outline">maxHeight=300</Badge>
+              <ImageViewer
+                src={demoImages.landscape}
+                alt="限制最大高度"
+                maxHeight={300}
+              />
+            </div>
+            <div className="space-y-3">
+              <Badge variant="outline">maxHeight=&quot;50vh&quot;</Badge>
+              <ImageViewer
+                src={demoImages.landscape}
+                alt="使用视口单位"
+                maxHeight="50vh"
+              />
+            </div>
+            <div className="space-y-3">
+              <Badge variant="outline">maxWidth=200 maxHeight=300</Badge>
+              <ImageViewer
+                src={demoImages.portrait}
+                alt="同时限制宽高"
+                maxWidth={200}
+                maxHeight={300}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>

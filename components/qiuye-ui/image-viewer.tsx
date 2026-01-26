@@ -57,6 +57,10 @@ interface ImageViewerProps extends BaseImageProps {
   overlayBlur?: boolean;
   lightboxPadding?: number;
   enableLightbox?: boolean;
+  /** 非灯箱模式下图片的最大高度（支持数字px或CSS字符串） */
+  maxHeight?: number | string;
+  /** 非灯箱模式下图片的最大宽度（支持数字px或CSS字符串） */
+  maxWidth?: number | string;
 }
 
 const DEFAULT_PADDING = 32;
@@ -69,6 +73,11 @@ const TRACKPAD_ZOOM_SENSITIVITY = 0.01;
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
+
+const formatSize = (value: number | string | undefined): string | undefined => {
+  if (value === undefined) return undefined;
+  return typeof value === "number" ? `${value}px` : value;
+};
 
 const getTouchDistance = (touches: React.TouchList) => {
   const dx = touches[0].clientX - touches[1].clientX;
@@ -94,6 +103,8 @@ export function ImageViewer({
   overlayBlur = false,
   lightboxPadding = DEFAULT_PADDING,
   enableLightbox = true,
+  maxHeight,
+  maxWidth,
   loading = "lazy",
   onLoad,
   onError,
@@ -165,6 +176,20 @@ export function ImageViewer({
       setImageLoading(false);
     }
   }, [resolvedSrc]);
+
+  // 预加载图片，确保点击打开灯箱时图片已在浏览器缓存中
+  // 这可以避免首次打开灯箱时因图片加载延迟导致 layoutId 过渡动画异常
+  useEffect(() => {
+    if (!resolvedSrc || !enableLightbox) return;
+
+    const preloadImage = new Image();
+    preloadImage.src = resolvedSrc;
+
+    return () => {
+      // 组件卸载时清理预加载
+      preloadImage.src = "";
+    };
+  }, [resolvedSrc, enableLightbox]);
 
   // 组件卸载时清理复位动画与定时器
   useEffect(() => {
@@ -616,6 +641,10 @@ export function ImageViewer({
               imageLoading ? "opacity-0" : "opacity-100",
               className
             )}
+            style={{
+              maxHeight: formatSize(maxHeight),
+              maxWidth: formatSize(maxWidth),
+            }}
             loading={loading}
             onLoad={(event) => {
               setImageLoading(false);
@@ -693,7 +722,8 @@ export function ImageViewer({
                         lightboxRoundedClass,
                         lightboxClassName
                       )}
-                      loading={loading}
+                      // 灯箱图片使用 eager 加载，配合预加载确保过渡动画流畅
+                      loading="eager"
                     />
                   </motion.div>
                 </motion.div>
