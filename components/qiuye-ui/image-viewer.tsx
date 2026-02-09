@@ -628,13 +628,16 @@ export function ImageViewer({
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
                 className={cn(
-                  "absolute inset-0 z-1 bg-accent animate-pulse",
+                  "absolute inset-0 z-1",
                   inlineRoundedClass
                 )}
-              />
+              >
+                <div className={cn("h-full w-full bg-accent animate-pulse", inlineRoundedClass)}></div>
+              </motion.span>
             )}
           </AnimatePresence>
           <motion.img
+            key={"image-loaded"}
             layoutId={sharedLayoutId}
             ref={imageRef}
             src={resolvedSrc}
