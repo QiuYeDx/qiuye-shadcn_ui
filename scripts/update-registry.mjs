@@ -134,8 +134,9 @@ async function processRegistryJson(jsonPath) {
     const f = data.files[i];
     if (!f || typeof f !== "object") continue;
 
-    // 仅处理 registry:component（你也可以放开到其他 type）
-    if (f.type !== "registry:component") {
+    // 处理需要同步源码 content 的 file 类型
+    const SYNCABLE_TYPES = new Set(["registry:component", "registry:hook", "registry:lib"]);
+    if (!SYNCABLE_TYPES.has(f.type)) {
       details.push(`- 跳过 files[${i}]（type=${f.type ?? "N/A"}）`);
       continue;
     }

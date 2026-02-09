@@ -33,7 +33,7 @@
           "path": "components/qiuye-ui/image-viewer.tsx"
         },
         {
-          "type": "registry:component",
+          "type": "registry:hook",
           "path": "hooks/use-prevent-scroll.ts"
         }
       ]
