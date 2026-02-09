@@ -1,9 +1,6 @@
 "use client";
 
 import React from "react";
-import { AnimatedButton } from "@/components/qiuye-ui/animated-button";
-import { GradientCard } from "@/components/qiuye-ui/gradient-card";
-import { TypingText } from "@/components/qiuye-ui/typing-text";
 import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
 import {
   ScrollableDialog,
@@ -17,44 +14,6 @@ import { DotGlass } from "@/components/qiuye-ui/dot-glass";
 import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-
-// AnimatedButton 简单演示
-export function AnimatedButtonSimpleDemo() {
-  return (
-    <div className="flex justify-center">
-      <AnimatedButton animation="bounce">点击我试试</AnimatedButton>
-    </div>
-  );
-}
-
-// GradientCard 简单演示
-export function GradientCardSimpleDemo() {
-  return (
-    <div className="flex justify-center">
-      <GradientCard gradient="blue" className="max-w-sm">
-        <div className="p-6">
-          <h3 className="text-lg font-semibold mb-2">渐变卡片</h3>
-          <p className="text-sm text-muted-foreground">
-            这是一个带有渐变背景的美观卡片组件。
-          </p>
-        </div>
-      </GradientCard>
-    </div>
-  );
-}
-
-// TypingText 简单演示
-export function TypingTextSimpleDemo() {
-  return (
-    <div className="flex justify-center">
-      <TypingText
-        text="Hello, 这是打字效果演示！"
-        className="text-lg font-mono"
-        speed={150}
-      />
-    </div>
-  );
-}
 
 // ResponsiveTabs 简单演示
 export function ResponsiveTabsSimpleDemo() {

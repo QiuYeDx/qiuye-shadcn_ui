@@ -311,7 +311,7 @@ export default function CLIPage() {
                             </p>
                             <CodeBlock
                               code={generateCommand(
-                                "npx shadcn@latest add @qiuye-ui/animated-button"
+                                "npx shadcn@latest add @qiuye-ui/responsive-tabs"
                               )}
                               copyKey="install-component"
                             />
@@ -333,7 +333,7 @@ export default function CLIPage() {
                                 </p>
                                 <CodeBlock
                                   code={generateCommand(
-                                    "npx shadcn@latest add https://qiuye-ui.vercel.app/registry/animated-button.json"
+                                    "npx shadcn@latest add https://qiuye-ui.vercel.app/registry/responsive-tabs.json"
                                   )}
                                   copyKey="install-component-url"
                                 />
@@ -344,7 +344,7 @@ export default function CLIPage() {
                                 </p>
                                 <CodeBlock
                                   code={generateCommand(
-                                    "npx shadcn@latest add https://ui.qiuyedx.com/registry/animated-button.json"
+                                    "npx shadcn@latest add https://ui.qiuyedx.com/registry/responsive-tabs.json"
                                   )}
                                   copyKey="install-component-url-cn"
                                 />
@@ -379,13 +379,13 @@ export default function CLIPage() {
                             <div className="space-y-3">
                               <CodeBlock
                                 code={generateCommand(
-                                  "npx shadcn@latest add @qiuye-ui/animated-button"
+                                  "npx shadcn@latest add @qiuye-ui/responsive-tabs"
                                 )}
                                 copyKey="add-single"
                               />
                               <CodeBlock
                                 code={generateCommand(
-                                  "npx shadcn@latest add @qiuye-ui/gradient-card @qiuye-ui/typing-text"
+                                  "npx shadcn@latest add @qiuye-ui/scrollable-dialog @qiuye-ui/dot-glass"
                                 )}
                                 copyKey="add-multiple"
                               />
@@ -400,7 +400,7 @@ export default function CLIPage() {
                                 </p>
                                 <CodeBlock
                                   code={generateCommand(
-                                    "npx shadcn@latest add https://qiuye-ui.vercel.app/registry/animated-button.json"
+                                    "npx shadcn@latest add https://qiuye-ui.vercel.app/registry/responsive-tabs.json"
                                   )}
                                   copyKey="add-single-url"
                                 />
@@ -411,7 +411,7 @@ export default function CLIPage() {
                                 </p>
                                 <CodeBlock
                                   code={generateCommand(
-                                    "npx shadcn@latest add https://ui.qiuyedx.com/registry/animated-button.json"
+                                    "npx shadcn@latest add https://ui.qiuyedx.com/registry/responsive-tabs.json"
                                   )}
                                   copyKey="add-single-url-cn"
                                 />
@@ -427,15 +427,23 @@ export default function CLIPage() {
                               2. 在代码中使用
                             </h3>
                             <CodeBlock
-                              code={`import { AnimatedButton } from "@/components/qiuye-ui/animated-button";
+                              code={`import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
+import { useState } from "react";
 
 export default function App() {
+  const [value, setValue] = useState("tab1");
+  const items = [
+    { value: "tab1", label: "标签一" },
+    { value: "tab2", label: "标签二" },
+  ];
+
   return (
-    <div>
-      <AnimatedButton animation="bounce">
-        点击我！
-      </AnimatedButton>
-    </div>
+    <ResponsiveTabs value={value} onValueChange={setValue} items={items}>
+      <div className="p-4">
+        {value === "tab1" && <div>标签一的内容</div>}
+        {value === "tab2" && <div>标签二的内容</div>}
+      </div>
+    </ResponsiveTabs>
   );
 }`}
                               language="tsx"
@@ -503,9 +511,7 @@ export default function App() {
     "utils": "@/lib/utils",
     "ui": "@/components/ui",
     "lib": "@/lib",
-    "hooks": "@/hooks",
-    // 可选自定义组件库安装路径，如果不配置，则使用默认的 shadcn/ui 组件库安装路径
-    // "qiuye-ui": "@/components/qiuye-ui"
+    "hooks": "@/hooks"
   },
   "registries": {
     "@qiuye-ui": "https://ui.qiuyedx.com/registry/{name}.json"
@@ -545,21 +551,21 @@ export default function App() {
                                 description:
                                   "添加 QiuYe UI 组件（需配置注册表）",
                                 example: generateCommand(
-                                  "npx shadcn@latest add @qiuye-ui/animated-button"
+                                  "npx shadcn@latest add @qiuye-ui/responsive-tabs"
                                 ),
                               },
                               {
                                 command: `${getCommandPrefix()} shadcn@latest add [URL]`,
                                 description: "直接使用URL添加组件",
                                 example: generateCommand(
-                                  "npx shadcn@latest add https://qiuye-ui.vercel.app/registry/animated-button.json"
+                                  "npx shadcn@latest add https://qiuye-ui.vercel.app/registry/responsive-tabs.json"
                                 ),
                               },
                               {
                                 command: `${getCommandPrefix()} shadcn@latest add @qiuye-ui/[multiple]`,
                                 description: "批量添加多个组件",
                                 example: generateCommand(
-                                  "npx shadcn@latest add @qiuye-ui/gradient-card @qiuye-ui/typing-text"
+                                  "npx shadcn@latest add @qiuye-ui/scrollable-dialog @qiuye-ui/dot-glass"
                                 ),
                               },
                               {
@@ -604,9 +610,6 @@ export default function App() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               {[
                                 // TODO: 后续需要添加更多组件, 或支持动态加载组件列表
-                                ComponentId.ANIMATED_BUTTON,
-                                ComponentId.GRADIENT_CARD,
-                                ComponentId.TYPING_TEXT,
                                 ComponentId.RESPONSIVE_TABS,
                                 ComponentId.SCROLLABLE_DIALOG,
                                 ComponentId.DOT_GLASS,
@@ -650,7 +653,7 @@ export default function App() {
                                 endpoint: "/registry/[component].json",
                                 description: "单个组件的详细配置和源代码",
                                 example:
-                                  "https://qiuye-ui.vercel.app/registry/animated-button.json",
+                                  "https://qiuye-ui.vercel.app/registry/responsive-tabs.json",
                               },
                             ].map((api, index) => (
                               <div

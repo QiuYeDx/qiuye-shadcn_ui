@@ -4,24 +4,6 @@
   "homepage": "https://ui.qiuyedx.com",
   "items": [
     {
-      "name": "animated-button",
-      "type": "registry:component",
-      "title": "AnimatedButton",
-      "author": "QiuYeDx <me@qiuyedx.com>",
-      "dependencies": [
-        "motion",
-        "class-variance-authority",
-        "clsx"
-      ],
-      "registryDependencies": [],
-      "files": [
-        {
-          "type": "registry:component",
-          "path": "components/qiuye-ui/animated-button.tsx"
-        }
-      ]
-    },
-    {
       "name": "dot-glass",
       "type": "registry:component",
       "title": "DotGlass",
@@ -32,23 +14,6 @@
         {
           "type": "registry:component",
           "path": "components/qiuye-ui/dot-glass.tsx"
-        }
-      ]
-    },
-    {
-      "name": "gradient-card",
-      "type": "registry:component",
-      "title": "GradientCard",
-      "author": "QiuYeDx <me@qiuyedx.com>",
-      "dependencies": [
-        "class-variance-authority",
-        "clsx"
-      ],
-      "registryDependencies": [],
-      "files": [
-        {
-          "type": "registry:component",
-          "path": "components/qiuye-ui/gradient-card.tsx"
         }
       ]
     },
@@ -110,22 +75,6 @@
         {
           "type": "registry:component",
           "path": "components/qiuye-ui/scrollable-dialog.tsx"
-        }
-      ]
-    },
-    {
-      "name": "typing-text",
-      "type": "registry:component",
-      "title": "TypingText",
-      "author": "QiuYeDx <me@qiuyedx.com>",
-      "dependencies": [
-        "react"
-      ],
-      "registryDependencies": [],
-      "files": [
-        {
-          "type": "registry:component",
-          "path": "components/qiuye-ui/typing-text.tsx"
         }
       ]
     }

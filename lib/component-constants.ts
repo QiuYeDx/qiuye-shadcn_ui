@@ -6,9 +6,6 @@
 // 组件 ID 枚举
 // TODO: 新增自定义组件时需要更新这里
 export enum ComponentId {
-  ANIMATED_BUTTON = "animated-button",
-  GRADIENT_CARD = "gradient-card",
-  TYPING_TEXT = "typing-text",
   RESPONSIVE_TABS = "responsive-tabs",
   SCROLLABLE_DIALOG = "scrollable-dialog",
   DOT_GLASS = "dot-glass",
@@ -28,29 +25,6 @@ export type BasicUsageExamples = Record<ComponentId, BasicUsageExample>;
 
 // 基础使用示例数据
 export const basicUsageExamples: BasicUsageExamples = {
-  [ComponentId.ANIMATED_BUTTON]: {
-    import: `import { AnimatedButton } from "@/components/qiuye-ui/animated-button";`,
-    usage: `<AnimatedButton animation="bounce" variant="primary">
-  点击我
-</AnimatedButton>`,
-  },
-  [ComponentId.GRADIENT_CARD]: {
-    import: `import { GradientCard } from "@/components/qiuye-ui/gradient-card";`,
-    usage: `<GradientCard gradient="blue">
-  <div className="p-6">
-    <h3 className="text-lg font-semibold">卡片标题</h3>
-    <p className="text-muted-foreground">这是卡片内容</p>
-  </div>
-</GradientCard>`,
-  },
-  [ComponentId.TYPING_TEXT]: {
-    import: `import { TypingText } from "@/components/qiuye-ui/typing-text";`,
-    usage: `<TypingText 
-  text="Hello, 这是打字效果！" 
-  speed={100}
-  showCursor={true}
-/>`,
-  },
   [ComponentId.RESPONSIVE_TABS]: {
     import: `import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
 import { useState } from "react";`,

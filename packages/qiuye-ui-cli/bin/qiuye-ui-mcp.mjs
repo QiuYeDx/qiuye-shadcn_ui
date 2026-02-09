@@ -12,11 +12,10 @@ import { z } from "zod";
 
 const DEFAULT_REGISTRY_BASE = "https://ui.qiuyedx.com/registry";
 const DEFAULT_COMPONENT_NAMES = [
-  "animated-button",
-  "gradient-card",
   "responsive-tabs",
   "scrollable-dialog",
-  "typing-text",
+  "dot-glass",
+  "image-viewer",
 ];
 
 function parseArgs(argv) {
@@ -424,7 +423,7 @@ async function runMcp(flags) {
         "生成安装命令（npx 或 pnpm dlx）。默认使用 @qiuye-ui registry alias。",
       inputSchema: z
         .object({
-          name: z.string().min(1).describe("组件名（例如 typing-text）"),
+          name: z.string().min(1).describe("组件名（例如 responsive-tabs）"),
           pm: z
             .enum(["npx", "pnpm"])
             .optional()

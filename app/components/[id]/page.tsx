@@ -39,9 +39,6 @@ export async function generateStaticParams() {
 }
 
 // 导入演示组件
-import { AnimatedButtonDemo } from "@/components/qiuye-ui/demos/animated-button-demo";
-import { GradientCardDemo } from "@/components/qiuye-ui/demos/gradient-card-demo";
-import { TypingTextDemo } from "@/components/qiuye-ui/demos/typing-text-demo";
 import { ResponsiveTabsDemo } from "@/components/qiuye-ui/demos/responsive-tabs-demo";
 import { ScrollableDialogDemo } from "@/components/qiuye-ui/demos/scrollable-dialog-demo";
 import { DotGlassDemo } from "@/components/qiuye-ui/demos/dot-glass-demo";
@@ -49,9 +46,6 @@ import { ImageViewerDemo } from "@/components/qiuye-ui/demos/image-viewer-demo";
 
 // TODO: 新增 qiuye-ui 自定义组件时需要完善 demo 文件
 const demoComponents = {
-  [ComponentId.ANIMATED_BUTTON]: AnimatedButtonDemo,
-  [ComponentId.GRADIENT_CARD]: GradientCardDemo,
-  [ComponentId.TYPING_TEXT]: TypingTextDemo,
   [ComponentId.RESPONSIVE_TABS]: ResponsiveTabsDemo,
   [ComponentId.SCROLLABLE_DIALOG]: ScrollableDialogDemo,
   [ComponentId.DOT_GLASS]: DotGlassDemo,
@@ -60,9 +54,6 @@ const demoComponents = {
 
 // 导入简单演示组件
 import {
-  AnimatedButtonSimpleDemo,
-  GradientCardSimpleDemo,
-  TypingTextSimpleDemo,
   ResponsiveTabsSimpleDemo,
   ScrollableDialogSimpleDemo,
   DotGlassSimpleDemo,
@@ -71,9 +62,6 @@ import {
 
 // 精简的单例演示组件
 const simpleDemoComponents = {
-  [ComponentId.ANIMATED_BUTTON]: AnimatedButtonSimpleDemo,
-  [ComponentId.GRADIENT_CARD]: GradientCardSimpleDemo,
-  [ComponentId.TYPING_TEXT]: TypingTextSimpleDemo,
   [ComponentId.RESPONSIVE_TABS]: ResponsiveTabsSimpleDemo,
   [ComponentId.SCROLLABLE_DIALOG]: ScrollableDialogSimpleDemo,
   [ComponentId.DOT_GLASS]: DotGlassSimpleDemo,
