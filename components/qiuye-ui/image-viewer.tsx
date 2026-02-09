@@ -619,16 +619,21 @@ export function ImageViewer({
             if (canPreview) setIsOpen(true);
           }}
         >
-          {imageLoading && (
-            <span
-              className={cn(
-                "absolute inset-0 flex items-center justify-center bg-muted/20 animate-pulse",
-                inlineRoundedClass
-              )}
-            >
-              <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
-            </span>
-          )}
+          <AnimatePresence>
+            {imageLoading && (
+              <motion.span
+                key="image-skeleton"
+                aria-hidden
+                initial={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className={cn(
+                  "absolute inset-0 z-1 bg-accent animate-pulse",
+                  inlineRoundedClass
+                )}
+              />
+            )}
+          </AnimatePresence>
           <motion.img
             layoutId={sharedLayoutId}
             ref={imageRef}
@@ -636,14 +641,16 @@ export function ImageViewer({
             alt={alt || ""}
             title={title}
             className={cn(
-              "block h-auto max-w-full transition-opacity duration-200",
+              "block h-auto max-w-full",
               inlineRoundedClass,
-              imageLoading ? "opacity-0" : "opacity-100",
               className
             )}
             style={{
               maxHeight: formatSize(maxHeight),
               maxWidth: formatSize(maxWidth),
+              opacity: imageLoading ? 0 : 1,
+              filter: imageLoading ? "blur(6px)" : "blur(0px)",
+              transition: "opacity 0.5s ease-out, filter 0.5s ease-out",
             }}
             loading={loading}
             onLoad={(event) => {

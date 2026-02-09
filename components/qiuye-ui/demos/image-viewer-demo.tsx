@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { ImageViewer } from "../image-viewer";
 import {
   Card,
@@ -9,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ViewSourceButton } from "@/components/view-source-button";
 
 const demoImages = {
@@ -60,6 +62,31 @@ const sourceCodes = {
   maxWidth={400}
   maxHeight={300}
 />`,
+  loading: `import { useState } from "react";
+import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
+import { Button } from "@/components/ui/button";
+
+function LoadingDemo() {
+  const [token, setToken] = useState(() => Date.now());
+
+  return (
+    <div className="space-y-4">
+      <ImageViewer
+        key={token}
+        src={\`https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=2400&q=80&_t=\${token}\`}
+        alt="山脉日出"
+        className="w-full"
+      />
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setToken(Date.now())}
+      >
+        重新加载（观察骨架屏与过渡效果）
+      </Button>
+    </div>
+  );
+}`,
   states: `import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
 
 // 禁用灯箱
@@ -73,6 +100,32 @@ const sourceCodes = {
 // 空链接占位
 <ImageViewer alt="空链接占位" src="" />`,
 };
+
+function LoadingTransitionDemo() {
+  const [reloadToken, setReloadToken] = useState(() => Date.now());
+
+  return (
+    <div className="space-y-4">
+      <div className="max-w-3xl mx-auto">
+        <ImageViewer
+          key={reloadToken}
+          src={`https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=2400&q=80&_t=${reloadToken}`}
+          alt="山脉日出"
+          className="w-full"
+        />
+      </div>
+      <div className="flex justify-center">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setReloadToken(Date.now())}
+        >
+          重新加载（观察骨架屏与过渡效果）
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export function ImageViewerDemo() {
   return (
@@ -95,6 +148,30 @@ export function ImageViewerDemo() {
               className="w-full"
             />
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="space-y-1.5">
+              <CardTitle>加载过渡效果</CardTitle>
+              <CardDescription>
+                图片加载时显示骨架屏动画，加载完成后平滑过渡入场
+              </CardDescription>
+            </div>
+            <ViewSourceButton
+              code={sourceCodes.loading}
+              title="加载过渡效果 - 源码"
+            />
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="secondary">骨架屏</Badge>
+            <Badge variant="secondary">模糊入场</Badge>
+          </div>
+          <LoadingTransitionDemo />
         </CardContent>
       </Card>
 
