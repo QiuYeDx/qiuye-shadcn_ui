@@ -637,7 +637,6 @@ export function ImageViewer({
             )}
           </AnimatePresence>
           <motion.img
-            key={"image-loaded"}
             layoutId={sharedLayoutId}
             ref={imageRef}
             src={resolvedSrc}
@@ -679,9 +678,6 @@ export function ImageViewer({
                 role="dialog"
                 aria-modal="true"
                 aria-label={alt ? `查看图片：${alt}` : "查看图片"}
-                // initial={{ opacity: 0 }}
-                // animate={{ opacity: 1 }}
-                // exit={{ opacity: 0 }}
                 transition={{ duration: 0.2, ease: "easeInOut" }}
               >
                 <motion.div
