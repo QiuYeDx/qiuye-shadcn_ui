@@ -20,6 +20,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Maximize2 } from "lucide-react";
 
 /* -------------------------------------------------------------------------- */
 /*                              Source Codes                                   */
@@ -78,6 +88,34 @@ function ScrollDemo() {
       {\`// 代码超出 maxHeight 时纵向滚动
 // 带滚动阴影指示器\`}
     </CodeBlock>
+  );
+}`,
+  autoHeight: `import { CodeBlock } from "@/components/qiuye-ui/code-block";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+
+function AutoHeightDemo() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">打开代码预览</Button>
+      </DialogTrigger>
+      <DialogContent className="h-[70vh] flex flex-col">
+        <DialogHeader>
+          <DialogTitle>代码预览</DialogTitle>
+        </DialogHeader>
+        {/* flex-1 + min-h-0 让 CodeBlock 自适应剩余高度 */}
+        <div className="flex-1 min-h-0">
+          <CodeBlock
+            language="typescript"
+            displayMode="auto-height"
+          >
+            {\`// 代码块高度跟随 Dialog 自适应
+// 无需手动设置 maxHeight\`}
+          </CodeBlock>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }`,
 };
@@ -375,7 +413,52 @@ export function CodeBlockDemo() {
         </CardContent>
       </Card>
 
-      {/* 5. 多语言示例 */}
+      {/* 5. 自适应高度模式 */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg">自适应高度模式</CardTitle>
+              <CardDescription>
+                高度自动适配父容器（如 Dialog），无需手动设置 maxHeight，适合弹窗 / Flex 布局场景
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary">displayMode=&quot;auto-height&quot;</Badge>
+              <ViewSourceButton code={sourceCodes.autoHeight} />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <Maximize2 className="h-4 w-4" />
+                打开代码预览
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="h-[70vh] max-h-[70vh] sm:max-w-2xl flex flex-col gap-0 p-0 overflow-hidden">
+              <DialogHeader className="px-6 pt-6 pb-4 shrink-0">
+                <DialogTitle>自适应高度代码预览</DialogTitle>
+                <DialogDescription>
+                  代码块高度跟随 Dialog 剩余空间自适应，超出部分可滚动
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex-1 min-h-0 px-6 pb-6">
+                <CodeBlock
+                  language="typescript"
+                  isDark={isDark}
+                  displayMode="auto-height"
+                >
+                  {sampleTypeScript}
+                </CodeBlock>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </CardContent>
+      </Card>
+
+      {/* 6. 多语言示例 */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
