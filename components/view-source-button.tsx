@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTheme } from "next-themes";
 import { Code, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,8 +13,7 @@ import {
   DialogDescription,
 } from "@/components/qiuye-ui/scrollable-dialog";
 import { toast } from "sonner";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { CodeBlock } from "@/components/qiuye-ui/code-block";
 
 interface ViewSourceButtonProps {
   code: string;
@@ -28,6 +28,8 @@ export function ViewSourceButton({
 }: ViewSourceButtonProps) {
   const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState(false);
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   const handleCopy = async () => {
     try {
@@ -69,25 +71,15 @@ export function ViewSourceButton({
 
         <ScrollableDialogContent
           fadeMasks={false}
-          horizontalScroll={true}
-          className="[&_[data-radix-scroll-area-viewport]]:border-none"
+          className="**:data-radix-scroll-area-viewport:border-none"
         >
-          <div className="rounded-md overflow-hidden border">
-            <SyntaxHighlighter
-              language="tsx"
-              style={oneDark}
-              customStyle={{
-                margin: 0,
-                borderRadius: 0,
-                fontSize: "0.875rem",
-                lineHeight: "1.5",
-              }}
-              showLineNumbers
-              wrapLongLines={false}
-            >
-              {code}
-            </SyntaxHighlighter>
-          </div>
+          <CodeBlock
+            language="tsx"
+            isDark={isDark}
+            className="[&_pre]:m-0!"
+          >
+            {code}
+          </CodeBlock>
         </ScrollableDialogContent>
 
         <ScrollableDialogFooter>
