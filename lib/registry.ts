@@ -514,6 +514,119 @@ export const componentRegistry: ComponentRegistry = {
     cliName: "image-viewer",
     basicUsage: basicUsageExamples[ComponentId.IMAGE_VIEWER],
   },
+
+  [ComponentId.DUAL_STATE_TOGGLE]: {
+    name: "Dual State Toggle",
+    description:
+      "双状态切换按钮：基于 shadcn/ui Button，内置点击缩放 + 图标切换动画（opacity + blur），支持 5 种过渡效果预设与自定义过渡配置。",
+    category: "交互",
+    dependencies: ["motion", "lucide-react"],
+    files: {
+      component: "components/qiuye-ui/dual-state-toggle.tsx",
+      demo: "components/qiuye-ui/demos/dual-state-toggle-demo.tsx",
+    },
+    props: [
+      {
+        name: "active",
+        type: "boolean",
+        description: "是否处于激活状态",
+        required: true,
+      },
+      {
+        name: "onToggle",
+        type: "(active: boolean) => void",
+        description: "状态切换回调",
+        required: true,
+      },
+      {
+        name: "activeIcon",
+        type: "React.ReactNode",
+        description: "激活状态下显示的图标",
+        required: true,
+      },
+      {
+        name: "inactiveIcon",
+        type: "React.ReactNode",
+        description: "非激活状态下显示的图标",
+        required: true,
+      },
+      {
+        name: "activeLabel",
+        type: "string",
+        description: "激活状态的无障碍标签",
+        required: false,
+      },
+      {
+        name: "inactiveLabel",
+        type: "string",
+        description: "非激活状态的无障碍标签",
+        required: false,
+      },
+      {
+        name: "blurAmount",
+        type: "string",
+        description: "图标切换时的模糊程度",
+        required: false,
+        default: '"2px"',
+      },
+      {
+        name: "shape",
+        type: '"square" | "circle"',
+        description: "按钮形状：square（圆角矩形）或 circle（纯圆形）",
+        required: false,
+        default: '"square"',
+      },
+      {
+        name: "effect",
+        type: '"fade" | "rotate" | "slide-up" | "slide-down" | "scale" | ToggleEffectConfig',
+        description:
+          "图标切换过渡效果，支持预设名或自定义 { initial, animate, exit } 配置",
+        required: false,
+        default: '"fade"',
+      },
+      {
+        name: "transitionDuration",
+        type: "number",
+        description: "图标切换动画时长（秒）",
+        required: false,
+        default: "0.25",
+      },
+      {
+        name: "variant",
+        type: "ButtonProps['variant']",
+        description: "按钮变体，继承 shadcn/ui Button 的 variant",
+        required: false,
+        default: '"default"',
+      },
+      {
+        name: "size",
+        type: "ButtonProps['size']",
+        description: "按钮尺寸，继承 shadcn/ui Button 的 size",
+        required: false,
+        default: '"icon"',
+      },
+      {
+        name: "className",
+        type: "string",
+        description: "额外的 CSS 类名",
+        required: false,
+      },
+    ],
+    version: "1.0.0",
+    author: "QiuYeDx",
+    tags: [
+      "toggle",
+      "button",
+      "icon",
+      "animation",
+      "switch",
+      "dual-state",
+      "motion",
+      "shadcn",
+    ],
+    cliName: "dual-state-toggle",
+    basicUsage: basicUsageExamples[ComponentId.DUAL_STATE_TOGGLE],
+  },
 };
 
 // 获取所有组件分类

@@ -12,8 +12,10 @@ import {
 } from "@/components/qiuye-ui/scrollable-dialog";
 import { DotGlass } from "@/components/qiuye-ui/dot-glass";
 import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
+import { DualStateToggle } from "@/components/qiuye-ui/dual-state-toggle";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Menu, X, Sun, Moon, Volume2, VolumeOff } from "lucide-react";
 
 // ResponsiveTabs 简单演示
 export function ResponsiveTabsSimpleDemo() {
@@ -160,6 +162,43 @@ export function ImageViewerSimpleDemo() {
         maxHeight={400}
         className="w-full"
         wrapperClassName="flex justify-center items-center"
+      />
+    </div>
+  );
+}
+
+// DualStateToggle 简单演示
+export function DualStateToggleSimpleDemo() {
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const [theme, setTheme] = React.useState(false);
+  const [muted, setMuted] = React.useState(false);
+
+  return (
+    <div className="flex items-center justify-center gap-3">
+      <DualStateToggle
+        active={menuOpen}
+        onToggle={setMenuOpen}
+        activeIcon={<X />}
+        inactiveIcon={<Menu />}
+        effect="rotate"
+        variant="outline"
+      />
+      <DualStateToggle
+        active={theme}
+        onToggle={setTheme}
+        activeIcon={<Sun />}
+        inactiveIcon={<Moon />}
+        effect="slide-up"
+        variant="secondary"
+        shape="circle"
+      />
+      <DualStateToggle
+        active={muted}
+        onToggle={setMuted}
+        activeIcon={<VolumeOff />}
+        inactiveIcon={<Volume2 />}
+        effect="scale"
+        variant="ghost"
       />
     </div>
   );

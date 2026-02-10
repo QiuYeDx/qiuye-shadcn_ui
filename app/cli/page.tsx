@@ -614,6 +614,7 @@ export default function App() {
                                 ComponentId.SCROLLABLE_DIALOG,
                                 ComponentId.DOT_GLASS,
                                 ComponentId.IMAGE_VIEWER,
+                                ComponentId.DUAL_STATE_TOGGLE,
                               ].map((component) => (
                                 <div
                                   key={component}

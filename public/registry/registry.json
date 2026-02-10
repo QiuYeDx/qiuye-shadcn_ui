@@ -18,6 +18,25 @@
       ]
     },
     {
+      "name": "dual-state-toggle",
+      "type": "registry:component",
+      "title": "DualStateToggle",
+      "author": "QiuYeDx <me@qiuyedx.com>",
+      "dependencies": [
+        "motion",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button"
+      ],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/dual-state-toggle.tsx"
+        }
+      ]
+    },
+    {
       "name": "image-viewer",
       "type": "registry:component",
       "title": "ImageViewer",

@@ -10,6 +10,7 @@ export enum ComponentId {
   SCROLLABLE_DIALOG = "scrollable-dialog",
   DOT_GLASS = "dot-glass",
   IMAGE_VIEWER = "image-viewer",
+  DUAL_STATE_TOGGLE = "dual-state-toggle",
 }
 
 // 组件 ID 数组，方便遍历
@@ -98,6 +99,24 @@ return (
   className="w-full"
   wrapperClassName="flex justify-center items-center"
 />`,
+  },
+  [ComponentId.DUAL_STATE_TOGGLE]: {
+    import: `import { DualStateToggle } from "@/components/qiuye-ui/dual-state-toggle";
+import { useState } from "react";
+import { Menu, X } from "lucide-react";`,
+    usage: `const [isOpen, setIsOpen] = useState(false);
+
+return (
+  <DualStateToggle
+    active={isOpen}
+    onToggle={setIsOpen}
+    activeIcon={<X />}
+    inactiveIcon={<Menu />}
+    activeLabel="关闭"
+    inactiveLabel="打开"
+    effect="rotate"
+  />
+);`,
   },
 };
 
