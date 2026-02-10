@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTheme } from "next-themes";
 import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
 import {
   ScrollableDialog,
@@ -13,6 +14,7 @@ import {
 import { DotGlass } from "@/components/qiuye-ui/dot-glass";
 import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
 import { DualStateToggle } from "@/components/qiuye-ui/dual-state-toggle";
+import { CodeBlock } from "@/components/qiuye-ui/code-block";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Menu, X, Sun, Moon, Volume2, VolumeOff } from "lucide-react";
@@ -201,5 +203,31 @@ export function DualStateToggleSimpleDemo() {
         variant="ghost"
       />
     </div>
+  );
+}
+
+// CodeBlock 简单演示
+export function CodeBlockSimpleDemo() {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+
+  const sampleCode = `import { useState } from "react";
+
+export function Counter({ initial = 0 }) {
+  const [count, setCount] = useState(initial);
+
+  return (
+    <div className="flex items-center gap-4">
+      <button onClick={() => setCount(c => c - 1)}>-</button>
+      <span className="text-xl font-bold">{count}</span>
+      <button onClick={() => setCount(c => c + 1)}>+</button>
+    </div>
+  );
+}`;
+
+  return (
+    <CodeBlock language="tsx" isDark={isDark}>
+      {sampleCode}
+    </CodeBlock>
   );
 }

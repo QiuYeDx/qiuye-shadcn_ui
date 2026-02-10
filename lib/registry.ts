@@ -627,6 +627,110 @@ export const componentRegistry: ComponentRegistry = {
     cliName: "dual-state-toggle",
     basicUsage: basicUsageExamples[ComponentId.DUAL_STATE_TOGGLE],
   },
+
+  [ComponentId.CODE_BLOCK]: {
+    name: "Code Block",
+    description:
+      "通用代码块显示组件：基于 prism-react-renderer 的语法高亮，7 套内置配色主题（浅/深色变体）+ 自定义主题支持，支持折叠、滚动、自适应高度三种显示模式，行号 sticky 固定，自带完整样式。",
+    category: "展示",
+    dependencies: ["prism-react-renderer", "motion", "lucide-react"],
+    files: {
+      component: "components/qiuye-ui/code-block.tsx",
+      demo: "components/qiuye-ui/demos/code-block-demo.tsx",
+    },
+    props: [
+      {
+        name: "children",
+        type: "string",
+        description: "代码内容",
+        required: true,
+      },
+      {
+        name: "language",
+        type: "string",
+        description: "编程语言（用于语法高亮）",
+        required: false,
+        default: '"plaintext"',
+      },
+      {
+        name: "isDark",
+        type: "boolean",
+        description: "是否为深色模式（控制内置主题的浅色/深色变体选择）",
+        required: false,
+        default: "true",
+      },
+      {
+        name: "colorTheme",
+        type: '"qiuvision" | "github" | "one" | "dracula" | "nord" | "vitesse" | "monokai"',
+        description: "内置配色主题名称，与 isDark 配合使用",
+        required: false,
+        default: '"qiuvision"',
+      },
+      {
+        name: "customTheme",
+        type: "CodeBlockThemeConfig | PrismTheme",
+        description:
+          "自定义主题配置（优先级高于 colorTheme 和 isDark）",
+        required: false,
+      },
+      {
+        name: "displayMode",
+        type: '"collapse" | "scroll" | "auto-height"',
+        description:
+          "显示模式：collapse（折叠）、scroll（滚动）、auto-height（自适应高度），不设置则无高度限制",
+        required: false,
+      },
+      {
+        name: "maxLines",
+        type: "number",
+        description: '折叠的行数阈值（displayMode="collapse" 时生效）',
+        required: false,
+        default: "15",
+      },
+      {
+        name: "maxHeight",
+        type: "string | number",
+        description:
+          '最大高度（displayMode="scroll" 时生效），支持 CSS 单位字符串或数字（px）',
+        required: false,
+        default: '"400px"',
+      },
+      {
+        name: "stickyLineNumbers",
+        type: "boolean",
+        description: "是否在横向滚动时固定左侧行号列（sticky 效果）",
+        required: false,
+        default: "true",
+      },
+      {
+        name: "spotlightOnCollapse",
+        type: "boolean",
+        description:
+          '是否在折叠后跳转时显示聚光灯阴影效果（displayMode="collapse" 时生效）',
+        required: false,
+        default: "true",
+      },
+      {
+        name: "className",
+        type: "string",
+        description: "额外的 CSS 类名",
+        required: false,
+      },
+    ],
+    version: "1.0.0",
+    author: "QiuYeDx",
+    tags: [
+      "code",
+      "syntax-highlighting",
+      "prism",
+      "theme",
+      "collapse",
+      "scroll",
+      "code-block",
+    ],
+    cliName: "code-block",
+    basicUsage: basicUsageExamples[ComponentId.CODE_BLOCK],
+  },
 };
 
 // 获取所有组件分类

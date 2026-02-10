@@ -615,6 +615,7 @@ export default function App() {
                                 ComponentId.DOT_GLASS,
                                 ComponentId.IMAGE_VIEWER,
                                 ComponentId.DUAL_STATE_TOGGLE,
+                                ComponentId.CODE_BLOCK,
                               ].map((component) => (
                                 <div
                                   key={component}

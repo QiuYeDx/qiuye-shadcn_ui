@@ -4,6 +4,28 @@
   "homepage": "https://ui.qiuyedx.com",
   "items": [
     {
+      "name": "code-block",
+      "type": "registry:component",
+      "title": "CodeBlock",
+      "author": "QiuYeDx <me@qiuyedx.com>",
+      "dependencies": [
+        "prism-react-renderer",
+        "motion",
+        "lucide-react"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/code-block.tsx"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/code-block-themes.ts"
+        }
+      ]
+    },
+    {
       "name": "dot-glass",
       "type": "registry:component",
       "title": "DotGlass",

@@ -11,6 +11,7 @@ export enum ComponentId {
   DOT_GLASS = "dot-glass",
   IMAGE_VIEWER = "image-viewer",
   DUAL_STATE_TOGGLE = "dual-state-toggle",
+  CODE_BLOCK = "code-block",
 }
 
 // 组件 ID 数组，方便遍历
@@ -117,6 +118,13 @@ return (
     effect="rotate"
   />
 );`,
+  },
+  [ComponentId.CODE_BLOCK]: {
+    import: `import { CodeBlock } from "@/components/qiuye-ui/code-block";`,
+    usage: `<CodeBlock language="typescript" isDark={true}>
+  {\`const greeting = "Hello, World!";
+console.log(greeting);\`}
+</CodeBlock>`,
   },
 };
 

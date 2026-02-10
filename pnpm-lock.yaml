@@ -113,6 +113,9 @@ dependencies:
   next-themes:
     specifier: ^0.4.6
     version: 0.4.6(react-dom@19.1.0)(react@19.1.0)
+  prism-react-renderer:
+    specifier: ^2.4.1
+    version: 2.4.1(react@19.1.0)
   react:
     specifier: 19.1.0
     version: 19.1.0
@@ -4850,6 +4853,16 @@ packages:
       ansi-regex: 5.0.1
       ansi-styles: 5.2.0
       react-is: 17.0.2
+    dev: false
+
+  /prism-react-renderer@2.4.1(react@19.1.0):
+    resolution: {integrity: sha512-ey8Ls/+Di31eqzUxC46h8MksNuGx/n0AAC8uKpwFau4RPDYLuE3EXTp8N8G2vX2N7UC/+IXeNUnlWBGGcAG+Ig==}
+    peerDependencies:
+      react: '>=16.0.0'
+    dependencies:
+      '@types/prismjs': 1.26.5
+      clsx: 2.1.1
+      react: 19.1.0
     dev: false
 
   /prismjs@1.30.0:

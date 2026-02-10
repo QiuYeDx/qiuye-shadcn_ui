@@ -44,6 +44,7 @@ import { ScrollableDialogDemo } from "@/components/qiuye-ui/demos/scrollable-dia
 import { DotGlassDemo } from "@/components/qiuye-ui/demos/dot-glass-demo";
 import { ImageViewerDemo } from "@/components/qiuye-ui/demos/image-viewer-demo";
 import { DualStateToggleDemo } from "@/components/qiuye-ui/demos/dual-state-toggle-demo";
+import { CodeBlockDemo } from "@/components/qiuye-ui/demos/code-block-demo";
 
 // TODO: 新增 qiuye-ui 自定义组件时需要完善 demo 文件
 const demoComponents = {
@@ -52,6 +53,7 @@ const demoComponents = {
   [ComponentId.DOT_GLASS]: DotGlassDemo,
   [ComponentId.IMAGE_VIEWER]: ImageViewerDemo,
   [ComponentId.DUAL_STATE_TOGGLE]: DualStateToggleDemo,
+  [ComponentId.CODE_BLOCK]: CodeBlockDemo,
 };
 
 // 导入简单演示组件
@@ -61,6 +63,7 @@ import {
   DotGlassSimpleDemo,
   ImageViewerSimpleDemo,
   DualStateToggleSimpleDemo,
+  CodeBlockSimpleDemo,
 } from "./simple-demos";
 
 // 精简的单例演示组件
@@ -70,6 +73,7 @@ const simpleDemoComponents = {
   [ComponentId.DOT_GLASS]: DotGlassSimpleDemo,
   [ComponentId.IMAGE_VIEWER]: ImageViewerSimpleDemo,
   [ComponentId.DUAL_STATE_TOGGLE]: DualStateToggleSimpleDemo,
+  [ComponentId.CODE_BLOCK]: CodeBlockSimpleDemo,
 };
 
 // 简单的演示预览组件
