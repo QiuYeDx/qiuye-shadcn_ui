@@ -126,3 +126,10 @@ html {
   overflow-y: auto;                 /* 必须是可滚动容器，属性才生效 */
   scrollbar-gutter: stable;         /* 或 stable both-edges 视情况 */
 }
+
+/* ---------- View Transition（主题切换圆形展开动画） ---------- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
