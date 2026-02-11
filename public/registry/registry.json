@@ -17,11 +17,15 @@
       "files": [
         {
           "type": "registry:component",
-          "path": "components/qiuye-ui/code-block.tsx"
+          "path": "components/qiuye-ui/code-block/code-block.tsx"
         },
         {
           "type": "registry:component",
-          "path": "components/qiuye-ui/code-block-themes.ts"
+          "path": "components/qiuye-ui/code-block/code-block-themes.ts"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/code-block/index.ts"
         }
       ]
     },

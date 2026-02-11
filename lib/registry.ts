@@ -635,7 +635,7 @@ export const componentRegistry: ComponentRegistry = {
     category: "展示",
     dependencies: ["prism-react-renderer", "motion", "lucide-react"],
     files: {
-      component: "components/qiuye-ui/code-block.tsx",
+      component: "components/qiuye-ui/code-block/code-block.tsx",
       demo: "components/qiuye-ui/demos/code-block-demo.tsx",
     },
     props: [
