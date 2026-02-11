@@ -87,6 +87,30 @@ function LoadingDemo() {
     </div>
   );
 }`,
+  hover: `import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
+
+// 默认弹性（bounce 默认 0.25）
+<ImageViewer
+  src="..."
+  alt="悬浮放大"
+  hoverScale={1.05}
+/>
+
+// 无弹性：平滑缩放
+<ImageViewer
+  src="..."
+  alt="无弹性"
+  hoverScale={1.05}
+  hoverBounce={0}
+/>
+
+// 较强弹性，回弹更明显
+<ImageViewer
+  src="..."
+  alt="强弹性悬浮"
+  hoverScale={1.05}
+  hoverBounce={0.5}
+/>`,
   states: `import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
 
 // 禁用灯箱
@@ -145,6 +169,7 @@ export function ImageViewerDemo() {
             <ImageViewer
               src={demoImages.landscape}
               alt="荒漠公路"
+              maxHeight={400}
               className="w-full"
             />
           </div>
@@ -259,6 +284,67 @@ export function ImageViewerDemo() {
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="space-y-1.5">
+              <CardTitle>悬浮放大效果</CardTitle>
+              <CardDescription>
+                鼠标悬浮时整体放大（含圆角容器），不影响页面布局，支持自定义弹性系数
+              </CardDescription>
+            </div>
+            <ViewSourceButton
+              code={sourceCodes.hover}
+              title="悬浮放大效果 - 源码"
+            />
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="secondary">hoverScale</Badge>
+            <Badge variant="secondary">hoverBounce</Badge>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="space-y-3">
+              <Badge variant="outline">scale=1.05 bounce=0</Badge>
+              <p className="text-xs text-muted-foreground">无弹性，平滑缩放</p>
+              <ImageViewer
+                src={demoImages.landscape}
+                alt="无弹性"
+                hoverScale={1.05}
+                hoverBounce={0}
+                className="w-full"
+              />
+            </div>
+            <div className="space-y-3">
+              <Badge variant="outline">scale=1.05（默认 bounce）</Badge>
+              <p className="text-xs text-muted-foreground">
+                默认弹性 0.25，轻微回弹
+              </p>
+              <ImageViewer
+                src={demoImages.landscape}
+                alt="默认弹性"
+                hoverScale={1.05}
+                className="w-full"
+              />
+            </div>
+            <div className="space-y-3">
+              <Badge variant="outline">scale=1.08 bounce=0.5</Badge>
+              <p className="text-xs text-muted-foreground">
+                较强弹性 0.5，回弹更明显
+              </p>
+              <ImageViewer
+                src={demoImages.landscape}
+                alt="强弹性"
+                hoverScale={1.05}
+                hoverBounce={0.5}
+                className="w-full"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="space-y-1.5">
               <CardTitle>状态展示</CardTitle>
               <CardDescription>禁用灯箱与空链接占位</CardDescription>
             </div>
@@ -273,12 +359,13 @@ export function ImageViewerDemo() {
                 src={demoImages.landscape}
                 alt="不启用灯箱"
                 enableLightbox={false}
+                maxHeight={300}
                 className="w-full"
               />
             </div>
             <div className="space-y-3">
               <Badge variant="outline">空链接占位</Badge>
-              <ImageViewer alt="空链接占位" src="" />
+              <ImageViewer alt="空链接占位" src="" maxHeight={300} />
             </div>
           </div>
         </CardContent>

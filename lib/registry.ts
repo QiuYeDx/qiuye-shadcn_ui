@@ -415,7 +415,7 @@ export const componentRegistry: ComponentRegistry = {
   [ComponentId.IMAGE_VIEWER]: {
     name: "Image Viewer",
     description:
-      "带灯箱预览的图片查看器，支持点击放大、滚轮/触控缩放与拖拽平移。",
+      "带灯箱预览的图片查看器，支持点击放大、滚轮/触控缩放与拖拽平移，内置骨架屏加载过渡与悬浮放大动效。",
     category: "媒体",
     dependencies: ["motion", "lucide-react"],
     files: {
@@ -433,6 +433,12 @@ export const componentRegistry: ComponentRegistry = {
         name: "alt",
         type: "string",
         description: "图片替代文本",
+        required: false,
+      },
+      {
+        name: "title",
+        type: "string",
+        description: "图片标题（鼠标悬停时显示的原生 title 提示）",
         required: false,
       },
       {
@@ -507,10 +513,52 @@ export const componentRegistry: ComponentRegistry = {
         description: "非灯箱模式下图片的最大宽度（数字为像素，字符串支持CSS值）",
         required: false,
       },
+      {
+        name: "hoverScale",
+        type: "number",
+        description:
+          "缩略图鼠标悬浮时的缩放倍数（例如 1.05 表示放大 5%），不设置则无悬浮效果",
+        required: false,
+      },
+      {
+        name: "hoverBounce",
+        type: "number",
+        description:
+          "悬浮动画的弹性系数（0‑1），仅在设置 hoverScale 时生效",
+        required: false,
+        default: "0.25",
+      },
+      {
+        name: "hoverDuration",
+        type: "number",
+        description:
+          "悬浮动画的时长（秒），仅在设置 hoverScale 时生效",
+        required: false,
+        default: "0.65",
+      },
+      {
+        name: "loading",
+        type: '"lazy" | "eager"',
+        description: "图片加载策略（HTML img 原生属性）",
+        required: false,
+        default: '"lazy"',
+      },
+      {
+        name: "onLoad",
+        type: "(event: React.SyntheticEvent<HTMLImageElement>) => void",
+        description: "图片加载成功的回调",
+        required: false,
+      },
+      {
+        name: "onError",
+        type: "(event: React.SyntheticEvent<HTMLImageElement>) => void",
+        description: "图片加载失败的回调",
+        required: false,
+      },
     ],
-    version: "1.0.0",
+    version: "1.1.0",
     author: "QiuYeDx",
-    tags: ["image", "viewer", "lightbox", "zoom", "gesture", "preview"],
+    tags: ["image", "viewer", "lightbox", "zoom", "gesture", "preview", "hover", "animation"],
     cliName: "image-viewer",
     basicUsage: basicUsageExamples[ComponentId.IMAGE_VIEWER],
   },

@@ -61,6 +61,12 @@ interface ImageViewerProps extends BaseImageProps {
   maxHeight?: number | string;
   /** 非灯箱模式下图片的最大宽度（支持数字px或CSS字符串） */
   maxWidth?: number | string;
+  /** 缩略图鼠标悬浮时的缩放倍数（例如 1.05 表示放大 5%），不设置则无悬浮效果 */
+  hoverScale?: number;
+  /** 悬浮动画的弹性系数（0‑1，默认 0.25），仅在设置 hoverScale 时生效 */
+  hoverBounce?: number;
+  /** 悬浮动画的时长（秒，默认 0.65），仅在设置 hoverScale 时生效 */
+  hoverDuration?: number;
 }
 
 const DEFAULT_PADDING = 32;
@@ -105,6 +111,9 @@ export function ImageViewer({
   enableLightbox = true,
   maxHeight,
   maxWidth,
+  hoverScale,
+  hoverBounce,
+  hoverDuration = 0.65,
   loading = "lazy",
   onLoad,
   onError,
@@ -608,13 +617,46 @@ export function ImageViewer({
   return (
     <LayoutGroup id={groupId}>
       <span className={cn("inline-block my-6 w-full", wrapperClassName)}>
-        <button
+        <motion.button
           type="button"
           className={cn(
             "group relative inline-block max-w-full bg-transparent p-0 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             inlineRoundedClass,
             canPreview ? "cursor-zoom-in" : "cursor-default"
           )}
+          whileHover={
+            hoverScale != null
+              ? {
+                scale: hoverScale,
+                transition: {
+                  type: "spring",
+                  bounce: hoverBounce ?? 0.25,
+                  duration: hoverDuration,
+                },
+              }
+              : undefined
+          }
+          whileTap={
+            hoverScale != null
+              ? {
+                scale: 0.97,
+                transition: {
+                  type: "spring",
+                  bounce: 0,
+                  duration: hoverDuration * 0.5,
+                },
+              }
+              : undefined
+          }
+          transition={
+            hoverScale != null
+              ? {
+                type: "spring",
+                bounce: hoverBounce ?? 0.25,
+                duration: hoverDuration,
+              }
+              : undefined
+          }
           onClick={() => {
             if (canPreview) setIsOpen(true);
           }}
@@ -666,7 +708,7 @@ export function ImageViewer({
             }}
             {...props}
           />
-        </button>
+        </motion.button>
       </span>
 
       {mounted &&
