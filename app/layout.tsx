@@ -35,13 +35,6 @@ export default function RootLayout({
     <html lang="zh-CN" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        // ! 禁用 radix 库的滚动条补偿
-        style={
-          {
-            "--removed-body-scroll-bar-size":
-              "0px !important; margin-right: 0 !important; width: auto !important; overflow: visible !important;",
-          } as React.CSSProperties
-        }
       >
         <ThemeProvider
           attribute="class"

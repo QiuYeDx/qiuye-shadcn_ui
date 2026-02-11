@@ -123,8 +123,31 @@
 
 html {
   /* 始终预留滚动条宽度, 防止页面内容宽度来回变化出现视觉闪烁 */
-  overflow-y: auto;                 /* 必须是可滚动容器，属性才生效 */
-  scrollbar-gutter: stable;         /* 或 stable both-edges 视情况 */
+  overflow-y: scroll;               /* 用 scroll 而非 auto, 确保 scrollbar-gutter 始终生效 */
+  scrollbar-gutter: stable;         /* 始终预留滚动条空间 */
+}
+
+/*
+ * 覆盖 react-remove-scroll-bar 在 Dialog/Sheet 等弹窗打开时注入到 body 的样式。
+ *
+ * react-remove-scroll-bar v2.3.8 会注入如下 CSS（通过 <style> 标签）：
+ *   body[data-scroll-locked] { overflow: hidden !important; margin-right: <gap>px !important; ... }
+ * 特异性为 0-1-1。
+ *
+ * 问题：
+ *   1. html 已通过 scrollbar-gutter:stable 预留了滚动条空间，
+ *      再加 margin-right 补偿会导致内容区突然变窄（双重补偿）。
+ *   2. body 上的 overflow:hidden 会使其成为"溢出容器"，破坏子元素的 position:sticky
+ *      定位（sticky header 退化为 relative，看起来像"消失"了）。
+ *
+ * 修复：用 html > body[data-scroll-locked]（特异性 0-1-2）+ !important 覆盖注入样式，
+ * 让 body 在弹窗打开时保持 overflow:visible、无额外边距。
+ * 背景滚动仍由 react-remove-scroll 的事件级拦截（wheel/touchmove）来阻止。
+ */
+html > body[data-scroll-locked] {
+  overflow: visible !important;
+  margin-right: 0px !important;
+  padding-right: 0px !important;
 }
 
 /* ---------- View Transition（主题切换圆形展开动画） ---------- */
