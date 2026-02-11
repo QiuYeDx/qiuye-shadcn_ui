@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
   ScrollableDialog,
   ScrollableDialogHeader,
-  ScrollableDialogContent,
   ScrollableDialogFooter,
   DialogTitle,
   DialogDescription,
@@ -69,18 +68,15 @@ export function ViewSourceButton({
           <DialogDescription>{description}</DialogDescription>
         </ScrollableDialogHeader>
 
-        <ScrollableDialogContent
-          fadeMasks={false}
-          className="**:data-radix-scroll-area-viewport:border-none"
-        >
+        <div className="overflow-hidden min-h-0 px-4 py-4">
           <CodeBlock
             language="tsx"
             isDark={isDark}
-            className="[&_pre]:m-0!"
+            displayMode="auto-height"
           >
             {code}
           </CodeBlock>
-        </ScrollableDialogContent>
+        </div>
 
         <ScrollableDialogFooter>
           <div className="flex justify-end gap-2">
