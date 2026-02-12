@@ -30,6 +30,13 @@ export interface TabItem {
  */
 type LayoutMode = "responsive" | "scroll" | "grid";
 
+/**
+ * Tab 尺寸
+ * - `"default"` — 默认尺寸
+ * - `"sm"` — 紧凑小尺寸，适用于工具栏、表单内嵌等场景
+ */
+type TabSize = "default" | "sm";
+
 /** ResponsiveTabs 组件的属性 */
 export interface ResponsiveTabsProps {
   /** 当前激活的 Tab 值 */
@@ -89,6 +96,13 @@ export interface ResponsiveTabsProps {
    * @default true
    */
   animatedHighlight?: boolean;
+  /**
+   * Tab 整体尺寸
+   * - `"default"` — 默认尺寸
+   * - `"sm"` — 紧凑小尺寸，触发器更小、文字更紧凑，适用于工具栏、表单内嵌等场景
+   * @default "default"
+   */
+  size?: TabSize;
 }
 
 /**
@@ -139,12 +153,14 @@ const ResponsiveTabs = React.forwardRef<
       fadeMasks = true,
       fadeMaskWidth = 64,
       animatedHighlight = true,
+      size = "default",
       ...props
     },
     ref
   ) => {
     // layoutId 动画高亮的唯一前缀（避免多实例冲突）
     const instanceId = React.useId();
+    const isSm = size === "sm";
 
     // 背景容器（不滚）
     const tabsListRef = useRef<HTMLDivElement>(null);
@@ -316,8 +332,10 @@ const ResponsiveTabs = React.forwardRef<
     );
 
     const triggerClass = cn(
-      !isGridAll && "shrink-0 min-w-fit px-3 py-2",
-      (isGridAll || isResponsive) &&
+      isSm ? "px-2 py-1 text-xs" : "px-3 py-2",
+      !isGridAll && "shrink-0 min-w-fit",
+      isGridAll && "shrink min-w-0 flex items-center justify-center",
+      isResponsive &&
       "sm:shrink sm:min-w-0 sm:flex sm:items-center sm:justify-center",
       "data-[state=active]:font-medium",
       // 当启用 layoutId 动画高亮时，取消 trigger 自带的选中态背景/阴影/边框，改由 motion.span 承载
@@ -341,7 +359,10 @@ const ResponsiveTabs = React.forwardRef<
           <AnimatePresence>
             {scrollButtons && !isGridAll && showLeftButton && (
               <motion.div
-                className="absolute left-1 top-1/2 z-10 h-8 w-8 -translate-y-1/2 rounded-full bg-background/80 p-0 shadow-md backdrop-blur-sm origin-left"
+                className={cn(
+                  "absolute top-1/2 z-10 -translate-y-1/2 rounded-full bg-background/80 p-0 shadow-md backdrop-blur-sm origin-left",
+                  isSm ? "left-0.5 h-6 w-6" : "left-1 h-8 w-8"
+                )}
                 initial={{ opacity: 0, scale: 0, x: -10 }}
                 animate={{ opacity: 1, scale: 1, x: 0 }}
                 exit={{ opacity: 0, scale: 0, x: -10 }}
@@ -351,13 +372,14 @@ const ResponsiveTabs = React.forwardRef<
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-8 w-8 size-8 rounded-full hover:bg-transparent cursor-pointer",
+                    "rounded-full hover:bg-transparent cursor-pointer",
+                    isSm ? "h-6 w-6 size-6" : "h-8 w-8 size-8",
                     buttonVisibilityClass
                   )}
                   onClick={() => scrollByDir("left")}
                   aria-label="向左滚动"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className={isSm ? "h-3 w-3" : "h-4 w-4"} />
                 </Button>
               </motion.div>
             )}
@@ -367,7 +389,10 @@ const ResponsiveTabs = React.forwardRef<
           <AnimatePresence>
             {scrollButtons && !isGridAll && showRightButton && (
               <motion.div
-                className="absolute right-1 top-1/2 z-10 h-8 w-8 -translate-y-1/2 rounded-full bg-background/80 p-0 shadow-md backdrop-blur-sm origin-right"
+                className={cn(
+                  "absolute top-1/2 z-10 -translate-y-1/2 rounded-full bg-background/80 p-0 shadow-md backdrop-blur-sm origin-right",
+                  isSm ? "right-0.5 h-6 w-6" : "right-1 h-8 w-8"
+                )}
                 initial={{ opacity: 0, scale: 0, x: 10 }}
                 animate={{ opacity: 1, scale: 1, x: 0 }}
                 exit={{ opacity: 0, scale: 0, x: 10 }}
@@ -377,13 +402,14 @@ const ResponsiveTabs = React.forwardRef<
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-8 w-8 size-8 rounded-full hover:bg-transparent cursor-pointer",
+                    "rounded-full hover:bg-transparent cursor-pointer",
+                    isSm ? "h-6 w-6 size-6" : "h-8 w-8 size-8",
                     buttonVisibilityClass
                   )}
                   onClick={() => scrollByDir("right")}
                   aria-label="向右滚动"
                 >
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className={isSm ? "h-3 w-3" : "h-4 w-4"} />
                 </Button>
               </motion.div>
             )}
@@ -416,7 +442,8 @@ const ResponsiveTabs = React.forwardRef<
                     )}
                     <span
                       className={cn(
-                        "flex items-center gap-2 max-w-full",
+                        "flex items-center max-w-full",
+                        isSm ? "gap-1.5" : "gap-2",
                         animatedHighlight && "relative z-[1]"
                       )}
                     >
@@ -427,7 +454,11 @@ const ResponsiveTabs = React.forwardRef<
                       {item.badge !== undefined && (
                         <Badge
                           variant="secondary"
-                          className="ml-1 h-4 min-w-[20px] px-1 text-xs"
+                          className={
+                            isSm
+                              ? "ml-0.5 h-3.5 min-w-[16px] px-0.5 text-[10px]"
+                              : "ml-1 h-4 min-w-[20px] px-1 text-xs"
+                          }
                         >
                           {item.badge}
                         </Badge>

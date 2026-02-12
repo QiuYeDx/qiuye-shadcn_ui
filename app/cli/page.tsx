@@ -167,8 +167,8 @@ export default function CLIPage() {
               ]}
               layout="grid"
               gridColsClass="grid-cols-2"
-              listClassName="w-[140px] sm:w-[180px] h-8"
-              triggerClassName="text-xs"
+              listClassName="w-[140px] sm:w-[180px]"
+              size="sm"
               scrollButtons={false}
               fadeMasks={false}
             />

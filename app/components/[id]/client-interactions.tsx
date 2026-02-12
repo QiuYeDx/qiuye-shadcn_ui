@@ -72,8 +72,8 @@ function PackageManagerSelector() {
         items={pmItems}
         layout="grid"
         gridColsClass="grid-cols-2"
-        listClassName="w-[140px] h-8"
-        triggerClassName="text-xs"
+        listClassName="w-[140px]"
+        size="sm"
         scrollButtons={false}
         fadeMasks={false}
       />

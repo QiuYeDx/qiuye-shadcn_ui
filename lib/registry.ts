@@ -152,8 +152,16 @@ export const componentRegistry: ComponentRegistry = {
         required: false,
         default: "true",
       },
+      {
+        name: "size",
+        type: '"default" | "sm"',
+        description:
+          "Tab 整体尺寸：default 为默认尺寸，sm 为紧凑小尺寸（更小的内边距和文字），适用于工具栏、表单内嵌等场景",
+        required: false,
+        default: "default",
+      },
     ],
-    version: "1.2.0",
+    version: "1.3.0",
     author: "QiuYeDx",
     tags: [
       "tabs",
