@@ -778,6 +778,14 @@ export const componentRegistry: ComponentRegistry = {
             default: '"400px"',
           },
           {
+            name: "showLineNumbers",
+            type: "boolean | number",
+            description:
+              "控制行号显示策略：true 始终显示、false 始终隐藏、数字 n 表示行数 >= n 时才显示",
+            required: false,
+            default: "true",
+          },
+          {
             name: "stickyLineNumbers",
             type: "boolean",
             description: "是否在横向滚动时固定左侧行号列（sticky 效果）",

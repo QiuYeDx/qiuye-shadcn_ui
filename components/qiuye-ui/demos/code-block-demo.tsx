@@ -160,6 +160,25 @@ console.log(message);\`}
     </CodeBlock>
   );
 }`,
+  showLineNumbers: `import { CodeBlock } from "@/components/qiuye-ui/code-block";
+
+function LineNumbersDemo() {
+  return (
+    <div className="space-y-4">
+      {/* 始终隐藏行号 */}
+      <CodeBlock language="typescript" showLineNumbers={false}>
+        {\`const a = "始终隐藏行号";
+console.log(a);\`}
+      </CodeBlock>
+
+      {/* 代码 >= 5 行时才显示行号 */}
+      <CodeBlock language="typescript" showLineNumbers={5}>
+        {\`const b = "少于 5 行时隐藏行号";
+console.log(b);\`}
+      </CodeBlock>
+    </div>
+  );
+}`,
 };
 
 /* -------------------------------------------------------------------------- */
@@ -645,7 +664,56 @@ export function CodeBlockDemo() {
         </CardContent>
       </Card>
 
-      {/* 9. 面板 + 折叠模式组合 */}
+      {/* 9. 行号显示控制 */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg">行号显示控制</CardTitle>
+              <CardDescription>
+                通过 showLineNumbers 控制行号显示策略：始终显示、始终隐藏、或按行数阈值自动切换
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary">showLineNumbers</Badge>
+              <ViewSourceButton code={sourceCodes.showLineNumbers} />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* 始终隐藏行号 */}
+          <div>
+            <p className="text-sm text-muted-foreground mb-2">
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">showLineNumbers=&#123;false&#125;</code> — 始终隐藏行号
+            </p>
+            <CodeBlock language="tsx" isDark={isDark} showLineNumbers={false}>
+              {sampleJSX}
+            </CodeBlock>
+          </div>
+
+          {/* 按行数阈值自动切换 */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">
+                <code className="text-xs bg-muted px-1 py-0.5 rounded">showLineNumbers=&#123;15&#125;</code> — 代码不足 15 行，自动隐藏
+              </p>
+              <CodeBlock language="tsx" isDark={isDark} showLineNumbers={15}>
+                {sampleJSX}
+              </CodeBlock>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">
+                <code className="text-xs bg-muted px-1 py-0.5 rounded">showLineNumbers=&#123;15&#125;</code> — 代码超过 15 行，自动显示
+              </p>
+              <CodeBlock language="typescript" isDark={isDark} showLineNumbers={15}>
+                {sampleTypeScript.slice(0, sampleTypeScript.indexOf("\n\n  // 分页"))}
+              </CodeBlock>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 10. 面板 + 折叠模式组合 */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">

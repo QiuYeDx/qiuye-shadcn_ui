@@ -85,6 +85,14 @@ export interface CodeBlockProps {
    * 默认 "400px"
    */
   maxHeight?: string | number;
+  /**
+   * 控制左侧行号的显示策略
+   *
+   * - `true`（默认）：始终显示行号
+   * - `false`：始终隐藏行号
+   * - `number`（如 `5`）：代码行数 >= 该值时才显示行号，否则隐藏
+   */
+  showLineNumbers?: boolean | number;
   /** 是否在横向滚动时固定左侧行号列（sticky 效果），默认 true */
   stickyLineNumbers?: boolean;
   /** 是否在折叠后跳转时显示聚光灯阴影效果（displayMode="collapse" 时生效），默认 true */
@@ -130,6 +138,7 @@ export function CodeBlock({
   displayMode,
   maxLines = 15,
   maxHeight = "400px",
+  showLineNumbers = true,
   stickyLineNumbers = true,
   spotlightOnCollapse = true,
   noShadow = false,
@@ -152,6 +161,14 @@ export function CodeBlock({
   const effectiveMode: CodeBlockDisplayMode | null = displayMode ?? null;
 
   const lineCount = code.split("\n").length;
+
+  // ---- 行号显示策略 ----
+  const lineNumbersVisible =
+    showLineNumbers === true
+      ? true
+      : showLineNumbers === false
+        ? false
+        : lineCount >= showLineNumbers;
 
   // ---- Collapse 模式状态 ----
   const [isExpanded, setIsExpanded] = useState(false);
@@ -295,7 +312,7 @@ export function CodeBlock({
       : effectiveMode === "scroll"
         ? " scroll-mode"
         : "";
-  const wrapperClass = `qiuye-code-block${stickyLineNumbers ? " sticky-line-numbers" : ""}${noShadow ? " no-shadow" : ""}${modeClass}${className ? ` ${className}` : ""}`;
+  const wrapperClass = `qiuye-code-block${lineNumbersVisible ? "" : " hide-line-numbers"}${stickyLineNumbers && lineNumbersVisible ? " sticky-line-numbers" : ""}${noShadow ? " no-shadow" : ""}${modeClass}${className ? ` ${className}` : ""}`;
 
   // ---- 普通模式（无显示模式，或 collapse 模式但行数不够触发折叠） ----
   if (!effectiveMode || (effectiveMode === "collapse" && !shouldCollapse)) {
@@ -819,6 +836,23 @@ function CodeBlockStyles() {
 
       .qiuye-code-block.sticky-line-numbers pre code > div:hover .line-number {
         background-color: var(--cb-hover-solid);
+      }
+
+      /* ============================================
+         隐藏行号模式 - 不显示左侧行号列
+         ============================================ */
+
+      .qiuye-code-block.hide-line-numbers .line-number {
+        display: none;
+      }
+
+      .qiuye-code-block.hide-line-numbers pre {
+        padding-left: 1rem;
+      }
+
+      .qiuye-code-block.hide-line-numbers .collapsible-code-block pre,
+      .qiuye-code-block.hide-line-numbers .scrollable-code-block pre {
+        padding-left: 1rem;
       }
 
       /* ============================================
