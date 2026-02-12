@@ -2,8 +2,17 @@
 
 import { useState, useSyncExternalStore, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { ArrowLeft, Copy, CheckCircle, Code } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { CodeBlock as CodeBlockDisplay } from "@/components/qiuye-ui/code-block/code-block";
 import {
   ResponsiveTabs,
   type TabItem,
@@ -328,5 +337,52 @@ export function DependenciesSection({
         <CopyAllDependenciesButton dependencies={dependencies} />
       </div>
     </div>
+  );
+}
+
+// ============ 基本用法代码块（深浅模式自适应） ============
+
+interface BasicUsageBlockProps {
+  componentName: string;
+  cliName: string;
+  importCode: string;
+  usageCode: string;
+}
+
+export function BasicUsageBlock({
+  componentName,
+  importCode,
+  usageCode,
+}: BasicUsageBlockProps) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">基本用法</CardTitle>
+        <CardDescription>使用 {componentName} 组件的基础示例</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div>
+            <h4 className="text-sm font-medium mb-2 text-muted-foreground">
+              导入组件
+            </h4>
+            <CodeBlockDisplay language="tsx" isDark={isDark} className="[&_pre]:my-0!">
+              {importCode}
+            </CodeBlockDisplay>
+          </div>
+          <div>
+            <h4 className="text-sm font-medium mb-2 text-muted-foreground">
+              使用组件
+            </h4>
+            <CodeBlockDisplay language="tsx" isDark={isDark} className="[&_pre]:my-0!">
+              {usageCode}
+            </CodeBlockDisplay>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

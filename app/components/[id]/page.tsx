@@ -30,6 +30,7 @@ import {
   CopyCodeButton,
   DependenciesSection,
   ComponentDetailTabs,
+  BasicUsageBlock,
 } from "./client-interactions";
 
 // 生成静态参数，用于静态站点生成
@@ -109,50 +110,15 @@ function DemoPreview({
   );
 }
 
-// 简单的代码块组件
-function CodeBlock({ component }: { component: ComponentInfo }) {
-  // 从组件信息中获取基础用法示例
+// 基本用法代码块 — 服务端预计算代码文本，客户端组件负责主题感知渲染
+function getBasicUsageCodes(component: ComponentInfo) {
   const example = component.basicUsage;
-
-  // 如果没有找到对应的示例，使用默认的简单格式
   const importCode =
     example?.import ||
     `import { ${String(component.name || "").replace(/\s+/g, "")} } from "@/components/qiuye-ui/${component.cliName}";`;
   const usageCode =
     example?.usage || `<${String(component.name || "").replace(/\s+/g, "")} />`;
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">基本用法</CardTitle>
-        <CardDescription>使用 {component.name} 组件的基础示例</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div>
-            <h4 className="text-sm font-medium mb-2 text-muted-foreground">
-              导入组件
-            </h4>
-            <div className="bg-muted/50 rounded-md p-3 overflow-x-auto">
-              <code className="text-sm font-mono whitespace-pre">
-                {importCode}
-              </code>
-            </div>
-          </div>
-          <div>
-            <h4 className="text-sm font-medium mb-2 text-muted-foreground">
-              使用组件
-            </h4>
-            <div className="bg-muted/50 rounded-md p-3 overflow-x-auto">
-              <code className="text-sm font-mono whitespace-pre">
-                {usageCode}
-              </code>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
+  return { importCode, usageCode };
 }
 
 interface ComponentDetailPageProps {
@@ -227,7 +193,11 @@ export default async function ComponentDetailPage({
             <div className="space-y-6">
               {/* 示例：代码或演示区块占满主列，避免留白 */}
               <DemoPreview componentId={componentId} component={component} />
-              <CodeBlock component={component} />
+              <BasicUsageBlock
+                componentName={component.name}
+                cliName={component.cliName}
+                {...getBasicUsageCodes(component)}
+              />
             </div>
           </div>
 
