@@ -48,27 +48,83 @@ type BaseImageProps = Omit<
   | "onAnimationIterationCapture"
 >;
 
+/** ImageViewer 组件的属性 */
 interface ImageViewerProps extends BaseImageProps {
+  /**
+   * 图片源地址，支持 URL 字符串或 Blob 对象
+   * - 传入 `string` 时作为 `<img>` 的 `src`
+   * - 传入 `Blob` 时自动通过 `URL.createObjectURL` 创建临时 URL
+   * - 未提供或为空字符串时显示占位符
+   */
   src?: string | Blob;
+  /**
+   * 缩略图的圆角大小
+   * @default "lg"
+   */
   rounded?: RoundedSize;
+  /**
+   * 灯箱（Lightbox）中图片的圆角大小，未设置时继承 `rounded` 的值
+   */
   lightboxRounded?: RoundedSize;
+  /**
+   * 缩略图外层容器的自定义 className
+   */
   wrapperClassName?: string;
+  /**
+   * 灯箱中图片的自定义 className
+   */
   lightboxClassName?: string;
+  /**
+   * 灯箱遮罩层的自定义 className
+   */
   overlayClassName?: string;
+  /**
+   * 灯箱遮罩层是否启用背景模糊效果
+   * @default false
+   */
   overlayBlur?: boolean;
+  /**
+   * 灯箱图片距离视口边缘的最小内边距（像素），最小值为 16
+   * @default 32
+   */
   lightboxPadding?: number;
+  /**
+   * 是否启用灯箱预览功能，点击缩略图后展开全屏查看
+   * @default true
+   */
   enableLightbox?: boolean;
-  /** 非灯箱模式下图片的最大高度（支持数字px或CSS字符串） */
+  /**
+   * 非灯箱模式下图片的最大高度
+   * - 传入 `number` 时单位为 px
+   * - 传入 `string` 时作为 CSS 值（如 `"50vh"`）
+   */
   maxHeight?: number | string;
-  /** 非灯箱模式下图片的最大宽度（支持数字px或CSS字符串） */
+  /**
+   * 非灯箱模式下图片的最大宽度
+   * - 传入 `number` 时单位为 px
+   * - 传入 `string` 时作为 CSS 值（如 `"300px"`）
+   */
   maxWidth?: number | string;
-  /** 缩略图鼠标悬浮时的缩放倍数（例如 1.05 表示放大 5%），不设置则无悬浮效果 */
+  /**
+   * 缩略图鼠标悬浮时的缩放倍数（例如 `1.05` 表示放大 5%），不设置则无悬浮效果
+   */
   hoverScale?: number;
-  /** 悬浮动画的弹性系数（0‑1，默认 0.25），仅在设置 hoverScale 时生效 */
+  /**
+   * 悬浮动画的弹性系数（0–1），仅在设置 `hoverScale` 时生效
+   * @default 0.25
+   */
   hoverBounce?: number;
-  /** 悬浮动画的时长（秒，默认 0.65），仅在设置 hoverScale 时生效 */
+  /**
+   * 悬浮动画的时长（秒），仅在设置 `hoverScale` 时生效
+   * @default 0.65
+   */
   hoverDuration?: number;
-  /** 是否允许用户选中/复制/拖拽图片（默认 false，防止浏览器原生选中效果影响长按等交互体验） */
+  /**
+   * 是否允许用户选中/复制/拖拽图片
+   *
+   * 设为 `false` 时会禁用浏览器原生选中，防止长按等交互触发意外效果
+   * @default false
+   */
   selectable?: boolean;
 }
 
@@ -99,6 +155,29 @@ const getTouchMidpoint = (touches: React.TouchList) => ({
   y: (touches[0].clientY + touches[1].clientY) / 2,
 });
 
+/**
+ * ImageViewer — 图片查看器组件
+ *
+ * 提供带灯箱（Lightbox）预览的图片展示，支持：
+ * - 点击缩略图打开全屏灯箱，带 `layoutId` 过渡动画
+ * - 灯箱内双指捏合缩放（移动端）、鼠标滚轮/触控板缩放（桌面端）
+ * - 灯箱内单指/鼠标拖拽平移
+ * - 缩略图悬浮缩放动效（可选）
+ * - 图片加载骨架屏、加载失败占位符
+ * - 支持 `string` URL 或 `Blob` 作为图片源
+ *
+ * @example
+ * ```tsx
+ * // 基本用法
+ * <ImageViewer src="/photo.jpg" alt="示例图片" />
+ *
+ * // 禁用灯箱 + 限制最大尺寸
+ * <ImageViewer src="/photo.jpg" enableLightbox={false} maxHeight={300} maxWidth="50%" />
+ *
+ * // 悬浮缩放 + 自定义灯箱圆角 + 背景模糊
+ * <ImageViewer src="/photo.jpg" hoverScale={1.03} lightboxRounded="xl" overlayBlur />
+ * ```
+ */
 export function ImageViewer({
   src,
   alt,

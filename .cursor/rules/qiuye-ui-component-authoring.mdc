@@ -1,7 +1,7 @@
 ---
 alwaysApply: true
 name: qiuye-ui-component-authoring
-description: 用于 QiuYe UI（基于 shadcn/ui + Next.js App Router）的自定义组件新增、注册、展示与 Registry 集成的完整编码与发布规范。
+description: 用于 QiuYe UI（基于 shadcn/ui + Next.js App Router）的自定义组件新增、修改、注册、展示与 Registry 集成的完整编码与发布规范。
 ---
 
 ## 你是谁（Cursor Agent 行为准则）
@@ -30,9 +30,9 @@ description: 用于 QiuYe UI（基于 shadcn/ui + Next.js App Router）的自定
   - 组件 ID/基础用法：`lib/component-constants.ts`
   - 组件元信息注册表：`lib/registry.ts`
 - **shadcn Registry（给 shadcn CLI 安装用）**：
- - `public/registry/<name>.json`：单组件 registry item（包含源码 content）
- - `public/registry/registry.json`：registry 清单（由脚本生成，避免手改）
- - 更新脚本：`scripts/update-registry.mjs`（仓库脚本：`pnpm update-registry`）
+- `public/registry/<name>.json`：单组件 registry item（包含源码 content）
+- `public/registry/registry.json`：registry 清单（由脚本生成，避免手改）
+- 更新脚本：`scripts/update-registry.mjs`（仓库脚本：`pnpm update-registry`）
 - **shadcn CLI Registry 配置**：`components.json`
   - 本地开发默认：`"@qiuye-ui": "http://localhost:3000/registry/{name}.json"`
 
@@ -60,6 +60,7 @@ description: 用于 QiuYe UI（基于 shadcn/ui + Next.js App Router）的自定
   - 需要 ref 的组件优先用 `React.forwardRef`
   - 导出保持与现有组件一致（`export { Xxx }`，必要时导出 variants）
   - 组件 API（props）要明确：类型、默认值、可选/必选
+  - **必须按照「JSDoc / 注释规范」为 interface、props、组件函数编写完整 JSDoc**（详见下方独立章节）
 
 ### 2）实现 Demo（必须）
 
@@ -127,6 +128,7 @@ description: 用于 QiuYe UI（基于 shadcn/ui + Next.js App Router）的自定
 - `"files": [{ "type": "registry:component", "path": "components/qiuye-ui/<id>.tsx" }]`
 
 注意：
+
 - 不要手动维护 `files[].content`（容易过期），后续用脚本自动写入。
 - `public/registry/registry.json` **不要手改**，由脚本生成。
 - 如果组件需要**拆分多个文件**（例如 `types.ts` / `utils.ts` / 多个导出文件），必须把这些文件都加入 `files[]`，否则用户通过 shadcn CLI 安装后会缺文件。
@@ -139,6 +141,7 @@ description: 用于 QiuYe UI（基于 shadcn/ui + Next.js App Router）的自定
 - `pnpm update-registry`
 
 该命令会：
+
 - 把 `public/registry/*.json` 中 `files[].content` 更新为 `components/qiuye-ui/*` 的真实源码
 - 重新生成 `public/registry/registry.json`
 
@@ -156,6 +159,98 @@ description: 用于 QiuYe UI（基于 shadcn/ui + Next.js App Router）的自定
 
 ---
 
+## 同样重要：修改「现有组件」时的必要流程（不得遗漏）
+
+> 目标：确保修改后的组件源码、Registry JSON、站点元信息保持一致，用户通过 `shadcn add @qiuye-ui/<name>` 安装时能获得完整、最新的文件与依赖。
+
+对现有组件做任何修改后，必须**逐条对照以下检查清单**，判断哪些步骤需要重新执行。
+
+### 1）判断变更类型，决定需要同步的范围
+
+| 变更类型 | 需要同步的内容 |
+|---|---|
+| **仅修改组件源码**（逻辑/样式/JSDoc） | → 执行 `pnpm update-registry`（同步 `files[].content`） |
+| **新增/移除了组件引用的本地文件**（如 hook、utils、类型文件） | → 更新 `public/registry/<id>.json` 的 `files[]`，再执行 `pnpm update-registry` |
+| **新增/移除了 npm 依赖** | → 更新 `public/registry/<id>.json` 的 `dependencies` / `registryDependencies`，同步更新 `lib/registry.ts` 的 `dependencies` |
+| **Props 接口变更**（新增/删除/重命名 prop，默认值变化） | → 更新 `lib/registry.ts` 的 `props` / `propsInfo` 字段 |
+| **基础用法变更**（导出名变化、最小示例需要调整） | → 更新 `lib/component-constants.ts` 的 `basicUsageExamples` |
+| **组件分类/描述/标签变更** | → 更新 `lib/registry.ts` 的 `name` / `description` / `category` / `tags` |
+| **Demo 逻辑需要跟随变更** | → 更新 `components/qiuye-ui/demos/<id>-demo.tsx` 和/或 `app/components/[id]/simple-demos.tsx` |
+
+### 2）重点场景：组件引入了新的本地文件
+
+当组件新增了对项目内其他文件的引用（最常见的是通用 hook 或工具函数），**必须**将这些文件加入 `public/registry/<id>.json` 的 `files[]`，否则用户通过 shadcn CLI 安装后会**缺少依赖文件**导致编译失败。
+
+#### 判断依据
+
+检查组件源码中所有 `import ... from "@/..."` 的导入路径：
+
+- 来自 `@/components/ui/*` 的导入 → 由 `registryDependencies` 管理（shadcn 会自动拉取），**不需要**加入 `files[]`
+- 来自 `@/lib/utils` 的导入 → 属于 shadcn 基础设施，**不需要**加入 `files[]`
+- 来自 `@/hooks/*`、`@/lib/*`（非 utils）、`@/components/qiuye-ui/*`（其他子文件）等的导入 → **必须**加入 `files[]`
+
+#### 操作步骤
+
+以组件 `image-viewer` 引入了 `hooks/use-hover-support.ts` 和 `hooks/use-prevent-scroll.ts` 为例：
+
+1. **编辑 `public/registry/<id>.json`**，在 `files[]` 数组中追加新条目：
+
+   ```json
+   {
+     "files": [
+       { "type": "registry:component", "path": "components/qiuye-ui/image-viewer.tsx" },
+       { "type": "registry:hook", "path": "hooks/use-hover-support.ts" },
+       { "type": "registry:hook", "path": "hooks/use-prevent-scroll.ts" }
+     ]
+   }
+   ```
+
+   - `type` 建议根据文件类型选用：`registry:hook`（hook）、`registry:lib`（工具函数/类型）、`registry:component`（子组件文件）
+   - 为了让 `pnpm update-registry` 能自动写入 `content`，确保 `path` 指向仓库内实际文件
+2. **执行 `pnpm update-registry`**：脚本会自动读取每个 `files[].path` 对应的源码并写入 `content` 字段
+
+#### 常见需要加入 `files[]` 的文件类型
+
+- `hooks/use-xxx.ts`：自定义 hooks
+- `lib/xxx.ts`（非 `utils.ts`）：工具函数、常量、类型定义
+- `components/qiuye-ui/<id>/*.ts(x)`：组件拆分出的子文件（如类型、变体、子组件）
+
+### 3）重点场景：新增或移除了 npm / shadcn 依赖
+
+- **新增 npm 依赖**：
+  1. `pnpm add <pkg>`
+  2. 在 `public/registry/<id>.json` 的 `"dependencies"` 数组中加入包名
+  3. 在 `lib/registry.ts` 对应条目的 `dependencies` 数组中加入包名
+- **新增 shadcn 组件依赖**（如组件内新 import 了 `@/components/ui/badge`）：
+  1. 在 `public/registry/<id>.json` 的 `"registryDependencies"` 数组中加入 shadcn 组件名（如 `"badge"`）
+- **移除依赖**：反向操作，从上述位置删除对应条目
+
+### 4）修改后必须执行 `pnpm update-registry`
+
+**任何**对以下内容的修改都需要重新执行此命令：
+
+- `components/qiuye-ui/<id>.tsx`（组件源码）
+- `hooks/*`、`lib/*` 等被 `files[]` 引用的文件
+- `public/registry/<id>.json`（修改了 `files[]`、`dependencies` 等字段）
+
+该命令会：
+
+- 将所有 `public/registry/*.json` 中 `files[].content` 更新为对应源文件的最新内容
+- 重新生成 `public/registry/registry.json` 清单
+
+### 5）修改后验证
+
+- **Registry 验证**：访问 `http://localhost:3000/registry/<id>.json`，确认：
+  - `files[].content` 与最新源码一致
+  - `dependencies` / `registryDependencies` 完整、无多余项
+  - 所有被组件 import 的本地文件都已出现在 `files[]` 中
+- **站点验证**（如果修改了 props / demo / 元信息）：
+  - `/components/<id>` 详情页正常渲染，API 表格与实际 props 一致
+- **可选：CLI 安装验证**：
+  - `pnpm dlx shadcn@latest add @qiuye-ui/<id>`，确认安装后项目能正常编译
+
+---
+
 ## 修改约束（避免破坏现有行为）
 
 - 不要随意改变已有组件导出名/文件名（这会破坏 registry/文档/安装路径）。
@@ -164,6 +259,87 @@ description: 用于 QiuYe UI（基于 shadcn/ui + Next.js App Router）的自定
   - 用 `pnpm add <pkg>`（或 `pnpm add -D <pkg>`）
   - **必须**同步更新 `public/registry/<id>.json` 的 `"dependencies"` / `"registryDependencies"`（这是 shadcn CLI 安装时依赖解析的依据）
   - `lib/registry.ts` 的 `dependencies` 用于站点展示/复制安装命令：可精简，但不要漏掉用户实际需要的关键三方依赖（例如 `motion`、`lucide-react`、`class-variance-authority` 等）
+
+---
+
+## JSDoc / 注释规范（编写与修改组件时必须遵守）
+
+> 目标：确保在编辑器中**悬浮组件名或 prop 名时**，能看到清晰的中文说明、默认值与用法示例。
+
+### 1. Props Interface
+
+- **每个导出的 interface / type** 必须有一行简要 JSDoc 描述：
+
+  ```ts
+  /** ImageViewer 组件的属性 */
+  interface ImageViewerProps { ... }
+  ```
+
+- **每个 prop** 必须有 JSDoc 注释，说明含义、取值范围、注意事项：
+
+  ```ts
+  /**
+   * 灯箱遮罩层是否启用背景模糊效果
+   * @default false
+   */
+  overlayBlur?: boolean;
+  ```
+
+- 有默认值的 prop **必须**使用 `@default` 标签标注实际默认值。
+- 支持多种取值形式的 prop（如 `number | string`），应在注释中说明每种形式的含义：
+
+  ```ts
+  /**
+   * 非灯箱模式下图片的最大高度
+   * - 传入 `number` 时单位为 px
+   * - 传入 `string` 时作为 CSS 值（如 `"50vh"`）
+   */
+  maxHeight?: number | string;
+  ```
+
+### 2. 组件函数
+
+- **每个导出的组件函数** 必须有组件级 JSDoc，包含：
+  1. **组件名 + 一句话概述**（如 `ImageViewer — 图片查看器组件`）
+  2. **核心功能列表**（用 `-` 列出 3–6 条关键能力）
+  3. **`@example` 用法示例**（至少覆盖基本用法，推荐 2–3 个典型场景）
+
+  ```ts
+  /**
+   * ImageViewer — 图片查看器组件
+   *
+   * 提供带灯箱（Lightbox）预览的图片展示，支持：
+   * - 点击缩略图打开全屏灯箱，带 layoutId 过渡动画
+   * - 灯箱内双指捏合缩放 / 鼠标滚轮缩放
+   * - 图片加载骨架屏、加载失败占位符
+   *
+   * @example
+   * ```tsx
+   * <ImageViewer src="/photo.jpg" alt="示例" />
+   * ```
+   */
+  export function ImageViewer({ ... }: ImageViewerProps) { ... }
+  ```
+
+### 3. 辅助类型与内部类型
+
+- **导出的辅助类型**（如 `TabItem`、`ToggleEffectPreset`）也需要 JSDoc。
+- 非导出的内部类型（如私有 helper type）可选，但建议对含义不直观的类型加注释。
+
+### 4. 子组件
+
+- 同一文件中导出多个子组件（如 `ScrollableDialogHeader`、`ScrollableDialogContent`、`ScrollableDialogFooter`）时，每个子组件函数都需要单独的 JSDoc，说明其在组合中的角色与定位行为。
+
+### 5. 注释语言
+
+- 所有 JSDoc 内容统一使用**中文（简体）**，与项目整体保持一致。
+- `@example` 中的代码可以使用英文命名（组件名、prop 名本身就是英文）。
+
+### 6. 注意事项
+
+- **仅补充注释，不修改代码逻辑**：完善 JSDoc 时严禁改动实际运行代码。
+- 避免在注释中重复 TypeScript 已表达的信息（如不需要写"类型为 boolean"，TS 已有类型标注）。
+- `@default` 的值应与代码中解构默认值一致，如有出入以代码为准并更新注释。
 
 ---
 

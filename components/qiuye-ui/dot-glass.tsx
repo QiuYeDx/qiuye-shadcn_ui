@@ -3,6 +3,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 
+/** DotGlass 组件的属性 */
 export interface DotGlassProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * 圆点直径（像素）
@@ -61,14 +62,34 @@ export interface DotGlassProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * DotGlass 点阵开孔毛玻璃组件
+ * DotGlass — 点阵开孔毛玻璃组件
  *
  * 一种"反直觉"的玻璃效果：只有点阵孔洞里会露出背后内容的模糊（blur），
  * 其余区域是纯色盖板遮挡。
  *
  * 实现原理：
- * - 底层玻璃层：带 backdrop-filter blur 和半透明背景
- * - 上层盖板层：纯色背景 + 反向 mask 挖出点阵孔洞
+ * - 底层玻璃层：带 `backdrop-filter: blur` 和半透明背景
+ * - 上层盖板层：纯色背景 + 反向 CSS mask 挖出点阵孔洞
+ *
+ * 支持 `fixed`、`absolute`、`sticky` 等定位模式，适用于 Header、侧边栏等场景。
+ *
+ * @example
+ * ```tsx
+ * // 基本用法 — 相对定位，包裹子内容
+ * <DotGlass className="p-4">
+ *   <h1>标题内容</h1>
+ * </DotGlass>
+ *
+ * // 固定定位的毛玻璃导航栏
+ * <DotGlass fixed className="top-0 inset-x-0 z-50 px-6 py-3">
+ *   <nav>导航内容</nav>
+ * </DotGlass>
+ *
+ * // 自定义点阵参数
+ * <DotGlass dotSize={4} dotGap={8} blur={6} saturation={150} coverColor="#000000">
+ *   <p>深色主题内容</p>
+ * </DotGlass>
+ * ```
  */
 const DotGlass = React.forwardRef<HTMLDivElement, DotGlassProps>(
   (

@@ -13,35 +13,73 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { AnimatePresence, motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
+/** ScrollableDialog 组件的属性 */
 interface ScrollableDialogProps {
+  /** 对话框是否打开 */
   open: boolean;
+  /** 打开/关闭状态变更回调 */
   onOpenChange: (open: boolean) => void;
+  /** 对话框内容（通常为 `ScrollableDialogHeader`、`ScrollableDialogContent`、`ScrollableDialogFooter` 的组合） */
   children?: React.ReactNode;
+  /** 内容区域包裹层的自定义 className */
   className?: string;
+  /** DialogContent（最外层面板）的自定义 className */
   contentClassName?: string;
+  /**
+   * 对话框打开时的自动聚焦回调
+   *
+   * 默认调用 `e.preventDefault()` 阻止自动聚焦行为
+   */
   onOpenAutoFocus?: (e: Event) => void;
-  /** 对话框最大宽度，默认 'sm:max-w-md' */
+  /**
+   * 对话框面板最大宽度的 Tailwind 类名
+   *
+   * 如果内容较宽，需手动设置合适的值，例如：
+   * - `"sm:max-w-[calc(100%-2rem)]"`
+   * - `"sm:max-w-[600px] md:max-w-[728px] lg:max-w-4xl"`
+   * @default "sm:max-w-md"
+   */
   maxWidth?: string;
 }
 
+/** ScrollableDialogHeader 组件的属性 */
 interface ScrollableDialogHeaderProps {
+  /** 头部内容，通常包含 `DialogTitle` 和 `DialogDescription` */
   children: React.ReactNode;
+  /** 头部容器的自定义 className */
   className?: string;
 }
 
+/** ScrollableDialogContent 组件的属性 */
 interface ScrollableDialogContentProps {
+  /** 可滚动区域的内容 */
   children: React.ReactNode;
+  /** ScrollArea 容器的自定义 className */
   className?: string;
-  /** 是否显示上下渐变遮罩 */
+  /**
+   * 是否显示上下渐变遮罩，用于提示用户有更多可滚动内容
+   * @default true
+   */
   fadeMasks?: boolean;
-  /** 渐变遮罩高度，单位为像素 */
+  /**
+   * 渐变遮罩高度（像素）
+   * @default 40
+   */
   fadeMaskHeight?: number;
-  /** 是否启用横向滚动，默认 false */
+  /**
+   * 是否启用横向滚动
+   *
+   * 当内部有大的固定宽度元素时需要开启
+   * @default false
+   */
   horizontalScroll?: boolean;
 }
 
+/** ScrollableDialogFooter 组件的属性 */
 interface ScrollableDialogFooterProps {
+  /** 底部内容，通常为操作按钮 */
   children: React.ReactNode;
+  /** 底部容器的自定义 className */
   className?: string;
 }
 
@@ -100,7 +138,10 @@ function ScrollableDialog({
 }
 
 /**
- * 可滚动对话框的固定头部区域
+ * ScrollableDialogHeader — 可滚动对话框的固定头部区域
+ *
+ * 固定在对话框顶部，不随内容滚动。内部使用 shadcn/ui 的 `DialogHeader` 包裹。
+ * 通常放置 `DialogTitle` 和 `DialogDescription`。
  */
 function ScrollableDialogHeader({
   children,
@@ -114,9 +155,11 @@ function ScrollableDialogHeader({
 }
 
 /**
- * 可滚动对话框的可滚动内容区域
- * 
- * @note 如果内容很宽, 需要手动设置 horizontalScroll 为 true, 如 "horizontalScroll={true}"
+ * ScrollableDialogContent — 可滚动对话框的可滚动内容区域
+ *
+ * 内部使用 shadcn/ui 的 `ScrollArea` 实现滚动，支持上下渐变遮罩效果。
+ *
+ * @note 如果内容很宽，需要设置 `horizontalScroll={true}` 以启用横向滚动
  */
 function ScrollableDialogContent({
   children,
@@ -228,7 +271,9 @@ function ScrollableDialogContent({
 }
 
 /**
- * 可滚动对话框的固定底部区域
+ * ScrollableDialogFooter — 可滚动对话框的固定底部区域
+ *
+ * 固定在对话框底部，不随内容滚动。通常放置确认/取消等操作按钮。
  */
 function ScrollableDialogFooter({
   children,

@@ -8,38 +8,109 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "motion/react";
 
+/** 单个 Tab 选项的配置 */
 export interface TabItem {
+  /** Tab 的唯一标识值，对应 `ResponsiveTabs` 的 `value` / `onValueChange` */
   value: string;
+  /** Tab 显示的文本标签 */
   label: string;
+  /** Tab 标签前方的图标（可选） */
   icon?: React.ReactNode;
+  /** Tab 标签后方的徽标，传入 `number` 或 `string`（可选） */
   badge?: number | string;
+  /** 是否禁用此 Tab */
   disabled?: boolean;
 }
 
+/**
+ * 布局模式
+ * - `"responsive"` — 小屏横向滚动，大屏（≥sm）切换为 grid 布局
+ * - `"scroll"` — 始终横向滚动
+ * - `"grid"` — 始终 grid 网格布局
+ */
 type LayoutMode = "responsive" | "scroll" | "grid";
 
+/** ResponsiveTabs 组件的属性 */
 export interface ResponsiveTabsProps {
+  /** 当前激活的 Tab 值 */
   value: string;
+  /** Tab 切换时的回调，参数为新激活的 Tab `value` */
   onValueChange: (value: string) => void;
+  /** Tab 选项列表 */
   items: TabItem[];
+  /** Tab 面板内容（`TabsContent` 区域） */
   children: React.ReactNode;
-  /** 是否显示左右滚动按钮（在滚动模式下生效） */
+  /**
+   * 是否显示左右滚动箭头按钮（仅在滚动模式下生效）
+   * @default true
+   */
   scrollButtons?: boolean;
-  /** 每次滚动步长 */
+  /**
+   * 点击滚动按钮时每次滚动的步长（像素）
+   * @default 220
+   */
   scrollStep?: number;
-  /** ≥sm 的网格列定义（会应用在 TabsList 上；在 layout="grid" 时请提供无断点或自定义断点的类） */
+  /**
+   * ≥sm 断点下的网格列数 Tailwind 类名（应用在 TabsList 上）
+   *
+   * 在 `layout="grid"` 时请提供无断点或自定义断点的类
+   * @default "sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8"
+   */
   gridColsClass?: string;
+  /** TabsList 容器的自定义 className */
   listClassName?: string;
+  /** 每个 TabsTrigger 的自定义 className */
   triggerClassName?: string;
-  /** 布局模式：responsive | scroll | grid */
+  /**
+   * 布局模式
+   * - `"responsive"` — 小屏横向滚动，大屏（≥sm）切换为 grid 布局（默认）
+   * - `"scroll"` — 始终横向滚动
+   * - `"grid"` — 始终 grid 网格布局
+   * @default "responsive"
+   */
   layout?: LayoutMode;
+  /** 根容器的自定义 className */
   className?: string;
-  /** 是否显示左右渐变遮罩（在滚动模式下生效） */
+  /**
+   * 是否在滚动模式下显示左右渐变遮罩，用于提示可滚动
+   * @default true
+   */
   fadeMasks?: boolean;
-  /** 渐变遮罩宽度，单位为像素 */
+  /**
+   * 渐变遮罩宽度（像素）
+   * @default 64
+   */
   fadeMaskWidth?: number;
 }
 
+/**
+ * ResponsiveTabs — 响应式标签页组件
+ *
+ * 基于 shadcn/ui Tabs 扩展，根据屏幕宽度自动切换布局：
+ * - **小屏**：横向滚动模式，支持左右箭头按钮和渐变遮罩提示
+ * - **大屏**：网格布局模式，Tab 选项平铺展示
+ *
+ * 支持三种布局模式：`responsive`（自动切换）、`scroll`（始终滚动）、`grid`（始终网格）。
+ * 每个 Tab 选项支持图标、徽标、禁用等配置。
+ *
+ * @example
+ * ```tsx
+ * const [tab, setTab] = useState("all");
+ *
+ * <ResponsiveTabs
+ *   value={tab}
+ *   onValueChange={setTab}
+ *   items={[
+ *     { value: "all", label: "全部" },
+ *     { value: "ui", label: "UI 组件", icon: <LayoutIcon />, badge: 12 },
+ *     { value: "hooks", label: "Hooks", disabled: true },
+ *   ]}
+ * >
+ *   <TabsContent value="all">全部内容</TabsContent>
+ *   <TabsContent value="ui">UI 组件内容</TabsContent>
+ * </ResponsiveTabs>
+ * ```
+ */
 const ResponsiveTabs = React.forwardRef<
   React.ElementRef<typeof Tabs>,
   ResponsiveTabsProps
