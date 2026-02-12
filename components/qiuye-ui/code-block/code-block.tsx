@@ -89,6 +89,8 @@ export interface CodeBlockProps {
   stickyLineNumbers?: boolean;
   /** 是否在折叠后跳转时显示聚光灯阴影效果（displayMode="collapse" 时生效），默认 true */
   spotlightOnCollapse?: boolean;
+  /** 是否隐藏容器周围的 box-shadow 阴影（默认 false） */
+  noShadow?: boolean;
   /** 额外的 CSS 类名 */
   className?: string;
 }
@@ -130,6 +132,7 @@ export function CodeBlock({
   maxHeight = "400px",
   stickyLineNumbers = true,
   spotlightOnCollapse = true,
+  noShadow = false,
   className = "",
 }: CodeBlockProps) {
   const code = children.trim();
@@ -292,7 +295,7 @@ export function CodeBlock({
       : effectiveMode === "scroll"
         ? " scroll-mode"
         : "";
-  const wrapperClass = `qiuye-code-block${stickyLineNumbers ? " sticky-line-numbers" : ""}${modeClass}${className ? ` ${className}` : ""}`;
+  const wrapperClass = `qiuye-code-block${stickyLineNumbers ? " sticky-line-numbers" : ""}${noShadow ? " no-shadow" : ""}${modeClass}${className ? ` ${className}` : ""}`;
 
   // ---- 普通模式（无显示模式，或 collapse 模式但行数不够触发折叠） ----
   if (!effectiveMode || (effectiveMode === "collapse" && !shouldCollapse)) {
@@ -816,6 +819,32 @@ function CodeBlockStyles() {
 
       .qiuye-code-block.sticky-line-numbers pre code > div:hover .line-number {
         background-color: var(--cb-hover-solid);
+      }
+
+      /* ============================================
+         No shadow 模式 - 隐藏容器阴影
+         ============================================ */
+
+      .qiuye-code-block.no-shadow pre,
+      .qiuye-code-block.no-shadow .collapsible-code-block,
+      .qiuye-code-block.no-shadow .scrollable-code-block {
+        box-shadow: none;
+      }
+
+      /* ============================================
+         CodeBlockPanel 嵌入模式
+         在 CodeBlockPanel 内部时，重置 CodeBlock 的
+         外层装饰样式（margin / border / radius / shadow），
+         由 Panel 统一控制外观。
+         ============================================ */
+
+      .code-block-panel-content .qiuye-code-block pre,
+      .code-block-panel-content .qiuye-code-block .collapsible-code-block,
+      .code-block-panel-content .qiuye-code-block .scrollable-code-block {
+        margin: 0;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
       }
     `}</style>
   );

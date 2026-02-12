@@ -120,11 +120,12 @@ return (
 );`,
   },
   [ComponentId.CODE_BLOCK]: {
-    import: `import { CodeBlock } from "@/components/qiuye-ui/code-block";`,
-    usage: `<CodeBlock language="typescript" isDark={true}>
-  {\`const greeting = "Hello, World!";
-console.log(greeting);\`}
-</CodeBlock>`,
+    import: `import { CodeBlock, CodeBlockPanel } from "@/components/qiuye-ui/code-block";`,
+    usage: `<CodeBlockPanel filename="app.ts" code={code}>
+  <CodeBlock language="typescript" isDark>
+    {code}
+  </CodeBlock>
+</CodeBlockPanel>`,
   },
 };
 

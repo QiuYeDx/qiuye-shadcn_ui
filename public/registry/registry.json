@@ -17,6 +17,10 @@
       "files": [
         {
           "type": "registry:component",
+          "path": "components/qiuye-ui/code-block/code-block-panel.tsx"
+        },
+        {
+          "type": "registry:component",
           "path": "components/qiuye-ui/code-block/code-block.tsx"
         },
         {

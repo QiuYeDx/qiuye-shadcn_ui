@@ -14,7 +14,7 @@ import {
 import { DotGlass } from "@/components/qiuye-ui/dot-glass";
 import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
 import { DualStateToggle } from "@/components/qiuye-ui/dual-state-toggle";
-import { CodeBlock } from "@/components/qiuye-ui/code-block";
+import { CodeBlock, CodeBlockPanel } from "@/components/qiuye-ui/code-block";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Menu, X, Sun, Moon, Volume2, VolumeOff } from "lucide-react";
@@ -209,9 +209,6 @@ export function DualStateToggleSimpleDemo() {
 
 // CodeBlock 简单演示
 export function CodeBlockSimpleDemo() {
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
-
   const sampleCode = `import { useState } from "react";
 
 export function Counter({ initial = 0 }) {
@@ -227,8 +224,10 @@ export function Counter({ initial = 0 }) {
 }`;
 
   return (
-    <CodeBlock language="tsx" isDark={isDark}>
-      {sampleCode}
-    </CodeBlock>
+    <CodeBlockPanel filename="counter.tsx" code={sampleCode}>
+      <CodeBlock language="tsx" isDark>
+        {sampleCode}
+      </CodeBlock>
+    </CodeBlockPanel>
   );
 }

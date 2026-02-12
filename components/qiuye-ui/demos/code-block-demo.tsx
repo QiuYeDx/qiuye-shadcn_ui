@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import { useTheme } from "next-themes";
-import { CodeBlock, CODE_BLOCK_COLOR_THEME_NAMES } from "../code-block";
+import {
+  CodeBlock,
+  CodeBlockPanel,
+  CODE_BLOCK_COLOR_THEME_NAMES,
+} from "../code-block";
 import {
   Card,
   CardContent,
@@ -30,6 +34,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Maximize2 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 /* -------------------------------------------------------------------------- */
 /*                              Source Codes                                   */
@@ -116,6 +121,43 @@ function AutoHeightDemo() {
         </div>
       </DialogContent>
     </Dialog>
+  );
+}`,
+  panel: `import { CodeBlock, CodeBlockPanel } from "@/components/qiuye-ui/code-block";
+
+const code = \`export function greet(name: string) {
+  return \\\`Hello, \\\${name}!\\\`;
+}\`;
+
+function PanelDemo() {
+  return (
+    <CodeBlockPanel filename="utils.ts" code={code}>
+      <CodeBlock language="typescript" isDark>
+        {code}
+      </CodeBlock>
+    </CodeBlockPanel>
+  );
+}`,
+  panelNoFilename: `import { CodeBlock, CodeBlockPanel } from "@/components/qiuye-ui/code-block";
+
+// 仅显示复制按钮，不显示文件名
+function PanelCopyOnlyDemo() {
+  return (
+    <CodeBlockPanel code={code}>
+      <CodeBlock language="python" isDark>
+        {code}
+      </CodeBlock>
+    </CodeBlockPanel>
+  );
+}`,
+  noShadow: `import { CodeBlock } from "@/components/qiuye-ui/code-block";
+
+function NoShadowDemo() {
+  return (
+    <CodeBlock language="typescript" noShadow>
+      {\`const message = "无阴影代码块";
+console.log(message);\`}
+    </CodeBlock>
   );
 }`,
 };
@@ -290,6 +332,7 @@ export function CodeBlockDemo() {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
   const [selectedTheme, setSelectedTheme] = useState<string>("qiuvision");
+  const [showPanel, setShowPanel] = useState(false);
 
   return (
     <div className="space-y-8">
@@ -316,7 +359,66 @@ export function CodeBlockDemo() {
         </CardContent>
       </Card>
 
-      {/* 2. 配色主题切换 */}
+      {/* 2. 面板容器 - 文件名 + 复制按钮 */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg">面板容器</CardTitle>
+              <CardDescription>
+                仿 Tailwind CSS 官网风格的深色面板外壳，支持文件名标签与复制按钮
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary">CodeBlockPanel</Badge>
+              <ViewSourceButton code={sourceCodes.panel} />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* 带文件名 + 复制按钮 */}
+          <CodeBlockPanel filename="hooks/use-list-manager.ts" code={sampleTypeScript.slice(0, sampleTypeScript.indexOf("\n\n  // 过滤 + 排序"))}>
+            <CodeBlock
+              language="typescript"
+              isDark
+              colorTheme="qiuvision"
+            >
+              {sampleTypeScript.slice(0, sampleTypeScript.indexOf("\n\n  // 过滤 + 排序"))}
+            </CodeBlock>
+          </CodeBlockPanel>
+
+          {/* 仅复制按钮，不带文件名 */}
+          <div>
+            <p className="text-sm text-muted-foreground mb-3">
+              不传 <code className="text-xs bg-muted px-1 py-0.5 rounded">filename</code> 时仅显示复制按钮：
+            </p>
+            <CodeBlockPanel code={sampleJSX}>
+              <CodeBlock language="tsx" isDark>
+                {sampleJSX}
+              </CodeBlock>
+            </CodeBlockPanel>
+          </div>
+
+          {/* 面板 + 滚动模式组合 */}
+          <div>
+            <p className="text-sm text-muted-foreground mb-3">
+              搭配 <code className="text-xs bg-muted px-1 py-0.5 rounded">displayMode=&quot;scroll&quot;</code> 使用：
+            </p>
+            <CodeBlockPanel filename="api_client.py" code={samplePython}>
+              <CodeBlock
+                language="python"
+                isDark
+                displayMode="scroll"
+                maxHeight="250px"
+              >
+                {samplePython}
+              </CodeBlock>
+            </CodeBlockPanel>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 3. 配色主题切换 */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -330,7 +432,7 @@ export function CodeBlockDemo() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Label htmlFor="theme-select">选择主题</Label>
             <Select value={selectedTheme} onValueChange={setSelectedTheme}>
               <SelectTrigger id="theme-select" className="w-[180px]">
@@ -344,20 +446,47 @@ export function CodeBlockDemo() {
                 ))}
               </SelectContent>
             </Select>
+            <div className="flex items-center gap-2">
+              <Switch
+                id="theme-panel"
+                checked={showPanel}
+                onCheckedChange={setShowPanel}
+              />
+              <Label htmlFor="theme-panel" className="cursor-pointer text-sm">
+                Panel 面板
+              </Label>
+            </div>
             <Badge variant="outline">{isDark ? "深色" : "浅色"}</Badge>
           </div>
 
-          <CodeBlock
-            language="typescript"
-            colorTheme={selectedTheme as "qiuvision"}
-            isDark={isDark}
-          >
-            {sampleTypeScript.slice(0, sampleTypeScript.indexOf("\n\n  // 分页"))}
-          </CodeBlock>
+          {showPanel ? (
+            <CodeBlockPanel
+              filename="example.ts"
+              code={sampleTypeScript.slice(0, sampleTypeScript.indexOf("\n\n  // 分页"))}
+              colorTheme={selectedTheme as "qiuvision"}
+              isDark={isDark}
+            >
+              <CodeBlock
+                language="typescript"
+                colorTheme={selectedTheme as "qiuvision"}
+                isDark={isDark}
+              >
+                {sampleTypeScript.slice(0, sampleTypeScript.indexOf("\n\n  // 分页"))}
+              </CodeBlock>
+            </CodeBlockPanel>
+          ) : (
+            <CodeBlock
+              language="typescript"
+              colorTheme={selectedTheme as "qiuvision"}
+              isDark={isDark}
+            >
+              {sampleTypeScript.slice(0, sampleTypeScript.indexOf("\n\n  // 分页"))}
+            </CodeBlock>
+          )}
         </CardContent>
       </Card>
 
-      {/* 3. 折叠模式 */}
+      {/* 4. 折叠模式 */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -385,7 +514,7 @@ export function CodeBlockDemo() {
         </CardContent>
       </Card>
 
-      {/* 4. 滚动模式 */}
+      {/* 5. 滚动模式 */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -413,7 +542,7 @@ export function CodeBlockDemo() {
         </CardContent>
       </Card>
 
-      {/* 5. 自适应高度模式 */}
+      {/* 6. 自适应高度模式 */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -458,7 +587,7 @@ export function CodeBlockDemo() {
         </CardContent>
       </Card>
 
-      {/* 6. 多语言示例 */}
+      {/* 7. 多语言示例 */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -479,6 +608,67 @@ export function CodeBlockDemo() {
           >
             {samplePython.slice(0, samplePython.indexOf("\n\nclass APIClient"))}
           </CodeBlock>
+        </CardContent>
+      </Card>
+
+      {/* 8. 无阴影模式 */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg">无阴影模式</CardTitle>
+              <CardDescription>
+                通过 noShadow 属性移除代码块容器的 box-shadow，适合嵌入卡片等已有阴影的容器中
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary">noShadow</Badge>
+              <ViewSourceButton code={sourceCodes.noShadow} />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">默认（有阴影）</p>
+              <CodeBlock language="typescript" isDark={isDark}>
+                {`const a = "有阴影";\nconsole.log(a);`}
+              </CodeBlock>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">noShadow（无阴影）</p>
+              <CodeBlock language="typescript" isDark={isDark} noShadow>
+                {`const b = "无阴影";\nconsole.log(b);`}
+              </CodeBlock>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 9. 面板 + 折叠模式组合 */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg">面板 + 折叠模式组合</CardTitle>
+              <CardDescription>
+                CodeBlockPanel 搭配 displayMode=&quot;collapse&quot; 使用，面板自动重置内部样式
+              </CardDescription>
+            </div>
+            <Badge variant="secondary">组合用法</Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <CodeBlockPanel filename="hooks/use-list-manager.ts" code={sampleTypeScript}>
+            <CodeBlock
+              language="typescript"
+              isDark
+              displayMode="collapse"
+              maxLines={8}
+            >
+              {sampleTypeScript}
+            </CodeBlock>
+          </CodeBlockPanel>
         </CardContent>
       </Card>
     </div>

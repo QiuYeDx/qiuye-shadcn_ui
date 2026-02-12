@@ -1,0 +1,208 @@
+"use client";
+
+import React, { useState, useCallback } from "react";
+import { cn } from "@/lib/utils";
+import { Check, Copy } from "lucide-react";
+import type { CodeBlockColorThemeName } from "./code-block-themes";
+
+// ============================================
+// Panel 主题配色
+// ============================================
+
+/**
+ * 每套主题对应的面板外壳背景色
+ *
+ * 面板背景比代码区域背景略深，营造容器层次感。
+ */
+const PANEL_BG: Record<
+  CodeBlockColorThemeName,
+  { dark: string; light: string }
+> = {
+  qiuvision: { dark: "#111113", light: "#E5E5E3" },
+  github: { dark: "#010409", light: "#EEF1F5" },
+  one: { dark: "#21252B", light: "#E6E7E8" },
+  dracula: { dark: "#21222C", light: "#EAEAE5" },
+  nord: { dark: "#252B35", light: "#DEE2EA" },
+  vitesse: { dark: "#0A0A0A", light: "#EBEBEB" },
+  monokai: { dark: "#1E1F1A", light: "#EBEBEA" },
+};
+
+/** 面板亮暗模式下的文本 / 图标通用配色 */
+const PANEL_TEXT = {
+  dark: {
+    border: "rgba(255,255,255,0.08)",
+    filename: "rgba(255,255,255,0.4)",
+    btn: "rgba(255,255,255,0.4)",
+    btnHover: "rgba(255,255,255,0.7)",
+    btnHoverBg: "rgba(255,255,255,0.1)",
+    check: "#34d399",
+  },
+  light: {
+    border: "rgba(0,0,0,0.08)",
+    filename: "rgba(0,0,0,0.45)",
+    btn: "rgba(0,0,0,0.35)",
+    btnHover: "rgba(0,0,0,0.65)",
+    btnHoverBg: "rgba(0,0,0,0.06)",
+    check: "#059669",
+  },
+} as const;
+
+// ============================================
+// CodeBlockPanel 组件
+// ============================================
+
+export interface CodeBlockPanelProps {
+  /** 文件名标签（显示在面板顶部左侧） */
+  filename?: string;
+  /**
+   * 代码文本内容（用于复制按钮功能）
+   *
+   * 传入后复制按钮自动可用；不传则不显示复制按钮。
+   */
+  code?: string;
+  /** 是否显示复制按钮（需要同时传入 code，默认 true） */
+  showCopyButton?: boolean;
+  /** 是否为深色模式（控制面板配色的浅色/深色变体选择，默认 true） */
+  isDark?: boolean;
+  /**
+   * 内置配色主题名称（默认 "qiuvision"）
+   *
+   * 与 isDark 配合使用，自动选择对应的浅色/深色面板配色。
+   * 可选值: "qiuvision" | "github" | "one" | "dracula" | "nord" | "vitesse" | "monokai"
+   */
+  colorTheme?: CodeBlockColorThemeName;
+  /** 子元素（通常为 CodeBlock 组件） */
+  children: React.ReactNode;
+  /** 额外的 CSS 类名 */
+  className?: string;
+}
+
+/**
+ * 代码块外层容器面板
+ *
+ * 仿照 Tailwind CSS 官网的代码块风格，提供面板外壳、
+ * 文件名标签、复制按钮等功能。搭配 CodeBlock 组件使用。
+ *
+ * 特性：
+ * - **7 套内置配色主题**（与 CodeBlock 主题一一对应），各有浅色/深色变体
+ * - 可选文件名标签（顶部左侧）
+ * - 可选复制按钮（顶部右侧），带复制成功动画反馈
+ * - 自动重置内部 CodeBlock 的 margin / border / shadow
+ *
+ * @example
+ * ```tsx
+ * <CodeBlockPanel filename="app.tsx" code={code} colorTheme="github" isDark>
+ *   <CodeBlock language="tsx" colorTheme="github" isDark>
+ *     {code}
+ *   </CodeBlock>
+ * </CodeBlockPanel>
+ * ```
+ */
+export function CodeBlockPanel({
+  filename,
+  code,
+  showCopyButton = true,
+  isDark = true,
+  colorTheme = "qiuvision",
+  children,
+  className,
+}: CodeBlockPanelProps) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(async () => {
+    if (!code) return;
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // 静默失败（如不支持 Clipboard API 时）
+    }
+  }, [code]);
+
+  const hasCopyButton = showCopyButton && !!code;
+  const hasHeader = !!filename || hasCopyButton;
+
+  // 解析面板配色
+  const mode = isDark ? "dark" : "light";
+  const panelBg = PANEL_BG[colorTheme]?.[mode] ?? PANEL_BG.qiuvision[mode];
+  const text = PANEL_TEXT[mode];
+
+  return (
+    <div
+      className={cn("group/code-panel rounded-xl", className)}
+      style={
+        {
+          backgroundColor: panelBg,
+          boxShadow: `inset 0 0 0 1px ${text.border}`,
+          "--cbp-filename": text.filename,
+          "--cbp-btn": text.btn,
+          "--cbp-btn-hover": text.btnHover,
+          "--cbp-btn-hover-bg": text.btnHoverBg,
+          "--cbp-check": text.check,
+        } as React.CSSProperties
+      }
+    >
+      {/* ---- 面板内容区域 ---- */}
+      <div className="rounded-xl p-1 text-sm">
+        {/* ---- 头部：文件名 + 复制按钮 ---- */}
+        {hasHeader && (
+          <div className="flex items-center justify-between px-3 pt-0.5 pb-1">
+            {filename ? (
+              <span className="cbp-filename text-xs/5 font-medium select-none">
+                {filename}
+              </span>
+            ) : (
+              <span />
+            )}
+            {hasCopyButton && (
+              <button
+                onClick={handleCopy}
+                className="cbp-copy-btn flex size-7 items-center justify-center rounded-md transition-colors duration-150"
+                title="复制到剪贴板"
+              >
+                <div className="grid size-4">
+                  <Check
+                    className={cn(
+                      "cbp-check col-start-1 row-start-1 size-4 transition-opacity duration-200",
+                      copied ? "opacity-100" : "opacity-0",
+                    )}
+                    strokeWidth={2}
+                  />
+                  <Copy
+                    className={cn(
+                      "col-start-1 row-start-1 size-4 transition-opacity duration-200",
+                      copied ? "opacity-0" : "opacity-100",
+                    )}
+                    strokeWidth={1.5}
+                  />
+                </div>
+              </button>
+            )}
+          </div>
+        )}
+        {/* ---- 代码内容容器 ---- */}
+        <div className="code-block-panel-content overflow-hidden rounded-lg">
+          {children}
+        </div>
+      </div>
+
+      {/* Panel 配色样式（通过 CSS 变量驱动，自动去重） */}
+      <style jsx global>{`
+        .cbp-filename {
+          color: var(--cbp-filename);
+        }
+        .cbp-copy-btn {
+          color: var(--cbp-btn);
+        }
+        .cbp-copy-btn:hover {
+          color: var(--cbp-btn-hover);
+          background-color: var(--cbp-btn-hover-bg);
+        }
+        .cbp-check {
+          color: var(--cbp-check);
+        }
+      `}</style>
+    </div>
+  );
+}
