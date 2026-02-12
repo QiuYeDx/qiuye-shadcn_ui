@@ -144,8 +144,16 @@ export const componentRegistry: ComponentRegistry = {
         description: "根容器额外类名",
         required: false,
       },
+      {
+        name: "animatedHighlight",
+        type: "boolean",
+        description:
+          "是否启用选中态 layoutId 底色平移过渡动画（切换 Tab 时高亮背景以弹簧动画从旧 Tab 滑动到新 Tab）",
+        required: false,
+        default: "true",
+      },
     ],
-    version: "1.1.0",
+    version: "1.2.0",
     author: "QiuYeDx",
     tags: [
       "tabs",
@@ -157,6 +165,7 @@ export const componentRegistry: ComponentRegistry = {
       "badge",
       "icon",
       "shadcn",
+      "animation",
     ],
     cliName: "responsive-tabs",
     basicUsage: basicUsageExamples[ComponentId.RESPONSIVE_TABS],

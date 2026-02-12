@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { ResponsiveTabs, type TabItem } from "../responsive-tabs";
 import { TabsContent } from "@/components/ui/tabs";
 import {
@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Home,
   Settings,
@@ -25,194 +26,144 @@ import {
   Bookmark,
   Calendar,
   Mail,
-  Phone,
   ArrowLeft,
   ArrowRight,
   Plus,
   Minus,
+  Layers,
+  Zap,
+  Shield,
+  Code,
+  Palette,
+  Globe,
+  Package,
 } from "lucide-react";
 import { ViewSourceButton } from "@/components/view-source-button";
 
 type LayoutMode = "responsive" | "scroll" | "grid";
 
-// 源码数据
+/* ── 源码片段（供 ViewSourceButton 展示） ──────────────── */
+
 const sourceCodes = {
-  basic: `const basicItems: TabItem[] = [
+  basic: `const items: TabItem[] = [
   { value: "all", label: "全部" },
   { value: "forms", label: "表单组件" },
   { value: "data", label: "数据展示" },
-  // ...更多项
+  // ...更多
 ];
 
 <ResponsiveTabs
-  value={basicTab}
-  onValueChange={setBasicTab}
-  items={basicItems}
+  value={tab}
+  onValueChange={setTab}
+  items={items}
 >
-  <TabsContent value="all" className="mt-4">
-    <div className="rounded-lg border p-4">
-      <h3 className="font-semibold">全部组件</h3>
-      <p className="mt-2 text-sm text-muted-foreground">
-        这里显示所有可用的组件...
-      </p>
-    </div>
-  </TabsContent>
-  {/* 更多 TabsContent */}
+  <TabsContent value="all">全部内容…</TabsContent>
+  <TabsContent value="forms">表单组件内容…</TabsContent>
 </ResponsiveTabs>`,
 
-  withIcon: `const iconItems: TabItem[] = [
-  { value: "home", label: "首页", icon: <Home className="h-4 w-4" /> },
-  { value: "profile", label: "个人资料", icon: <User className="h-4 w-4" /> },
-  { value: "settings", label: "设置", icon: <Settings className="h-4 w-4" /> },
-  // ...更多项
+  iconsAndBadges: `const items: TabItem[] = [
+  { value: "inbox", label: "收件箱", icon: <Mail className="h-4 w-4" />, badge: 12 },
+  { value: "starred", label: "星标邮件", icon: <Star className="h-4 w-4" />, badge: "新" },
+  { value: "archive", label: "归档", icon: <Package className="h-4 w-4" />, disabled: true },
 ];
 
 <ResponsiveTabs
-  value={iconTab}
-  onValueChange={setIconTab}
-  items={iconItems}
-  gridColsClass="sm:grid-cols-5"
+  value={tab}
+  onValueChange={setTab}
+  items={items}
+  gridColsClass="sm:grid-cols-3 md:grid-cols-5"
 >
-  {/* TabsContent */}
+  <TabsContent value="inbox">…</TabsContent>
 </ResponsiveTabs>`,
+
+  animatedHighlight: `// 默认开启弹簧动画高亮
+<ResponsiveTabs animatedHighlight={true} ... />
+
+// 关闭动画高亮 → 回到默认即时切换
+<ResponsiveTabs animatedHighlight={false} ... />`,
+
+  layoutModes: `// 自适应（默认）：小屏横向滚动 → 大屏网格
+<ResponsiveTabs layout="responsive" ... />
+
+// 始终横向滚动
+<ResponsiveTabs layout="scroll" scrollStep={200} ... />
+
+// 始终网格布局
+<ResponsiveTabs layout="grid" gridColsClass="grid-cols-5" ... />`,
 
   fadeMasks: `<ResponsiveTabs
-  value={customTab}
-  onValueChange={setCustomTab}
-  items={[
-    { value: "docs", label: "文档" },
-    { value: "components", label: "组件库" },
-    // ...更多项
-  ]}
   layout="scroll"
-  fadeMasks={true}
-  fadeMaskWidth={40}
+  fadeMasks={true}       // 开启渐变遮罩
+  fadeMaskWidth={48}     // 遮罩宽度(px)
+  items={manyItems}
 >
-  <TabsContent value="docs" className="mt-4">
-    <div className="rounded-lg border p-4">
-      <h3 className="font-semibold">文档</h3>
-      <p className="mt-2 text-sm text-muted-foreground">
-        注意观察左右两侧的渐变遮罩效果
-      </p>
-    </div>
-  </TabsContent>
+  <TabsContent value="docs">…</TabsContent>
 </ResponsiveTabs>`,
 
-  withBadge: `const badgeItems: TabItem[] = [
-  { value: "forms", label: "表单", badge: 12 },
-  { value: "data", label: "数据", badge: "新", icon: <Star className="h-4 w-4" /> },
-  { value: "layout", label: "布局", disabled: true },
-  // ...更多项
-];
-
-<ResponsiveTabs
-  value={badgeTab}
-  onValueChange={setBadgeTab}
-  items={badgeItems}
-  scrollStep={150}
-  gridColsClass="sm:grid-cols-4 lg:grid-cols-6"
->
-  {/* TabsContent */}
-</ResponsiveTabs>`,
-
-  playground: `// 动态配置演示
-<ResponsiveTabs
-  value={playTab}
-  onValueChange={setPlayTab}
-  items={playItems}
-  layout={playLayout}          // "responsive" | "scroll" | "grid"
-  scrollStep={playScrollStep}   // 滚动步长
-  fadeMasks={playFadeMasks}     // 渐变遮罩
-  fadeMaskWidth={playFadeMaskWidth}
-  gridColsClass="sm:grid-cols-6 xl:grid-cols-8"
-  triggerClassName="text-xs"
->
-  {/* 内容 */}
-</ResponsiveTabs>`,
-
-  scrollLayout: `// 桌面也保持横向滚动
-<ResponsiveTabs
-  value={playTab}
-  onValueChange={setPlayTab}
-  items={playItems}
-  layout="scroll"
-  scrollStep={220}
-  triggerClassName="text-xs"
->
-  {/* 内容 */}
-</ResponsiveTabs>`,
-
-  gridLayout: `// 始终使用网格布局
-<ResponsiveTabs
-  value={customTab}
-  onValueChange={setCustomTab}
-  items={customItems}
-  layout="grid"
-  gridColsClass="grid-cols-6 xl:grid-cols-8"
-  listClassName="bg-muted/50"
-  triggerClassName="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
->
-  {/* 内容 */}
-</ResponsiveTabs>`,
-
-  dynamic: `// 动态增删标签
-const [dynItems, setDynItems] = useState<TabItem[]>([...]);
-const [dynActive, setDynActive] = useState("d0");
+  dynamic: `const [items, setItems] = useState<TabItem[]>([...]);
+const [active, setActive] = useState("d0");
 
 // 新增标签
 const addTab = () => {
-  const id = \`d\${dynItems.length}\`;
-  setDynItems(arr => [...arr, { 
-    value: id, 
-    label: \`动态标签 \${arr.length + 1}\` 
-  }]);
-  setDynActive(id);
+  const id = \`d\${counter.current++}\`;
+  setItems(prev => [...prev, { value: id, label: \`标签 \${prev.length + 1}\` }]);
+  setActive(id);
 };
 
 // 删除当前标签
 const deleteTab = () => {
-  const next = dynItems.filter(i => i.value !== dynActive);
-  setDynItems(next);
-  if (next.length > 0) {
-    const idx = dynItems.findIndex(i => i.value === dynActive);
-    setDynActive(next[Math.max(0, idx - 1)].value);
-  }
+  const idx = items.findIndex(i => i.value === active);
+  const next = items.filter(i => i.value !== active);
+  setItems(next);
+  setActive(next[Math.max(0, idx - 1)].value);
 };
 
 <ResponsiveTabs
   layout="scroll"
-  value={dynActive}
-  onValueChange={setDynActive}
-  items={dynItems}
-  scrollStep={180}
+  value={active}
+  onValueChange={setActive}
+  items={items}
+/>`,
+
+  customStyles: `<ResponsiveTabs
+  layout="grid"
+  animatedHighlight={false}  // 自定义选中态时建议关闭
+  gridColsClass="grid-cols-4"
+  listClassName="bg-muted/50"
+  triggerClassName="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+  items={items}
 >
-  {/* 内容 */}
+  <TabsContent value="home">…</TabsContent>
 </ResponsiveTabs>`,
 };
 
-export function ResponsiveTabsDemo() {
-  const [basicTab, setBasicTab] = useState("all");
-  const [iconTab, setIconTab] = useState("home");
-  const [badgeTab, setBadgeTab] = useState("forms");
-  const [customTab, setCustomTab] = useState("docs");
+/* ── 通用内容面板 ──────────────────────────────────────── */
 
-  // Playground 状态
-  const [playLayout, setPlayLayout] = useState<LayoutMode>("responsive");
-  const [playScrollStep, setPlayScrollStep] = useState(200);
-  const [playFadeMasks, setPlayFadeMasks] = useState(true);
-  const [playFadeMaskWidth, setPlayFadeMaskWidth] = useState(64);
-  const [playTab, setPlayTab] = useState("t0");
-
-  // 动态标签状态
-  const [dynItems, setDynItems] = useState<TabItem[]>(
-    Array.from({ length: 6 }).map((_, i) => ({
-      value: `d${i}`,
-      label: `动态标签 ${i + 1}`,
-    }))
+function ContentPanel({
+  title,
+  description,
+  badge,
+}: {
+  title: string;
+  description: string;
+  badge?: string | number;
+}) {
+  return (
+    <div className="rounded-lg border p-4">
+      <div className="flex items-center gap-2">
+        <h3 className="font-semibold">{title}</h3>
+        {badge !== undefined && <Badge variant="secondary">{badge}</Badge>}
+      </div>
+      <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+    </div>
   );
-  const [dynActive, setDynActive] = useState("d0");
+}
 
-  // 基本标签页
+/* ── Demo 主组件 ───────────────────────────────────────── */
+
+export function ResponsiveTabsDemo() {
+  /* ── 1. 基本用法 ── */
+  const [basicTab, setBasicTab] = useState("all");
   const basicItems: TabItem[] = [
     { value: "all", label: "全部" },
     { value: "forms", label: "表单组件" },
@@ -224,57 +175,97 @@ export function ResponsiveTabsDemo() {
     { value: "display", label: "展示组件" },
   ];
 
-  // 带图标的标签页
-  const iconItems: TabItem[] = [
-    { value: "home", label: "首页", icon: <Home className="h-4 w-4" /> },
-    { value: "profile", label: "个人资料", icon: <User className="h-4 w-4" /> },
-    {
-      value: "settings",
-      label: "设置",
-      icon: <Settings className="h-4 w-4" />,
-    },
-    {
-      value: "notifications",
-      label: "通知",
-      icon: <Bell className="h-4 w-4" />,
-    },
-    {
-      value: "documents",
-      label: "文档",
-      icon: <FileText className="h-4 w-4" />,
-    },
-  ];
-
-  // 带徽标和复杂状态的标签页
+  /* ── 2. 图标 & 徽标 & 禁用 ── */
+  const [badgeTab, setBadgeTab] = useState("inbox");
   const badgeItems: TabItem[] = [
-    { value: "forms", label: "表单", badge: 12 },
     {
-      value: "data",
-      label: "数据",
-      badge: "新",
+      value: "inbox",
+      label: "收件箱",
+      icon: <Mail className="h-4 w-4" />,
+      badge: 12,
+    },
+    {
+      value: "starred",
+      label: "星标邮件",
       icon: <Star className="h-4 w-4" />,
+      badge: "新",
     },
-    { value: "nav", label: "导航", badge: 8 },
     {
-      value: "feedback",
-      label: "反馈",
+      value: "sent",
+      label: "已发送",
+      icon: <ArrowRight className="h-4 w-4" />,
+    },
+    {
+      value: "drafts",
+      label: "草稿箱",
+      icon: <FileText className="h-4 w-4" />,
       badge: 3,
-      icon: <Heart className="h-4 w-4" />,
     },
-    { value: "layout", label: "布局", disabled: true },
-    { value: "input", label: "输入", badge: 25 },
-    { value: "search", label: "搜索", icon: <Search className="h-4 w-4" /> },
     {
-      value: "bookmarks",
-      label: "收藏",
-      badge: 99,
-      icon: <Bookmark className="h-4 w-4" />,
+      value: "archive",
+      label: "归档",
+      icon: <Package className="h-4 w-4" />,
+      disabled: true,
     },
   ];
 
-  // 自定义网格配置的标签页
-  const customItems: TabItem[] = [
-    { value: "docs", label: "文档", icon: <FileText className="h-4 w-4" /> },
+  /* ── 3. 动画高亮 ── */
+  const [hlTab, setHlTab] = useState("overview");
+  const [hlEnabled, setHlEnabled] = useState(true);
+  const hlItems: TabItem[] = [
+    { value: "overview", label: "概览", icon: <Home className="h-4 w-4" /> },
+    { value: "design", label: "设计", icon: <Palette className="h-4 w-4" /> },
+    { value: "develop", label: "开发", icon: <Code className="h-4 w-4" /> },
+    { value: "test", label: "测试", icon: <Search className="h-4 w-4" /> },
+    { value: "deploy", label: "部署", icon: <Globe className="h-4 w-4" /> },
+  ];
+
+  /* ── 4. 布局模式 ── */
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>("responsive");
+  const [layoutTab, setLayoutTab] = useState("t0");
+  const layoutItems: TabItem[] = useMemo(() => {
+    const icons = [Layers, Zap, Star, Heart, Shield];
+    return Array.from({ length: 10 }).map((_, i) => {
+      const Icon = icons[i % icons.length];
+      return {
+        value: `t${i}`,
+        label: `分类 ${i + 1}`,
+        icon: <Icon className="h-3.5 w-3.5" />,
+      };
+    });
+  }, []);
+
+  /* ── 5. 渐变遮罩 ── */
+  const [fadeTab, setFadeTab] = useState("docs");
+  const fadeItems: TabItem[] = [
+    { value: "docs", label: "文档" },
+    { value: "components", label: "组件库" },
+    { value: "examples", label: "示例代码" },
+    { value: "tutorials", label: "教程指南" },
+    { value: "api", label: "API 参考" },
+    { value: "changelog", label: "更新日志" },
+    { value: "practices", label: "最佳实践" },
+    { value: "troubleshoot", label: "故障排除" },
+    { value: "community", label: "社区" },
+    { value: "support", label: "技术支持" },
+    { value: "enterprise", label: "企业版" },
+    { value: "pricing", label: "价格方案" },
+  ];
+
+  /* ── 6. 动态增删 ── */
+  const dynCounter = useRef(5);
+  const [dynItems, setDynItems] = useState<TabItem[]>(
+    Array.from({ length: 5 }).map((_, i) => ({
+      value: `d${i}`,
+      label: `标签 ${i + 1}`,
+    }))
+  );
+  const [dynActive, setDynActive] = useState("d0");
+
+  /* ── 7. 自定义样式 ── */
+  const [styleTab, setStyleTab] = useState("home");
+  const styleItems: TabItem[] = [
+    { value: "home", label: "首页", icon: <Home className="h-4 w-4" /> },
     {
       value: "calendar",
       label: "日历",
@@ -283,28 +274,39 @@ export function ResponsiveTabsDemo() {
     {
       value: "mail",
       label: "邮件",
-      badge: 5,
       icon: <Mail className="h-4 w-4" />,
+      badge: 5,
     },
-    { value: "phone", label: "电话", icon: <Phone className="h-4 w-4" /> },
+    {
+      value: "settings",
+      label: "设置",
+      icon: <Settings className="h-4 w-4" />,
+    },
   ];
 
-  // Playground 用的很多项（测试溢出/滚动）
+  /* ── 8. Playground ── */
+  const [playLayout, setPlayLayout] = useState<LayoutMode>("responsive");
+  const [playScrollStep, setPlayScrollStep] = useState(200);
+  const [playFadeMasks, setPlayFadeMasks] = useState(true);
+  const [playFadeMaskWidth, setPlayFadeMaskWidth] = useState(64);
+  const [playAnimatedHL, setPlayAnimatedHL] = useState(true);
+  const [playTab, setPlayTab] = useState("p0");
+
   const playItems: TabItem[] = useMemo(() => {
     const icons = [Home, Settings, User, Bell, FileText, Star, Heart, Bookmark];
     return Array.from({ length: 14 }).map((_, i) => {
       const Icon = icons[i % icons.length];
-      const long = i % 3 === 0; // 加几个长标题测截断
       return {
-        value: `t${i}`,
-        label: long ? `这是一个很长很长很长的标签标题 ${i}` : `标签 ${i + 1}`,
-        icon: <Icon className="h-3 w-3 size-3" />,
+        value: `p${i}`,
+        label:
+          i % 3 === 0 ? `这是一个很长的标签标题 ${i}` : `标签 ${i + 1}`,
+        icon: <Icon className="h-3 w-3" />,
         badge: i % 4 === 0 ? i + 1 : undefined,
       } as TabItem;
     });
   }, []);
 
-  // 工具方法
+  /* ── 工具方法 ── */
   const nextOf = (items: TabItem[], cur: string) => {
     const idx = items.findIndex((i) => i.value === cur);
     return items[(idx + 1) % items.length]?.value ?? cur;
@@ -316,15 +318,19 @@ export function ResponsiveTabsDemo() {
 
   return (
     <div className="space-y-8 overflow-hidden">
-      {/* 基本使用 */}
+      {/* ━━━━━━━━━━━━━ 1. 基本用法 ━━━━━━━━━━━━━━━━━━━━ */}
       <Card>
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="space-y-1.5">
-              <CardTitle>基本使用</CardTitle>
-              <CardDescription>移动端横向滚动，≥sm 网格布局</CardDescription>
+              <CardTitle>基本用法</CardTitle>
+              <CardDescription>
+                默认 <code>responsive</code>{" "}
+                布局：小屏横向滚动，≥sm&nbsp;断点自动切换为网格。
+                尝试缩放浏览器宽度观察变化。
+              </CardDescription>
             </div>
-            <ViewSourceButton code={sourceCodes.basic} title="基本使用 - 源码" />
+            <ViewSourceButton code={sourceCodes.basic} title="基本用法 - 源码" />
           </div>
         </CardHeader>
         <CardContent>
@@ -333,231 +339,34 @@ export function ResponsiveTabsDemo() {
             onValueChange={setBasicTab}
             items={basicItems}
           >
-            <TabsContent value="all" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">全部组件</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  这里显示所有可用的组件...
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="forms" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">表单组件</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  包含输入框、选择器、开关等...
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="data" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">数据展示</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  表格、列表、卡片等...
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="navigation" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">导航组件</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  菜单、面包屑、分页等...
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="feedback" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">反馈组件</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  提示、通知、确认框等...
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="layout" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">布局组件</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  网格、分割器、容器等...
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="input" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">输入组件</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  各种输入控件和交互...
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="display" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">展示组件</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  图片、头像、标签等...
-                </p>
-              </div>
-            </TabsContent>
-          </ResponsiveTabs>
-        </CardContent>
-      </Card>
-
-      {/* 带图标 */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="space-y-1.5">
-              <CardTitle>带图标的标签页</CardTitle>
-              <CardDescription>每个标签页都可以配置图标</CardDescription>
-            </div>
-            <ViewSourceButton code={sourceCodes.withIcon} title="带图标 - 源码" />
-          </div>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveTabs
-            value={iconTab}
-            onValueChange={setIconTab}
-            items={iconItems}
-            gridColsClass="sm:grid-cols-5"
-          >
-            <TabsContent value="home" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">首页</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  系统概览...
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="profile" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">个人资料</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  管理个人信息与偏好...
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="settings" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">设置</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  系统设置与配置...
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="notifications" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">通知</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  查看与管理通知...
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="documents" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">文档</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  浏览与管理文档...
-                </p>
-              </div>
-            </TabsContent>
-          </ResponsiveTabs>
-        </CardContent>
-      </Card>
-
-      {/* 渐变遮罩演示 */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="space-y-1.5">
-              <CardTitle>渐变遮罩效果</CardTitle>
-              <CardDescription>
-                在scroll模式下展示左右渐变遮罩，提示更多内容
-              </CardDescription>
-            </div>
-            <ViewSourceButton code={sourceCodes.fadeMasks} title="渐变遮罩 - 源码" />
-          </div>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveTabs
-            value={customTab}
-            onValueChange={setCustomTab}
-            items={[
-              { value: "docs", label: "文档" },
-              { value: "components", label: "组件库" },
-              { value: "examples", label: "示例代码" },
-              { value: "tutorials", label: "教程指南" },
-              { value: "api-reference", label: "API参考" },
-              { value: "changelog", label: "更新日志" },
-              { value: "best-practices", label: "最佳实践" },
-              { value: "troubleshooting", label: "故障排除" },
-              { value: "community", label: "社区" },
-              { value: "support", label: "技术支持" },
-              { value: "enterprise", label: "企业版" },
-              { value: "pricing", label: "价格方案" },
-            ]}
-            layout="scroll"
-            fadeMasks={true}
-            fadeMaskWidth={40}
-          >
-            <TabsContent value="docs" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">文档</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  注意观察左右两侧的渐变遮罩效果，它们会在有更多内容可滚动时自动显示。
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="components" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">组件库</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  渐变遮罩使用 CSS gradient 实现，可以适配深浅色主题。
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="examples" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">示例代码</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  通过 fadeMasks 和 fadeMaskWidth 属性控制渐变遮罩的显示和宽度。
-                </p>
-              </div>
-            </TabsContent>
-            {/* 其他tab content */}
-            {[
-              "tutorials",
-              "api-reference",
-              "changelog",
-              "best-practices",
-              "troubleshooting",
-              "community",
-              "support",
-              "enterprise",
-              "pricing",
-            ].map((value) => (
-              <TabsContent key={value} value={value} className="mt-4">
-                <div className="rounded-lg border p-4">
-                  <h3 className="font-semibold capitalize">
-                    {value.replace("-", " ")}
-                  </h3>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {value} 相关内容...
-                  </p>
-                </div>
+            {basicItems.map((item) => (
+              <TabsContent key={item.value} value={item.value}>
+                <ContentPanel
+                  title={item.label}
+                  description={`当前选中「${item.label}」。缩小窗口宽度 → 标签栏自动变为横向滚动；放大窗口 → 自动切换为网格平铺。`}
+                />
               </TabsContent>
             ))}
           </ResponsiveTabs>
         </CardContent>
       </Card>
 
-      {/* 徽标 + 禁用 */}
+      {/* ━━━━━━━━━━━ 2. 图标、徽标与禁用态 ━━━━━━━━━━━━━ */}
       <Card>
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="space-y-1.5">
-              <CardTitle>徽标与状态</CardTitle>
-              <CardDescription>支持徽标显示和禁用状态</CardDescription>
+              <CardTitle>图标、徽标与禁用态</CardTitle>
+              <CardDescription>
+                每个 Tab 可独立配置{" "}
+                <code>icon</code>（前置图标）、<code>badge</code>
+                （数字/文字徽标）和 <code>disabled</code>（禁用）。
+              </CardDescription>
             </div>
-            <ViewSourceButton code={sourceCodes.withBadge} title="徽标与状态 - 源码" />
+            <ViewSourceButton
+              code={sourceCodes.iconsAndBadges}
+              title="图标与徽标 - 源码"
+            />
           </div>
         </CardHeader>
         <CardContent>
@@ -565,319 +374,199 @@ export function ResponsiveTabsDemo() {
             value={badgeTab}
             onValueChange={setBadgeTab}
             items={badgeItems}
-            scrollStep={150}
-            gridColsClass="sm:grid-cols-4 lg:grid-cols-6"
+            gridColsClass="sm:grid-cols-3 md:grid-cols-5"
           >
-            <TabsContent value="forms" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold">表单组件</h3>
-                  <Badge variant="secondary">12个</Badge>
-                </div>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  丰富的表单组件库...
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="data" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold">数据组件</h3>
-                  <Badge>新</Badge>
-                </div>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  最新发布的数据展示组件...
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="nav" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold">导航组件</h3>
-                  <Badge variant="secondary">8个</Badge>
-                </div>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  导航相关组件集合...
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="feedback" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold">反馈组件</h3>
-                  <Badge variant="secondary">3个</Badge>
-                </div>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  交互提示与反馈...
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="input" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold">输入组件</h3>
-                  <Badge variant="secondary">25个</Badge>
-                </div>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  输入与选择控件...
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="search" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">搜索组件</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  搜索与过滤功能...
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="bookmarks" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold">收藏组件</h3>
-                  <Badge variant="destructive">99+</Badge>
-                </div>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  收藏与标记功能...
-                </p>
-              </div>
-            </TabsContent>
+            {badgeItems.map((item) => (
+              <TabsContent key={item.value} value={item.value}>
+                <ContentPanel
+                  title={item.label}
+                  badge={item.badge}
+                  description={
+                    item.badge !== undefined
+                      ? `徽标值为「${item.badge}」。可以是数字表示数量，也可以是文字标记状态。`
+                      : `「${item.label}」— 普通标签页，未配置徽标。注意：「归档」标签页处于 disabled 禁用状态，无法点击。`
+                  }
+                />
+              </TabsContent>
+            ))}
           </ResponsiveTabs>
         </CardContent>
       </Card>
 
-      {/* 布局模式 Playground */}
+      {/* ━━━━━━━━━━━ 3. 选中态动画高亮 ━━━━━━━━━━━━━━━━━ */}
       <Card>
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="space-y-1.5">
-              <CardTitle>布局模式 Playground</CardTitle>
-              <CardDescription>切换布局/步长/贴边，观察行为变化</CardDescription>
+              <CardTitle>选中态动画高亮</CardTitle>
+              <CardDescription>
+                切换 Tab 时，高亮底色以弹簧动画平滑滑动到目标选项卡
+                （默认开启，可通过 <code>animatedHighlight</code> 属性控制）。
+              </CardDescription>
             </div>
-            <ViewSourceButton code={sourceCodes.playground} title="Playground - 源码" />
+            <ViewSourceButton
+              code={sourceCodes.animatedHighlight}
+              title="动画高亮 - 源码"
+            />
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm text-muted-foreground">布局：</span>
-            <Button
-              size="sm"
-              variant={playLayout === "responsive" ? "default" : "outline"}
-              onClick={() => setPlayLayout("responsive")}
-              className="cursor-pointer"
-            >
-              responsive
-            </Button>
-            <Button
-              size="sm"
-              variant={playLayout === "scroll" ? "default" : "outline"}
-              onClick={() => setPlayLayout("scroll")}
-              className="cursor-pointer"
-            >
-              scroll
-            </Button>
-            <Button
-              size="sm"
-              variant={playLayout === "grid" ? "default" : "outline"}
-              onClick={() => setPlayLayout("grid")}
-              className="cursor-pointer"
-            >
-              grid
-            </Button>
-
-            <div className="mx-3 h-5 w-px bg-border" />
-
-            <span className="text-sm text-muted-foreground">
-              滚动步长(px)：
-            </span>
-            <Input
-              className="h-8 w-24"
-              type="number"
-              value={playScrollStep}
-              onChange={(e) => setPlayScrollStep(Number(e.target.value || 0))}
-            />
-
-            <div className="mx-3 h-5 w-px bg-border" />
-
-            <Button
-              size="sm"
-              variant={playFadeMasks ? "default" : "outline"}
-              onClick={() => setPlayFadeMasks((v) => !v)}
-              className="cursor-pointer"
-            >
-              {playFadeMasks ? "渐变遮罩已开" : "渐变遮罩已关"}
-            </Button>
-
-            <span className="text-sm text-muted-foreground">
-              遮罩宽度(px)：
-            </span>
-            <Input
-              className="h-8 w-20"
-              type="number"
-              value={playFadeMaskWidth}
-              onChange={(e) =>
-                setPlayFadeMaskWidth(Number(e.target.value || 64))
-              }
-              disabled={!playFadeMasks}
-            />
-
-            <div className="mx-3 h-5 w-px bg-border" />
-
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setPlayTab(prevOf(playItems, playTab))}
-              className="cursor-pointer"
-            >
-              <ArrowLeft className="h-4 w-4" /> 上一项
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setPlayTab(nextOf(playItems, playTab))}
-              className="cursor-pointer"
-            >
-              下一项 <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
+          <Button
+            size="sm"
+            variant={hlEnabled ? "default" : "outline"}
+            onClick={() => setHlEnabled((v) => !v)}
+            className="cursor-pointer"
+          >
+            {hlEnabled ? "animatedHighlight：开启" : "animatedHighlight：关闭"}
+          </Button>
 
           <ResponsiveTabs
-            value={playTab}
-            onValueChange={setPlayTab}
-            items={playItems}
-            layout={playLayout}
-            scrollStep={playScrollStep}
-            fadeMasks={playFadeMasks}
-            fadeMaskWidth={playFadeMaskWidth}
-            gridColsClass="sm:grid-cols-6 xl:grid-cols-8"
-            triggerClassName="text-xs"
+            value={hlTab}
+            onValueChange={setHlTab}
+            items={hlItems}
+            animatedHighlight={hlEnabled}
+            gridColsClass="sm:grid-cols-5"
           >
-            {playItems.map((it) => (
-              <TabsContent key={it.value} value={it.value} className="mt-4">
-                <div className="rounded-lg border p-4">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold">{it.label}</h3>
-                    {typeof it.badge !== "undefined" && (
-                      <Badge variant="secondary">{it.badge}</Badge>
-                    )}
-                  </div>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    当前布局模式：<code>{playLayout}</code>，当前选中：
-                    <code>{it.value}</code>
-                  </p>
-                </div>
+            {hlItems.map((item) => (
+              <TabsContent key={item.value} value={item.value}>
+                <ContentPanel
+                  title={item.label}
+                  description={
+                    hlEnabled
+                      ? "注意观察：选中高亮底色正以弹簧动画从前一个标签平滑滑动到当前标签。"
+                      : "动画已关闭，选中态为默认的即时切换效果，无滑动过渡。"
+                  }
+                />
               </TabsContent>
             ))}
           </ResponsiveTabs>
         </CardContent>
       </Card>
 
-      {/* 桌面也滚动（长标题/多项） */}
+      {/* ━━━━━━━━━━━━━ 4. 三种布局模式 ━━━━━━━━━━━━━━━━ */}
       <Card>
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="space-y-1.5">
-              <CardTitle>桌面也滚动（layout=&quot;scroll&quot;）</CardTitle>
-              <CardDescription>测试长标题截断与左右按钮</CardDescription>
+              <CardTitle>三种布局模式</CardTitle>
+              <CardDescription>
+                <code>responsive</code>（自适应，默认）、
+                <code>scroll</code>（始终横向滚动）、
+                <code>grid</code>（始终网格平铺）。
+                切换按钮实时对比差异。
+              </CardDescription>
             </div>
-            <ViewSourceButton code={sourceCodes.scrollLayout} title="滚动布局 - 源码" />
+            <ViewSourceButton
+              code={sourceCodes.layoutModes}
+              title="布局模式 - 源码"
+            />
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground shrink-0">
+              layout =
+            </span>
+            {(["responsive", "scroll", "grid"] as const).map((mode) => (
+              <Button
+                key={mode}
+                size="sm"
+                variant={layoutMode === mode ? "default" : "outline"}
+                onClick={() => setLayoutMode(mode)}
+                className="cursor-pointer"
+              >
+                {`"${mode}"`}
+              </Button>
+            ))}
+          </div>
+
+          <ResponsiveTabs
+            value={layoutTab}
+            onValueChange={setLayoutTab}
+            items={layoutItems}
+            layout={layoutMode}
+            scrollStep={200}
+            gridColsClass={
+              layoutMode === "grid"
+                ? "grid-cols-5 lg:grid-cols-10"
+                : "sm:grid-cols-5 lg:grid-cols-10"
+            }
+          >
+            {layoutItems.map((item) => (
+              <TabsContent key={item.value} value={item.value}>
+                <ContentPanel
+                  title={item.label}
+                  description={
+                    layoutMode === "responsive"
+                      ? "当前为 responsive 模式：小屏自动横向滚动（可手势左右滑动），大屏切换为网格平铺展示。"
+                      : layoutMode === "scroll"
+                        ? "当前为 scroll 模式：所有屏幕尺寸均保持横向滚动，配合左右箭头按钮导航。适合标签数量不确定或频繁变化的场景。"
+                        : "当前为 grid 模式：所有屏幕尺寸均为网格平铺，选项卡均匀分布。适合数量固定、需要一目了然的场景。"
+                  }
+                />
+              </TabsContent>
+            ))}
+          </ResponsiveTabs>
+        </CardContent>
+      </Card>
+
+      {/* ━━━━━━━━━━━━━ 5. 渐变遮罩效果 ━━━━━━━━━━━━━━━━ */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="space-y-1.5">
+              <CardTitle>渐变遮罩效果</CardTitle>
+              <CardDescription>
+                滚动模式下，左右两侧显示渐变遮罩提示可滚动区域。通过{" "}
+                <code>fadeMasks</code> 开关和 <code>fadeMaskWidth</code>{" "}
+                设置宽度。遮罩会在滚到边界时自动消失。
+              </CardDescription>
+            </div>
+            <ViewSourceButton
+              code={sourceCodes.fadeMasks}
+              title="渐变遮罩 - 源码"
+            />
           </div>
         </CardHeader>
         <CardContent>
           <ResponsiveTabs
-            value={playTab}
-            onValueChange={setPlayTab}
-            items={playItems}
+            value={fadeTab}
+            onValueChange={setFadeTab}
+            items={fadeItems}
             layout="scroll"
-            scrollStep={220}
-            triggerClassName="text-xs"
+            fadeMasks={true}
+            fadeMaskWidth={48}
           >
-            {playItems.slice(0, 3).map((it) => (
-              <TabsContent key={it.value} value={it.value} className="mt-4">
-                <div className="rounded-lg border p-4">
-                  <h3 className="font-semibold">{it.label}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    桌面也保留横向滚动，适合超多分类或标签数量不定的场景。
-                  </p>
-                </div>
+            {fadeItems.map((item) => (
+              <TabsContent key={item.value} value={item.value}>
+                <ContentPanel
+                  title={item.label}
+                  description="向左右滚动标签栏，注意观察两端的渐变遮罩 — 有更多内容可滚动时自动出现，滚到最边界时平滑消失。"
+                />
               </TabsContent>
             ))}
           </ResponsiveTabs>
         </CardContent>
       </Card>
 
-      {/* 始终网格 */}
+      {/* ━━━━━━━━━━━━━ 6. 动态增删标签 ━━━━━━━━━━━━━━━━━ */}
       <Card>
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="space-y-1.5">
-              <CardTitle>始终网格（layout=&quot;grid&quot;）</CardTitle>
-              <CardDescription>均匀分布，信息密集展示</CardDescription>
+              <CardTitle>动态增删标签</CardTitle>
+              <CardDescription>
+                支持运行时动态增删 Tab
+                选项，组件自动维护激活态和滚动位置。配合外部控制（上一项/下一项）验证受控切换。
+              </CardDescription>
             </div>
-            <ViewSourceButton code={sourceCodes.gridLayout} title="网格布局 - 源码" />
+            <ViewSourceButton
+              code={sourceCodes.dynamic}
+              title="动态增删 - 源码"
+            />
           </div>
         </CardHeader>
-        <CardContent>
-          <ResponsiveTabs
-            value={customTab}
-            onValueChange={setCustomTab}
-            items={customItems}
-            layout="grid"
-            gridColsClass="grid-cols-6 xl:grid-cols-8"
-            listClassName="bg-muted/50"
-            triggerClassName="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-          >
-            <TabsContent value="docs" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">文档中心</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  均匀网格分布的选项卡。
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="calendar" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">日历功能</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  日程管理和时间安排。
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="mail" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold">邮件系统</h3>
-                  <Badge variant="destructive">5个未读</Badge>
-                </div>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  收发与管理邮件。
-                </p>
-              </div>
-            </TabsContent>
-            <TabsContent value="phone" className="mt-4">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-semibold">通话功能</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  语音通话与视频会议。
-                </p>
-              </div>
-            </TabsContent>
-          </ResponsiveTabs>
-        </CardContent>
-      </Card>
-
-      {/* 动态增删 + 外部控制 */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="space-y-1.5">
-              <CardTitle>动态增删标签 + 外部控制</CardTitle>
-              <CardDescription>验证滚动定位与受控切换</CardDescription>
-            </div>
-            <ViewSourceButton code={sourceCodes.dynamic} title="动态增删 - 源码" />
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-4">
           <div className="flex flex-wrap items-center gap-2">
             <Button
               size="sm"
@@ -898,17 +587,17 @@ export function ResponsiveTabsDemo() {
               <ArrowRight className="h-4 w-4" />
             </Button>
 
-            <div className="mx-3 h-5 w-px bg-border" />
+            <div className="mx-1 h-5 w-px bg-border" />
 
             <Button
               size="sm"
               onClick={() => {
-                const id = `d${dynItems.length}`;
+                const id = `d${dynCounter.current++}`;
                 setDynItems((arr) => [
                   ...arr,
-                  { value: id, label: `动态标签 ${arr.length + 1}` },
+                  { value: id, label: `标签 ${arr.length + 1}` },
                 ]);
-                setDynActive(`d${dynItems.length}`);
+                setDynActive(id);
               }}
               className="cursor-pointer"
             >
@@ -920,19 +609,22 @@ export function ResponsiveTabsDemo() {
               size="sm"
               variant="destructive"
               onClick={() => {
-                if (dynItems.length === 0) return;
+                if (dynItems.length <= 1) return;
                 const idx = dynItems.findIndex((i) => i.value === dynActive);
                 const next = dynItems.filter((i) => i.value !== dynActive);
                 setDynItems(next);
-                if (next.length === 0) return;
-                const newIdx = Math.max(0, idx - 1);
-                setDynActive(next[newIdx].value);
+                setDynActive(next[Math.max(0, idx - 1)].value);
               }}
               className="cursor-pointer"
+              disabled={dynItems.length <= 1}
             >
               <Minus className="h-4 w-4" />
               删除当前
             </Button>
+
+            <span className="text-xs text-muted-foreground">
+              共 {dynItems.length} 个标签
+            </span>
           </div>
 
           <ResponsiveTabs
@@ -941,16 +633,205 @@ export function ResponsiveTabsDemo() {
             onValueChange={setDynActive}
             items={dynItems}
             scrollStep={180}
+          >
+            {dynItems.map((item) => (
+              <TabsContent key={item.value} value={item.value}>
+                <ContentPanel
+                  title={item.label}
+                  description={`动态生成的内容 · 标签 ID：${item.value} · 当前共 ${dynItems.length} 个标签。新增的标签会自动被选中并滚动到可见位置。`}
+                />
+              </TabsContent>
+            ))}
+          </ResponsiveTabs>
+        </CardContent>
+      </Card>
+
+      {/* ━━━━━━━━━━━━━ 7. 自定义样式 ━━━━━━━━━━━━━━━━━━ */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="space-y-1.5">
+              <CardTitle>自定义样式</CardTitle>
+              <CardDescription>
+                通过 <code>listClassName</code>、
+                <code>triggerClassName</code>
+                自定义容器与选项卡样式。自定义选中态时建议关闭{" "}
+                <code>animatedHighlight</code> 以避免冲突。
+              </CardDescription>
+            </div>
+            <ViewSourceButton
+              code={sourceCodes.customStyles}
+              title="自定义样式 - 源码"
+            />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveTabs
+            value={styleTab}
+            onValueChange={setStyleTab}
+            items={styleItems}
+            layout="grid"
+            animatedHighlight={false}
+            gridColsClass="grid-cols-4"
+            listClassName="bg-muted/50"
+            triggerClassName="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+          >
+            {styleItems.map((item) => (
+              <TabsContent key={item.value} value={item.value}>
+                <ContentPanel
+                  title={item.label}
+                  badge={item.badge}
+                  description="此示例使用了 primary 色系的选中态样式，容器添加了半透明背景色。关闭了 animatedHighlight 以避免与自定义样式冲突。"
+                />
+              </TabsContent>
+            ))}
+          </ResponsiveTabs>
+        </CardContent>
+      </Card>
+
+      {/* ━━━━━━━━━━━ 8. 交互式 Playground ━━━━━━━━━━━━━━ */}
+      <Card>
+        <CardHeader>
+          <div className="space-y-1.5">
+            <CardTitle>交互式 Playground</CardTitle>
+            <CardDescription>
+              调整所有可配置参数，实时观察行为变化。包含 14
+              个标签项（含长标题、图标、徽标）以充分测试溢出与滚动。
+            </CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          {/* 控制面板 */}
+          <div className="rounded-lg border bg-muted/30 p-4">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {/* 布局模式 */}
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">
+                  layout
+                </Label>
+                <div className="flex gap-1.5">
+                  {(["responsive", "scroll", "grid"] as const).map((m) => (
+                    <Button
+                      key={m}
+                      size="sm"
+                      variant={playLayout === m ? "default" : "outline"}
+                      onClick={() => setPlayLayout(m)}
+                      className="cursor-pointer flex-1 text-xs"
+                    >
+                      {m}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 功能开关 */}
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">
+                  功能开关
+                </Label>
+                <div className="flex gap-1.5">
+                  <Button
+                    size="sm"
+                    variant={playAnimatedHL ? "default" : "outline"}
+                    onClick={() => setPlayAnimatedHL((v) => !v)}
+                    className="cursor-pointer flex-1 text-xs"
+                  >
+                    animatedHighlight
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={playFadeMasks ? "default" : "outline"}
+                    onClick={() => setPlayFadeMasks((v) => !v)}
+                    className="cursor-pointer flex-1 text-xs"
+                  >
+                    fadeMasks
+                  </Button>
+                </div>
+              </div>
+
+              {/* 数值参数 */}
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">
+                  数值参数
+                </Label>
+                <div className="flex gap-2">
+                  <div className="flex-1 space-y-1">
+                    <span className="text-[11px] text-muted-foreground">
+                      scrollStep(px)
+                    </span>
+                    <Input
+                      className="h-8 text-xs"
+                      type="number"
+                      value={playScrollStep}
+                      onChange={(e) =>
+                        setPlayScrollStep(Number(e.target.value || 200))
+                      }
+                    />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <span className="text-[11px] text-muted-foreground">
+                      fadeMaskWidth(px)
+                    </span>
+                    <Input
+                      className="h-8 text-xs"
+                      type="number"
+                      value={playFadeMaskWidth}
+                      onChange={(e) =>
+                        setPlayFadeMaskWidth(Number(e.target.value || 64))
+                      }
+                      disabled={!playFadeMasks}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 外部切换按钮 */}
+            <div className="mt-4 flex items-center gap-2 border-t border-border/50 pt-3">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPlayTab(prevOf(playItems, playTab))}
+                className="cursor-pointer"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                上一项
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPlayTab(nextOf(playItems, playTab))}
+                className="cursor-pointer"
+              >
+                下一项
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+              <span className="text-[11px] text-muted-foreground ml-1">
+                外部受控切换 · 验证滚动跟随定位
+              </span>
+            </div>
+          </div>
+
+          {/* 实际 Tabs */}
+          <ResponsiveTabs
+            value={playTab}
+            onValueChange={setPlayTab}
+            items={playItems}
+            layout={playLayout}
+            scrollStep={playScrollStep}
+            fadeMasks={playFadeMasks}
+            fadeMaskWidth={playFadeMaskWidth}
+            animatedHighlight={playAnimatedHL}
+            gridColsClass="sm:grid-cols-6 xl:grid-cols-8"
             triggerClassName="text-xs"
           >
-            {dynItems.map((it) => (
-              <TabsContent key={it.value} value={it.value} className="mt-4">
-                <div className="rounded-lg border p-4">
-                  <h3 className="font-semibold">{it.label}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    这是动态生成的内容。
-                  </p>
-                </div>
+            {playItems.map((item) => (
+              <TabsContent key={item.value} value={item.value}>
+                <ContentPanel
+                  title={item.label}
+                  badge={item.badge}
+                  description={`layout: ${playLayout} · animatedHighlight: ${playAnimatedHL ? "on" : "off"} · fadeMasks: ${playFadeMasks ? "on" : "off"} · scrollStep: ${playScrollStep}px · fadeMaskWidth: ${playFadeMaskWidth}px`}
+                />
               </TabsContent>
             ))}
           </ResponsiveTabs>

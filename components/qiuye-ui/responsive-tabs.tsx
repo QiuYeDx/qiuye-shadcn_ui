@@ -81,6 +81,14 @@ export interface ResponsiveTabsProps {
    * @default 64
    */
   fadeMaskWidth?: number;
+  /**
+   * 是否启用选中态 layoutId 底色平移过渡动画
+   *
+   * 开启后，切换 Tab 时选中高亮背景会以弹簧动画从上一个 Tab 滑动到新 Tab，
+   * 而非默认的即时切换。
+   * @default true
+   */
+  animatedHighlight?: boolean;
 }
 
 /**
@@ -130,10 +138,14 @@ const ResponsiveTabs = React.forwardRef<
       className,
       fadeMasks = true,
       fadeMaskWidth = 64,
+      animatedHighlight = true,
       ...props
     },
     ref
   ) => {
+    // layoutId 动画高亮的唯一前缀（避免多实例冲突）
+    const instanceId = React.useId();
+
     // 背景容器（不滚）
     const tabsListRef = useRef<HTMLDivElement>(null);
     // 可滚动轨道（只滚内容）
@@ -288,7 +300,7 @@ const ResponsiveTabs = React.forwardRef<
           : "overflow-x-auto sm:overflow-visible",
       // 隐藏滚动条
       !isGridAll &&
-        "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+      "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
       // 阻断 inline 方向滚动链
       "overscroll-contain"
     );
@@ -306,8 +318,11 @@ const ResponsiveTabs = React.forwardRef<
     const triggerClass = cn(
       !isGridAll && "shrink-0 min-w-fit px-3 py-2",
       (isGridAll || isResponsive) &&
-        "sm:shrink sm:min-w-0 sm:flex sm:items-center sm:justify-center",
+      "sm:shrink sm:min-w-0 sm:flex sm:items-center sm:justify-center",
       "data-[state=active]:font-medium",
+      // 当启用 layoutId 动画高亮时，取消 trigger 自带的选中态背景/阴影/边框，改由 motion.span 承载
+      animatedHighlight &&
+      "relative data-[state=active]:bg-transparent data-[state=active]:shadow-none dark:data-[state=active]:bg-transparent dark:data-[state=active]:border-transparent",
       triggerClassName
     );
 
@@ -387,7 +402,24 @@ const ResponsiveTabs = React.forwardRef<
                     disabled={item.disabled}
                     className={triggerClass}
                   >
-                    <span className="flex items-center gap-2 max-w-full">
+                    {/* layoutId 动画高亮底色 */}
+                    {animatedHighlight && value === item.value && (
+                      <motion.span
+                        layoutId={`${instanceId}-tab-highlight`}
+                        className="absolute inset-0 rounded-md bg-background shadow-sm dark:border dark:border-input dark:bg-input/30"
+                        transition={{
+                          type: "spring",
+                          bounce: 0.15,
+                          duration: 0.4,
+                        }}
+                      />
+                    )}
+                    <span
+                      className={cn(
+                        "flex items-center gap-2 max-w-full",
+                        animatedHighlight && "relative z-[1]"
+                      )}
+                    >
                       {item.icon && (
                         <span className="shrink-0">{item.icon}</span>
                       )}
