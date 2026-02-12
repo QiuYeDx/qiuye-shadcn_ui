@@ -140,10 +140,10 @@ function PanelDemo() {
 }`,
   panelNoFilename: `import { CodeBlock, CodeBlockPanel } from "@/components/qiuye-ui/code-block";
 
-// 仅显示复制按钮，不显示文件名
-function PanelCopyOnlyDemo() {
+// 不传 filename 时自动显示语言类型标签
+function PanelLanguageLabelDemo() {
   return (
-    <CodeBlockPanel code={code}>
+    <CodeBlockPanel language="python" code={code}>
       <CodeBlock language="python" isDark>
         {code}
       </CodeBlock>
@@ -406,12 +406,12 @@ export function CodeBlockDemo() {
             </CodeBlock>
           </CodeBlockPanel>
 
-          {/* 仅复制按钮，不带文件名 */}
+          {/* 不传 filename，自动显示语言类型标签 */}
           <div>
             <p className="text-sm text-muted-foreground mb-3">
-              不传 <code className="text-xs bg-muted px-1 py-0.5 rounded">filename</code> 时仅显示复制按钮：
+              不传 <code className="text-xs bg-muted px-1 py-0.5 rounded">filename</code> 时自动显示语言类型标签：
             </p>
-            <CodeBlockPanel code={sampleJSX}>
+            <CodeBlockPanel language="tsx" code={sampleJSX}>
               <CodeBlock language="tsx" isDark>
                 {sampleJSX}
               </CodeBlock>

@@ -49,12 +49,88 @@ const PANEL_TEXT = {
 } as const;
 
 // ============================================
+// 语言显示名称映射
+// ============================================
+
+/** 常见编程语言的显示名称映射 */
+const LANGUAGE_DISPLAY_NAMES: Record<string, string> = {
+  typescript: "TypeScript",
+  javascript: "JavaScript",
+  tsx: "TSX",
+  jsx: "JSX",
+  python: "Python",
+  css: "CSS",
+  scss: "SCSS",
+  less: "Less",
+  html: "HTML",
+  json: "JSON",
+  yaml: "YAML",
+  xml: "XML",
+  markdown: "Markdown",
+  bash: "Bash",
+  shell: "Shell",
+  sh: "Shell",
+  zsh: "Zsh",
+  sql: "SQL",
+  graphql: "GraphQL",
+  rust: "Rust",
+  go: "Go",
+  java: "Java",
+  kotlin: "Kotlin",
+  swift: "Swift",
+  ruby: "Ruby",
+  php: "PHP",
+  csharp: "C#",
+  cpp: "C++",
+  c: "C",
+  dart: "Dart",
+  r: "R",
+  lua: "Lua",
+  perl: "Perl",
+  scala: "Scala",
+  diff: "Diff",
+  dockerfile: "Dockerfile",
+  docker: "Docker",
+  toml: "TOML",
+  ini: "INI",
+  vue: "Vue",
+  svelte: "Svelte",
+};
+
+/**
+ * 获取编程语言的格式化显示名称
+ *
+ * 优先使用内置映射表；未命中时回退到首字母大写。
+ * 对于 "plaintext" 返回 null（不适合作为标签显示）。
+ */
+function getLanguageDisplayName(language: string): string | null {
+  const lower = language.toLowerCase();
+  if (lower === "plaintext" || lower === "text" || lower === "plain") {
+    return null;
+  }
+  return LANGUAGE_DISPLAY_NAMES[lower] ?? language.charAt(0).toUpperCase() + language.slice(1);
+}
+
+// ============================================
 // CodeBlockPanel 组件
 // ============================================
 
 export interface CodeBlockPanelProps {
   /** 文件名标签（显示在面板顶部左侧） */
   filename?: string;
+  /**
+   * 编程语言标识（当未设置 filename 时，作为 fallback 标签显示语言类型）
+   *
+   * 传入后若 filename 为空且 showLanguageLabel 为 true，
+   * 会在面板顶部左侧显示格式化后的语言名称（如 "TypeScript"、"Python"）。
+   */
+  language?: string;
+  /**
+   * 是否在未设置 filename 时自动显示语言类型标签（默认 true）
+   *
+   * 设为 false 后即使传入了 language，也不会作为 fallback 标签显示。
+   */
+  showLanguageLabel?: boolean;
   /**
    * 代码文本内容（用于复制按钮功能）
    *
@@ -87,20 +163,36 @@ export interface CodeBlockPanelProps {
  * 特性：
  * - **7 套内置配色主题**（与 CodeBlock 主题一一对应），各有浅色/深色变体
  * - 可选文件名标签（顶部左侧）
+ * - **语言类型 fallback 标签**：未设置 filename 时，自动显示语言名称（如 "TypeScript"），视觉更平衡
  * - 可选复制按钮（顶部右侧），带复制成功动画反馈
  * - 自动重置内部 CodeBlock 的 margin / border / shadow
  *
  * @example
  * ```tsx
+ * // 显示文件名标签
  * <CodeBlockPanel filename="app.tsx" code={code} colorTheme="github" isDark>
  *   <CodeBlock language="tsx" colorTheme="github" isDark>
  *     {code}
  *   </CodeBlock>
  * </CodeBlockPanel>
+ *
+ * // 不设置 filename，自动显示语言类型 "TypeScript" 作为 fallback 标签
+ * <CodeBlockPanel language="typescript" code={code} colorTheme="github" isDark>
+ *   <CodeBlock language="typescript" colorTheme="github" isDark>
+ *     {code}
+ *   </CodeBlock>
+ * </CodeBlockPanel>
+ *
+ * // 关闭语言类型 fallback 标签
+ * <CodeBlockPanel language="typescript" showLanguageLabel={false} code={code}>
+ *   <CodeBlock language="typescript">{code}</CodeBlock>
+ * </CodeBlockPanel>
  * ```
  */
 export function CodeBlockPanel({
   filename,
+  language,
+  showLanguageLabel = true,
   code,
   showCopyButton = true,
   isDark = true,
@@ -125,7 +217,14 @@ export function CodeBlockPanel({
   );
 
   const hasCopyButton = showCopyButton && !!code;
-  const hasHeader = !!filename || hasCopyButton;
+
+  // 当没有 filename 时，语言类型作为 fallback 标签
+  const languageLabel =
+    !filename && showLanguageLabel && language
+      ? getLanguageDisplayName(language)
+      : null;
+  const displayLabel = filename ?? languageLabel;
+  const hasHeader = !!displayLabel || hasCopyButton;
 
   // 解析面板配色
   const mode = isDark ? "dark" : "light";
@@ -152,9 +251,9 @@ export function CodeBlockPanel({
         {/* ---- 头部：文件名 + 复制按钮 ---- */}
         {hasHeader && (
           <div className="flex items-center justify-between px-3 pt-0.5 pb-1">
-            {filename ? (
+            {displayLabel ? (
               <span className="cbp-filename text-xs/5 font-medium select-none">
-                {filename}
+                {displayLabel}
               </span>
             ) : (
               <span />

@@ -825,6 +825,21 @@ export const componentRegistry: ComponentRegistry = {
             required: false,
           },
           {
+            name: "language",
+            type: "string",
+            description:
+              "编程语言标识（当未设置 filename 时，作为 fallback 标签显示语言类型，如 \"TypeScript\"）",
+            required: false,
+          },
+          {
+            name: "showLanguageLabel",
+            type: "boolean",
+            description:
+              "是否在未设置 filename 时自动显示语言类型标签",
+            required: false,
+            default: "true",
+          },
+          {
             name: "code",
             type: "string",
             description: "代码文本内容（用于复制按钮功能，不传则不显示复制按钮）",
