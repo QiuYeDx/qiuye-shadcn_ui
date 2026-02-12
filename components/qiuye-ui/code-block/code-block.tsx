@@ -433,6 +433,7 @@ function CodeBlockStyles() {
         border: 1px solid var(--cb-border);
         scrollbar-width: thin;
         scrollbar-color: var(--cb-sb-thumb) var(--cb-sb-track);
+        overscroll-behavior-x: none;
       }
 
       .qiuye-code-block pre code {
@@ -694,6 +695,7 @@ function CodeBlockStyles() {
         overflow: auto;
         scrollbar-width: thin;
         scrollbar-color: var(--cb-sb-thumb) var(--cb-sb-track);
+        overscroll-behavior-x: none;
       }
 
       /* 内部 pre 取消自身外层样式（由 wrapper 统一处理），并取消 overflow 交给父容器 */
