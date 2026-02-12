@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -38,8 +38,8 @@ export interface ResponsiveTabsProps {
   onValueChange: (value: string) => void;
   /** Tab 选项列表 */
   items: TabItem[];
-  /** Tab 面板内容（`TabsContent` 区域） */
-  children: React.ReactNode;
+  /** Tab 面板内容（`TabsContent` 区域），不传则不渲染内容区域 */
+  children?: React.ReactNode;
   /**
    * 是否显示左右滚动箭头按钮（仅在滚动模式下生效）
    * @default true
@@ -468,11 +468,11 @@ const ResponsiveTabs = React.forwardRef<
           </TabsList>
         </div>
 
-        <div className="mt-4">{children}</div>
+        {children != null && <div className="mt-4">{children}</div>}
       </Tabs>
     );
   }
 );
 
 ResponsiveTabs.displayName = "ResponsiveTabs";
-export { ResponsiveTabs };
+export { ResponsiveTabs, TabsContent };

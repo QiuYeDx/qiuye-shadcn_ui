@@ -13,7 +13,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  ResponsiveTabs,
+  type TabItem,
+} from "@/components/qiuye-ui/responsive-tabs";
 import { Separator } from "@/components/ui/separator";
 import { useClipboard } from "use-clipboard-copy";
 import { toast } from "sonner";
@@ -151,75 +154,67 @@ export default function CLIPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:flex-shrink-0">
-            <span className="text-sm text-muted-foreground">包管理器:</span>
-            <Tabs
+          <div className="flex items-center gap-2 sm:shrink-0">
+            <span className="text-sm text-muted-foreground shrink-0">包管理器:</span>
+            <ResponsiveTabs
               value={packageManager}
               onValueChange={(value) =>
                 setPackageManager(value as "npm" | "pnpm")
               }
-            >
-              <TabsList className="grid w-[140px] sm:w-[180px] grid-cols-2 h-8">
-                <TabsTrigger value="npm" className="text-xs">
-                  npm
-                </TabsTrigger>
-                <TabsTrigger value="pnpm" className="text-xs">
-                  pnpm
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+              items={[
+                { value: "npm", label: "npm" },
+                { value: "pnpm", label: "pnpm" },
+              ]}
+              layout="grid"
+              gridColsClass="grid-cols-2"
+              listClassName="w-[140px] sm:w-[180px] h-8"
+              triggerClassName="text-xs"
+              scrollButtons={false}
+              fadeMasks={false}
+            />
           </div>
         </div>
       </motion.div>
 
       {/* Content */}
       <div>
-        <Tabs
-          value={tab}
-          onValueChange={(v) => {
-            setPrevTab(tab);
-            setTab(v as Tab);
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            type: "spring",
+            stiffness: 120,
+            damping: 40,
+            duration: 0.5,
+            delay: 0.45,
           }}
-          className="space-y-6"
         >
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              type: "spring",
-              stiffness: 120,
-              damping: 40,
-              duration: 0.5,
-              delay: 0.45,
+          <ResponsiveTabs
+            value={tab}
+            onValueChange={(v) => {
+              setPrevTab(tab);
+              setTab(v as Tab);
             }}
+            items={[
+              { value: "installation", label: "安装" },
+              { value: "usage", label: "使用" },
+              { value: "commands", label: "命令" },
+              { value: "api", label: "API" },
+            ]}
+            layout="grid"
+            gridColsClass="grid-cols-4"
           >
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger id="tab-installation" value="installation">
-                安装
-              </TabsTrigger>
-              <TabsTrigger id="tab-usage" value="usage">
-                使用
-              </TabsTrigger>
-              <TabsTrigger id="tab-commands" value="commands">
-                命令
-              </TabsTrigger>
-              <TabsTrigger id="tab-api" value="api">
-                API
-              </TabsTrigger>
-            </TabsList>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              type: "spring",
-              stiffness: 120,
-              damping: 40,
-              duration: 0.5,
-              delay: 0.75,
-            }}
-          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                type: "spring",
+                stiffness: 120,
+                damping: 40,
+                duration: 0.5,
+                delay: 0.3,
+              }}
+            >
             {/* Animated panels */}
             <div className="relative min-h-[480px]">
               <AnimatePresence
@@ -241,7 +236,6 @@ export default function CLIPage() {
                     mass: 0.8,
                   }}
                   role="tabpanel"
-                  aria-labelledby={`tab-${tab}`}
                 >
                   {tab === "installation" && (
                     <div className="space-y-6">
@@ -761,8 +755,9 @@ export default function App() {
                 </motion.div>
               </AnimatePresence>
             </div>
-          </motion.div>
-        </Tabs>
+            </motion.div>
+          </ResponsiveTabs>
+        </motion.div>
       </div>
     </div>
   );

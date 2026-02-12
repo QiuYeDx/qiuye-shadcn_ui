@@ -4,7 +4,10 @@ import { useState, useSyncExternalStore, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Copy, CheckCircle, Code } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  ResponsiveTabs,
+  type TabItem,
+} from "@/components/qiuye-ui/responsive-tabs";
 import { useClipboard } from "use-clipboard-copy";
 import { toast } from "sonner";
 
@@ -51,26 +54,29 @@ function usePackageManager() {
   return { packageManager, setPackageManager };
 }
 
+const pmItems: TabItem[] = [
+  { value: "npm", label: "npm" },
+  { value: "pnpm", label: "pnpm" },
+];
+
 // 包管理器选择器组件
 function PackageManagerSelector() {
   const { packageManager, setPackageManager } = usePackageManager();
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm text-muted-foreground">包管理器:</span>
-      <Tabs
+      <span className="text-sm text-muted-foreground shrink-0">包管理器:</span>
+      <ResponsiveTabs
         value={packageManager}
         onValueChange={(value) => setPackageManager(value as PackageManager)}
-      >
-        <TabsList className="grid w-[140px] grid-cols-2 h-8">
-          <TabsTrigger value="npm" className="text-xs">
-            npm
-          </TabsTrigger>
-          <TabsTrigger value="pnpm" className="text-xs">
-            pnpm
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+        items={pmItems}
+        layout="grid"
+        gridColsClass="grid-cols-2"
+        listClassName="w-[140px] h-8"
+        triggerClassName="text-xs"
+        scrollButtons={false}
+        fadeMasks={false}
+      />
     </div>
   );
 }
@@ -239,6 +245,43 @@ function CopyAllDependenciesButton({
 // 依赖项区块组件（使用全局 packageManager，不再显示选择器）
 interface DependenciesSectionProps {
   dependencies: string[];
+}
+
+// 组件详情页标签区域（受控 ResponsiveTabs 包装器，供 server component 使用）
+interface ComponentDetailTabsProps {
+  items: TabItem[];
+  children: React.ReactNode;
+  defaultValue?: string;
+  layout?: "responsive" | "scroll" | "grid";
+  gridColsClass?: string;
+  listClassName?: string;
+  className?: string;
+}
+
+export function ComponentDetailTabs({
+  items,
+  children,
+  defaultValue,
+  layout = "grid",
+  gridColsClass,
+  listClassName,
+  className,
+}: ComponentDetailTabsProps) {
+  const [tab, setTab] = useState(defaultValue ?? items[0]?.value ?? "");
+
+  return (
+    <ResponsiveTabs
+      value={tab}
+      onValueChange={setTab}
+      items={items}
+      layout={layout}
+      gridColsClass={gridColsClass}
+      listClassName={listClassName}
+      className={className}
+    >
+      {children}
+    </ResponsiveTabs>
+  );
 }
 
 export function DependenciesSection({

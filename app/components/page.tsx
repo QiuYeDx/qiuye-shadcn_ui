@@ -15,7 +15,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ResponsiveTabs,
   type TabItem,
@@ -178,22 +177,23 @@ export default function ComponentsPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">包管理器:</span>
-            <Tabs
+            <span className="text-sm text-muted-foreground shrink-0">包管理器:</span>
+            <ResponsiveTabs
               value={packageManager}
               onValueChange={(value) =>
                 setPackageManager(value as "npm" | "pnpm")
               }
-            >
-              <TabsList className="grid w-[140px] grid-cols-2 h-9">
-                <TabsTrigger value="npm" className="text-xs">
-                  npm
-                </TabsTrigger>
-                <TabsTrigger value="pnpm" className="text-xs">
-                  pnpm
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+              items={[
+                { value: "npm", label: "npm" },
+                { value: "pnpm", label: "pnpm" },
+              ]}
+              layout="grid"
+              gridColsClass="grid-cols-2"
+              listClassName="w-[140px] h-9"
+              triggerClassName="text-xs"
+              scrollButtons={false}
+              fadeMasks={false}
+            />
           </div>
         </div>
 
@@ -205,7 +205,6 @@ export default function ComponentsPage() {
             gridColsClass="sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
             triggerClassName="text-xs"
           >
-            <div></div>
           </ResponsiveTabs>
         </div>
       </motion.div>

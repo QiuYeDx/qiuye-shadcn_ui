@@ -24,6 +24,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getAllComponents } from "@/lib/registry";
+import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
 
 const features = [
   {

@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsContent } from "@/components/qiuye-ui/responsive-tabs";
 import {
   Table,
   TableBody,
@@ -29,6 +29,7 @@ import {
   CopyCommandButton,
   CopyCodeButton,
   DependenciesSection,
+  ComponentDetailTabs,
 } from "./client-interactions";
 
 // 生成静态参数，用于静态站点生成
@@ -294,12 +295,16 @@ export default async function ComponentDetailPage({
 
       {/* Content Tabs */}
       <div>
-        <Tabs defaultValue="demo" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="demo">演示</TabsTrigger>
-            <TabsTrigger value="api">API</TabsTrigger>
-            <TabsTrigger value="dependencies">依赖</TabsTrigger>
-          </TabsList>
+        <ComponentDetailTabs
+          items={[
+            { value: "demo", label: "演示" },
+            { value: "api", label: "API" },
+            { value: "dependencies", label: "依赖" },
+          ]}
+          defaultValue="demo"
+          layout="grid"
+          gridColsClass="grid-cols-3"
+        >
 
           {/* Demo Tab */}
           <TabsContent value="demo" className="space-y-6">
@@ -469,7 +474,7 @@ export default async function ComponentDetailPage({
               </CardContent>
             </Card>
           </TabsContent>
-        </Tabs>
+        </ComponentDetailTabs>
       </div>
     </div>
   );

@@ -1,8 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { ResponsiveTabs, type TabItem } from "../responsive-tabs";
-import { TabsContent } from "@/components/ui/tabs";
+import { ResponsiveTabs, TabsContent, type TabItem } from "../responsive-tabs";
 import {
   Card,
   CardContent,
