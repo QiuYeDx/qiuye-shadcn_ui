@@ -325,7 +325,7 @@ export function ImageViewerDemo() {
               />
             </div>
             <div className="space-y-3">
-              <Badge variant="outline">scale=1.08 bounce=0.5</Badge>
+              <Badge variant="outline">scale=1.05 bounce=0.5</Badge>
               <p className="text-xs text-muted-foreground">
                 较强弹性 0.5，回弹更明显
               </p>

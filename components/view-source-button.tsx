@@ -88,12 +88,12 @@ export function ViewSourceButton({
             >
               {copied ? (
                 <>
-                  <Check className="h-4 w-4 mr-2" />
+                  <Check className="h-4 w-4" />
                   已复制
                 </>
               ) : (
                 <>
-                  <Copy className="h-4 w-4 mr-2" />
+                  <Copy className="h-4 w-4" />
                   复制代码
                 </>
               )}

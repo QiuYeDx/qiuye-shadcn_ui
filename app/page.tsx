@@ -161,7 +161,7 @@ export default function Home() {
               <Button size="lg" asChild>
                 <Link href="/components">
                   浏览组件
-                  <ArrowRightIcon className="ml-2 h-4 w-4" />
+                  <ArrowRightIcon className="h-4 w-4" />
                 </Link>
               </Button>
             </motion.div>
@@ -173,7 +173,7 @@ export default function Home() {
             >
               <Button variant="outline" size="lg" asChild>
                 <Link href="/cli">
-                  <CodeIcon className="mr-2 h-4 w-4" />
+                  <CodeIcon className="h-4 w-4" />
                   CLI 工具
                 </Link>
               </Button>
@@ -328,7 +328,7 @@ export default function Home() {
               >
                 <Button size="lg" asChild>
                   <Link href="/cli">
-                    <BookOpenIcon className="mr-2 h-4 w-4" />
+                    <BookOpenIcon className="h-4 w-4" />
                     CLI 使用指南
                   </Link>
                 </Button>
@@ -341,7 +341,7 @@ export default function Home() {
                 <Button variant="outline" size="lg" asChild>
                   <Link href="/components">
                     浏览组件
-                    <ArrowRightIcon className="ml-2 h-4 w-4" />
+                    <ArrowRightIcon className="h-4 w-4" />
                   </Link>
                 </Button>
               </motion.div>

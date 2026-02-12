@@ -175,9 +175,9 @@ export function CopyCodeButton({
       size="sm"
     >
       {copiedCode ? (
-        <CheckCircle className="h-4 w-4 mr-2" />
+        <CheckCircle className="h-4 w-4" />
       ) : (
-        <Code className="h-4 w-4 mr-2" />
+        <Code className="h-4 w-4" />
       )}
       {copiedCode ? "已复制" : "复制导入"}
     </Button>
@@ -230,7 +230,7 @@ function CopyAllDependenciesButton({
 
   return (
     <Button variant="outline" onClick={handleCopyAllDependencies}>
-      <Copy className="h-4 w-4 mr-2" />
+      <Copy className="h-4 w-4" />
       复制安装命令
     </Button>
   );

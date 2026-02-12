@@ -729,7 +729,7 @@ export function ResponsiveTabsDemo() {
               onClick={() => setPlayTab(prevOf(playItems, playTab))}
               className="cursor-pointer"
             >
-              <ArrowLeft className="mr-1 h-4 w-4" /> 上一项
+              <ArrowLeft className="h-4 w-4" /> 上一项
             </Button>
             <Button
               size="sm"
@@ -737,7 +737,7 @@ export function ResponsiveTabsDemo() {
               onClick={() => setPlayTab(nextOf(playItems, playTab))}
               className="cursor-pointer"
             >
-              下一项 <ArrowRight className="ml-1 h-4 w-4" />
+              下一项 <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
 
@@ -885,7 +885,7 @@ export function ResponsiveTabsDemo() {
               onClick={() => setDynActive((v) => prevOf(dynItems, v))}
               className="cursor-pointer"
             >
-              <ArrowLeft className="mr-1 h-4 w-4" />
+              <ArrowLeft className="h-4 w-4" />
               上一项
             </Button>
             <Button
@@ -895,7 +895,7 @@ export function ResponsiveTabsDemo() {
               className="cursor-pointer"
             >
               下一项
-              <ArrowRight className="ml-1 h-4 w-4" />
+              <ArrowRight className="h-4 w-4" />
             </Button>
 
             <div className="mx-3 h-5 w-px bg-border" />
@@ -912,7 +912,7 @@ export function ResponsiveTabsDemo() {
               }}
               className="cursor-pointer"
             >
-              <Plus className="mr-1 h-4 w-4" />
+              <Plus className="h-4 w-4" />
               新增
             </Button>
 
@@ -930,7 +930,7 @@ export function ResponsiveTabsDemo() {
               }}
               className="cursor-pointer"
             >
-              <Minus className="mr-1 h-4 w-4" />
+              <Minus className="h-4 w-4" />
               删除当前
             </Button>
           </div>

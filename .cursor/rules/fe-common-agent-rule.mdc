@@ -1,0 +1,59 @@
+---
+alwaysApply: true
+---
+
+# 通用代理开发须知
+
+## 组件与代码组织规范
+
+1. **业务组件规范**
+   - 如果开发新的业务组件，**必须**在合适的 `components` 文件夹或其子文件夹中新增组件。
+   - **禁止**将业务组件直接写在业务页面的 `.tsx` 文件中。
+   - 较为通用的组件可以放在**全局 `components` 文件夹**中。
+   - **禁止**将项目中自行开发的组件放在 `/ui` 路径下。
+     - `/ui` 目录仅用于存放通过 `shadcn/ui` 方式安装的组件库组件。
+
+2. **通用方法规范**
+   - 如果开发新的通用方法（方法内部逻辑与具体业务无关）：
+     - **必须**放在合适的 `utils.ts`（或相关通用工具文件）中。
+     - **禁止**将通用方法写在页面文件或组件文件中。
+
+## 可视性检测规范（Motion）
+
+- 当需要监听元素是否进入/离开视口时，统一使用 `motion/react` 的 `useInView` hook。
+- **禁止**自行实现 `IntersectionObserver` 或引入其他替代方案（除非确有必要并说明原因）。
+
+## Button 组件使用规范（shadcn/ui）
+
+3. **Button 子元素间距规范**
+   - 当使用 `@/components/ui/button.tsx` 中的 `Button` 组件时：
+     - **不需要**再手动为其 `children` 元素（主要指 icon 与 text 之间）添加额外间距。
+     - **禁止**添加类似 `mr-2`、`ml-2` 等 margin 类名。
+
+   ### 示例（正确用法）
+
+   ```tsx
+   <Button
+     variant="outline"
+     size="lg"
+     className="border-border/40 hover:border-primary/30 hover:bg-primary/5 w-full sm:w-auto"
+     asChild
+   >
+     <Link
+       href="https://github.com/QiuYeDx"
+       target="_blank"
+       rel="noopener noreferrer"
+     >
+       <GithubIcon className="h-5 w-5" />
+       GitHub
+     </Link>
+   </Button>
+   ```
+
+## 优先使用或维护公共的通用的方法和逻辑
+
+优先检查项目中通用的 hooks, utils等, 是否存在可以直接复用的功能和逻辑, 不要"重复造轮子". 如果有可能可以作为通用功能和方法的逻辑, 也要优先实现在合适的通用的代码文件中, 而不是写在业务组件中.
+
+## 其他
+
+其他详细的 AGENTS 规则详见项目根目录下的 `AGENTS.md` 文件
