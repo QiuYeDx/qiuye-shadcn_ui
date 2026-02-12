@@ -10,7 +10,7 @@
     "lucide-react"
   ],
   "registryDependencies": [
-    "dual-state-toggle"
+    "@qiuye-ui/dual-state-toggle"
   ],
   "files": [
     {
