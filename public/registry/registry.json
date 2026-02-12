@@ -79,6 +79,10 @@
         },
         {
           "type": "registry:hook",
+          "path": "hooks/use-hover-support.ts"
+        },
+        {
+          "type": "registry:hook",
           "path": "hooks/use-prevent-scroll.ts"
         }
       ]
