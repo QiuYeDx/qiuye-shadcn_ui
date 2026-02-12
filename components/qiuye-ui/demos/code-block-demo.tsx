@@ -331,8 +331,8 @@ export function Counter({ initial = 0 }) {
 export function CodeBlockDemo() {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
-  const [selectedTheme, setSelectedTheme] = useState<string>("qiuvision");
-  const [showPanel, setShowPanel] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState<string>("github");
+  const [showPanel, setShowPanel] = useState(true);
 
   return (
     <div className="space-y-8">
@@ -428,7 +428,7 @@ export function CodeBlockDemo() {
                 7 套内置主题，自动适配浅色 / 深色模式
               </CardDescription>
             </div>
-            <ViewSourceButton code={sourceCodes.themes} />
+            {/* <ViewSourceButton code={sourceCodes.themes} /> */}
           </div>
         </CardHeader>
         <CardContent className="space-y-4">

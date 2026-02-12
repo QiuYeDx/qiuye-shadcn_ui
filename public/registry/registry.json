@@ -13,7 +13,9 @@
         "motion",
         "lucide-react"
       ],
-      "registryDependencies": [],
+      "registryDependencies": [
+        "dual-state-toggle"
+      ],
       "files": [
         {
           "type": "registry:component",

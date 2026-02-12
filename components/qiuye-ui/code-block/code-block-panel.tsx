@@ -3,6 +3,7 @@
 import React, { useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { Check, Copy } from "lucide-react";
+import { DualStateToggle } from "@/components/qiuye-ui/dual-state-toggle";
 import type { CodeBlockColorThemeName } from "./code-block-themes";
 
 // ============================================
@@ -109,16 +110,19 @@ export function CodeBlockPanel({
 }: CodeBlockPanelProps) {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = useCallback(async () => {
-    if (!code) return;
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // 静默失败（如不支持 Clipboard API 时）
-    }
-  }, [code]);
+  const handleCopyToggle = useCallback(
+    async (newActive: boolean) => {
+      if (!newActive || !code) return;
+      try {
+        await navigator.clipboard.writeText(code);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch {
+        // 静默失败（如不支持 Clipboard API 时）
+      }
+    },
+    [code],
+  );
 
   const hasCopyButton = showCopyButton && !!code;
   const hasHeader = !!filename || hasCopyButton;
@@ -156,28 +160,20 @@ export function CodeBlockPanel({
               <span />
             )}
             {hasCopyButton && (
-              <button
-                onClick={handleCopy}
-                className="cbp-copy-btn flex size-7 items-center justify-center rounded-md transition-colors duration-150"
+              <DualStateToggle
+                active={copied}
+                onToggle={handleCopyToggle}
+                activeIcon={<Check className="cbp-check" strokeWidth={2} />}
+                inactiveIcon={<Copy strokeWidth={1.5} />}
+                effect="scale"
+                variant="ghost"
+                size="icon"
+                className="cbp-copy-btn size-7!"
                 title="复制到剪贴板"
-              >
-                <div className="grid size-4">
-                  <Check
-                    className={cn(
-                      "cbp-check col-start-1 row-start-1 size-4 transition-opacity duration-200",
-                      copied ? "opacity-100" : "opacity-0",
-                    )}
-                    strokeWidth={2}
-                  />
-                  <Copy
-                    className={cn(
-                      "col-start-1 row-start-1 size-4 transition-opacity duration-200",
-                      copied ? "opacity-0" : "opacity-100",
-                    )}
-                    strokeWidth={1.5}
-                  />
-                </div>
-              </button>
+                activeLabel="已复制"
+                inactiveLabel="复制到剪贴板"
+                transitionDuration={0.2}
+              />
             )}
           </div>
         )}
@@ -193,11 +189,12 @@ export function CodeBlockPanel({
           color: var(--cbp-filename);
         }
         .cbp-copy-btn {
-          color: var(--cbp-btn);
+          color: var(--cbp-btn) !important;
+          transition: color 0.15s ease, background-color 0.15s ease;
         }
         .cbp-copy-btn:hover {
-          color: var(--cbp-btn-hover);
-          background-color: var(--cbp-btn-hover-bg);
+          color: var(--cbp-btn-hover) !important;
+          background-color: var(--cbp-btn-hover-bg) !important;
         }
         .cbp-check {
           color: var(--cbp-check);
