@@ -32,7 +32,7 @@ description: QiuYe UI 组件库的自定义组件新增、修改、Registry 集�
 - 组件 ID：**kebab-case**（如 `fancy-card`）
 - 导出名：**PascalCase**（如 `FancyCard`）
 - 用到 hooks/事件/动画 → 文件顶部加 `"use client";`
-- 列清 `dependencies`（npm 包）和 `registryDependencies`（shadcn 组件名）
+- 列清 `dependencies`（npm 包）和 `registryDependencies`（registry 组件依赖）
 
 ### Step 1：实现组件源码
 
@@ -99,6 +99,36 @@ description: QiuYe UI 组件库的自定义组件新增、修改、Registry 集�
 - 多文件组件：所有文件都加入 `files[]`
 - `public/registry/registry.json` **勿手改**
 
+### Step 6.1：依赖另一个 QiuYe UI 组件时的写法（重点）
+
+当组件源码中出现类似：
+
+- `import { X } from "@/components/qiuye-ui/<dep-id>"`
+
+则 `public/registry/<id>.json` 的 `registryDependencies` 必须写成：
+
+- `"@qiuye-ui/<dep-id>"`
+
+**不要**写成裸名称（如 `"dual-state-toggle"`），否则 shadcn CLI 会把它当成官方组件去 `ui.shadcn.com` 查找，常见报错：
+
+- `The item at https://ui.shadcn.com/.../dual-state-toggle.json was not found`
+
+对照规则：
+
+- 依赖 `@/components/ui/*`（shadcn 官方基础组件）→ `registryDependencies` 写裸名称（如 `"button"`、`"tabs"`）
+- 依赖 `@/components/qiuye-ui/*`（本仓库自定义组件）→ `registryDependencies` 写带 alias 的名称（如 `"@qiuye-ui/dual-state-toggle"`）
+
+示例：
+
+```json
+{
+  "dependencies": ["motion", "lucide-react"],
+  "registryDependencies": ["@qiuye-ui/dual-state-toggle"]
+}
+```
+
+此外请确保被依赖组件本身存在对应的 registry item（如 `public/registry/dual-state-toggle.json`），并在修改后执行 `pnpm update-registry` 同步清单。
+
 ### Step 7：更新 registry
 
 ```bash
@@ -131,6 +161,7 @@ pnpm update-registry
 - 不要改变已有组件导出名/文件名（会破坏 registry/安装路径）
 - `public/registry/registry.json` 只由 `pnpm update-registry` 生成
 - 新增依赖必须同步更新 `public/registry/<id>.json` 的 `dependencies` / `registryDependencies`
+- 当依赖 `@/components/qiuye-ui/*` 时，`registryDependencies` 必须使用 `@qiuye-ui/<id>`（不要写裸名称）
 - 组件 import 的本地文件（`@/hooks/*`、`@/lib/*` 非 utils）必须加入 `files[]`
 - `@/components/ui/*` 和 `@/lib/utils` 的导入**不需要**加入 `files[]`
 
