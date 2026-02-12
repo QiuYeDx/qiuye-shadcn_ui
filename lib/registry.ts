@@ -443,16 +443,14 @@ export const componentRegistry: ComponentRegistry = {
       },
       {
         name: "rounded",
-        type:
-          '"none" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "full"',
+        type: '"none" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "full"',
         description: "主图圆角大小",
         required: false,
         default: "lg",
       },
       {
         name: "lightboxRounded",
-        type:
-          '"none" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "full"',
+        type: '"none" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "full"',
         description: "灯箱图片圆角大小（默认跟随 rounded）",
         required: false,
       },
@@ -504,13 +502,15 @@ export const componentRegistry: ComponentRegistry = {
       {
         name: "maxHeight",
         type: "number | string",
-        description: "非灯箱模式下图片的最大高度（数字为像素，字符串支持CSS值如'50vh'）",
+        description:
+          "非灯箱模式下图片的最大高度（数字为像素，字符串支持CSS值如'50vh'）",
         required: false,
       },
       {
         name: "maxWidth",
         type: "number | string",
-        description: "非灯箱模式下图片的最大宽度（数字为像素，字符串支持CSS值）",
+        description:
+          "非灯箱模式下图片的最大宽度（数字为像素，字符串支持CSS值）",
         required: false,
       },
       {
@@ -523,18 +523,24 @@ export const componentRegistry: ComponentRegistry = {
       {
         name: "hoverBounce",
         type: "number",
-        description:
-          "悬浮动画的弹性系数（0‑1），仅在设置 hoverScale 时生效",
+        description: "悬浮动画的弹性系数（0‑1），仅在设置 hoverScale 时生效",
         required: false,
         default: "0.25",
       },
       {
         name: "hoverDuration",
         type: "number",
-        description:
-          "悬浮动画的时长（秒），仅在设置 hoverScale 时生效",
+        description: "悬浮动画的时长（秒），仅在设置 hoverScale 时生效",
         required: false,
         default: "0.65",
+      },
+      {
+        name: "selectable",
+        type: "boolean",
+        description:
+          "是否允许用户选中/复制/拖拽图片（设为 false 可防止浏览器原生选中效果影响长按等交互体验）",
+        required: false,
+        default: "false",
       },
       {
         name: "loading",
@@ -558,7 +564,16 @@ export const componentRegistry: ComponentRegistry = {
     ],
     version: "1.1.0",
     author: "QiuYeDx",
-    tags: ["image", "viewer", "lightbox", "zoom", "gesture", "preview", "hover", "animation"],
+    tags: [
+      "image",
+      "viewer",
+      "lightbox",
+      "zoom",
+      "gesture",
+      "preview",
+      "hover",
+      "animation",
+    ],
     cliName: "image-viewer",
     basicUsage: basicUsageExamples[ComponentId.IMAGE_VIEWER],
   },
@@ -717,8 +732,7 @@ export const componentRegistry: ComponentRegistry = {
       {
         name: "customTheme",
         type: "CodeBlockThemeConfig | PrismTheme",
-        description:
-          "自定义主题配置（优先级高于 colorTheme 和 isDark）",
+        description: "自定义主题配置（优先级高于 colorTheme 和 isDark）",
         required: false,
       },
       {
@@ -793,7 +807,7 @@ export function getCategories(): string[] {
 // 根据分类获取组件
 export function getComponentsByCategory(category: string): ComponentInfo[] {
   return Object.values(componentRegistry).filter(
-    (component) => component.category === category
+    (component) => component.category === category,
   );
 }
 
@@ -809,7 +823,7 @@ export function searchComponents(query: string): ComponentInfo[] {
     (component) =>
       component.name.toLowerCase().includes(lowercaseQuery) ||
       component.description.toLowerCase().includes(lowercaseQuery) ||
-      component.tags.some((tag) => tag.toLowerCase().includes(lowercaseQuery))
+      component.tags.some((tag) => tag.toLowerCase().includes(lowercaseQuery)),
   );
 }
 

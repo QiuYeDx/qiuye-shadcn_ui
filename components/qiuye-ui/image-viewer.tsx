@@ -19,6 +19,7 @@ import { animate } from "motion";
 import { ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePreventScroll } from "@/hooks/use-prevent-scroll";
+import { useHoverSupport } from "@/hooks/use-hover-support";
 
 const roundedClasses = {
   none: "rounded-none",
@@ -67,6 +68,8 @@ interface ImageViewerProps extends BaseImageProps {
   hoverBounce?: number;
   /** 悬浮动画的时长（秒，默认 0.65），仅在设置 hoverScale 时生效 */
   hoverDuration?: number;
+  /** 是否允许用户选中/复制/拖拽图片（默认 false，防止浏览器原生选中效果影响长按等交互体验） */
+  selectable?: boolean;
 }
 
 const DEFAULT_PADDING = 32;
@@ -114,6 +117,7 @@ export function ImageViewer({
   hoverScale,
   hoverBounce,
   hoverDuration = 0.65,
+  selectable = false,
   loading = "lazy",
   onLoad,
   onError,
@@ -144,6 +148,7 @@ export function ImageViewer({
   const resetTimeoutRef = useRef<number | null>(null);
   const suppressClickRef = useRef(false);
   const id = useId();
+  const canHover = useHoverSupport();
 
   const sharedLayoutId = useMemo(() => `image-viewer-${id}`, [id]);
   const groupId = useMemo(() => `image-viewer-group-${id}`, [id]);
@@ -625,7 +630,7 @@ export function ImageViewer({
             canPreview ? "cursor-zoom-in" : "cursor-default"
           )}
           whileHover={
-            hoverScale != null
+            canHover && hoverScale != null
               ? {
                 scale: hoverScale,
                 transition: {
@@ -684,8 +689,10 @@ export function ImageViewer({
             src={resolvedSrc}
             alt={alt || ""}
             title={title}
+            draggable={selectable}
             className={cn(
               "block h-auto max-w-full",
+              !selectable && "select-none",
               inlineRoundedClass,
               className
             )}
@@ -695,6 +702,7 @@ export function ImageViewer({
               opacity: imageLoading ? 0 : 1,
               filter: imageLoading ? "blur(6px)" : "blur(0px)",
               transition: "opacity 0.5s ease-out, filter 0.5s ease-out",
+              ...(!selectable && { WebkitTouchCallout: "none" }),
             }}
             loading={loading}
             onLoad={(event) => {
@@ -765,11 +773,18 @@ export function ImageViewer({
                       src={resolvedSrc}
                       alt={alt || ""}
                       title={title}
+                      draggable={selectable}
                       className={cn(
                         "h-auto w-auto max-h-full max-w-full object-contain shadow-2xl",
+                        !selectable && "select-none",
                         lightboxRoundedClass,
                         lightboxClassName
                       )}
+                      style={
+                        !selectable
+                          ? { WebkitTouchCallout: "none" }
+                          : undefined
+                      }
                       // 灯箱图片使用 eager 加载，配合预加载确保过渡动画流畅
                       loading="eager"
                     />
