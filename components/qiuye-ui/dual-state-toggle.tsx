@@ -244,7 +244,7 @@ export function DualStateToggle({
       variant={variant}
       size={size}
       className={cn(
-        "transition-transform duration-150 active:scale-[0.97] cursor-pointer",
+        "relative transition-transform duration-150 active:scale-[0.97] cursor-pointer",
         shape === "circle" && "rounded-full",
         className
       )}
