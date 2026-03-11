@@ -97,7 +97,7 @@ export interface CodeBlockProps {
   stickyLineNumbers?: boolean;
   /** 是否在折叠后跳转时显示聚光灯阴影效果（displayMode="collapse" 时生效），默认 true */
   spotlightOnCollapse?: boolean;
-  /** 是否隐藏容器周围的 box-shadow 阴影（默认 false） */
+  /** 是否隐藏容器周围的 box-shadow 阴影（默认 true） */
   noShadow?: boolean;
   /** 额外的 CSS 类名 */
   className?: string;
@@ -141,7 +141,7 @@ export function CodeBlock({
   showLineNumbers = true,
   stickyLineNumbers = true,
   spotlightOnCollapse = true,
-  noShadow = false,
+  noShadow = true,
   className = "",
 }: CodeBlockProps) {
   const code = children.trim();
