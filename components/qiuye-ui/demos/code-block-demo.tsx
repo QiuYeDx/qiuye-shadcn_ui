@@ -150,12 +150,24 @@ function PanelLanguageLabelDemo() {
     </CodeBlockPanel>
   );
 }`,
-  noShadow: `import { CodeBlock } from "@/components/qiuye-ui/code-block";
+  panelTrafficLights: `import { CodeBlock, CodeBlockPanel } from "@/components/qiuye-ui/code-block";
 
-function NoShadowDemo() {
+// 不传 filename 和 language 时，自动显示 macOS 风格装饰圆点
+function PanelTrafficLightsDemo() {
   return (
-    <CodeBlock language="typescript" noShadow>
-      {\`const message = "无阴影代码块";
+    <CodeBlockPanel code={code}>
+      <CodeBlock language="typescript" isDark>
+        {code}
+      </CodeBlock>
+    </CodeBlockPanel>
+  );
+}`,
+  shadow: `import { CodeBlock } from "@/components/qiuye-ui/code-block";
+
+function ShadowDemo() {
+  return (
+    <CodeBlock language="typescript" noShadow={false}>
+      {\`const message = "带阴影的代码块";
 console.log(message);\`}
     </CodeBlock>
   );
@@ -418,6 +430,18 @@ export function CodeBlockDemo() {
             </CodeBlockPanel>
           </div>
 
+          {/* 不传 filename 和 language，显示 macOS 装饰圆点 */}
+          <div>
+            <p className="text-sm text-muted-foreground mb-3">
+              不传 <code className="text-xs bg-muted px-1 py-0.5 rounded">filename</code> 和 <code className="text-xs bg-muted px-1 py-0.5 rounded">language</code> 时，自动显示 macOS 风格装饰圆点：
+            </p>
+            <CodeBlockPanel code={sampleJSX}>
+              <CodeBlock language="tsx" isDark>
+                {sampleJSX}
+              </CodeBlock>
+            </CodeBlockPanel>
+          </div>
+
           {/* 面板 + 滚动模式组合 */}
           <div>
             <p className="text-sm text-muted-foreground mb-3">
@@ -630,34 +654,36 @@ export function CodeBlockDemo() {
         </CardContent>
       </Card>
 
-      {/* 8. 无阴影模式 */}
+      {/* 8. 容器阴影 */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-lg">无阴影模式</CardTitle>
+              <CardTitle className="text-lg">容器阴影</CardTitle>
               <CardDescription>
-                通过 noShadow 属性移除代码块容器的 box-shadow，适合嵌入卡片等已有阴影的容器中
+                默认不显示容器阴影；通过 noShadow=&#123;false&#125; 可启用 box-shadow，适合需要层次感的独立展示场景
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <Badge variant="secondary">noShadow</Badge>
-              <ViewSourceButton code={sourceCodes.noShadow} />
+              <ViewSourceButton code={sourceCodes.shadow} />
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <p className="text-sm text-muted-foreground mb-2">默认（有阴影）</p>
+              <p className="text-sm text-muted-foreground mb-2">默认（无阴影）</p>
               <CodeBlock language="typescript" isDark={isDark}>
-                {`const a = "有阴影";\nconsole.log(a);`}
+                {`const a = "默认无阴影";\nconsole.log(a);`}
               </CodeBlock>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground mb-2">noShadow（无阴影）</p>
-              <CodeBlock language="typescript" isDark={isDark} noShadow>
-                {`const b = "无阴影";\nconsole.log(b);`}
+              <p className="text-sm text-muted-foreground mb-2">
+                <code className="text-xs bg-muted px-1 py-0.5 rounded">noShadow=&#123;false&#125;</code>（有阴影）
+              </p>
+              <CodeBlock language="typescript" isDark={isDark} noShadow={false}>
+                {`const b = "启用阴影";\nconsole.log(b);`}
               </CodeBlock>
             </div>
           </div>

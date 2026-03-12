@@ -224,7 +224,8 @@ export function CodeBlockPanel({
       ? getLanguageDisplayName(language)
       : null;
   const displayLabel = filename ?? languageLabel;
-  const hasHeader = !!displayLabel || hasCopyButton;
+  const showTrafficLights = !displayLabel;
+  const hasHeader = !!displayLabel || hasCopyButton || showTrafficLights;
 
   // 解析面板配色
   const mode = isDark ? "dark" : "light";
@@ -256,7 +257,14 @@ export function CodeBlockPanel({
                 {displayLabel}
               </span>
             ) : (
-              <span />
+              <div
+                className="flex items-center gap-2 py-0.5 select-none"
+                aria-hidden="true"
+              >
+                <span className="size-[10px] rounded-full bg-[#FF5F56]" />
+                <span className="size-[10px] rounded-full bg-[#FFBD2E]" />
+                <span className="size-[10px] rounded-full bg-[#27C93F]" />
+              </div>
             )}
             {hasCopyButton && (
               <DualStateToggle
