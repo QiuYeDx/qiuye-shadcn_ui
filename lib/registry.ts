@@ -711,7 +711,7 @@ export const componentRegistry: ComponentRegistry = {
   [ComponentId.CODE_BLOCK]: {
     name: "Code Block",
     description:
-      "通用代码块显示组件：基于 prism-react-renderer 的语法高亮，7 套内置配色主题（浅/深色变体）+ 自定义主题支持，支持折叠、滚动、自适应高度三种显示模式，行号 sticky 固定，自带完整样式。含 CodeBlockPanel 外层容器面板（仿 Tailwind CSS 官网风格），支持文件名标签与复制按钮。",
+      "通用代码块显示组件：基于 prism-react-renderer 的语法高亮，7 套内置配色主题（浅/深色变体）+ 自定义主题支持，支持折叠、滚动、自适应高度三种显示模式，Diff 高亮模式（绿色/红色行背景 + 左侧指示条），行高亮标记（淡蓝色背景标记指定行），行号 sticky 固定，自带完整样式。含 CodeBlockPanel 外层容器面板（仿 Tailwind CSS 官网风格），支持文件名标签与复制按钮。",
     category: "展示",
     dependencies: ["prism-react-renderer", "motion", "lucide-react"],
     files: {
@@ -808,6 +808,21 @@ export const componentRegistry: ComponentRegistry = {
             default: "false",
           },
           {
+            name: "diff",
+            type: "boolean",
+            description:
+              "是否启用 Diff 高亮模式，自动识别行首 +/- 标记并以绿色/红色背景高亮显示，搭配 language=\"diff\" 使用效果最佳",
+            required: false,
+            default: "false",
+          },
+          {
+            name: "highlightLines",
+            type: "number[] | string",
+            description:
+              "需要高亮标记的行号（行号从 1 开始），高亮行以淡蓝色背景显示。支持行号数组如 [1, 3, 5] 或逗号分隔的范围字符串如 \"1,3,5-10\"",
+            required: false,
+          },
+          {
             name: "className",
             type: "string",
             description: "额外的 CSS 类名",
@@ -879,6 +894,8 @@ export const componentRegistry: ComponentRegistry = {
       "code-block",
       "panel",
       "copy",
+      "diff",
+      "highlight",
     ],
     cliName: "code-block",
     basicUsage: basicUsageExamples[ComponentId.CODE_BLOCK],

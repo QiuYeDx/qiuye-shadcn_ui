@@ -108,7 +108,10 @@ function getLanguageDisplayName(language: string): string | null {
   if (lower === "plaintext" || lower === "text" || lower === "plain") {
     return null;
   }
-  return LANGUAGE_DISPLAY_NAMES[lower] ?? language.charAt(0).toUpperCase() + language.slice(1);
+  return (
+    LANGUAGE_DISPLAY_NAMES[lower] ??
+    language.charAt(0).toUpperCase() + language.slice(1)
+  );
 }
 
 // ============================================
@@ -142,7 +145,7 @@ export interface CodeBlockPanelProps {
   /** 是否为深色模式（控制面板配色的浅色/深色变体选择，默认 true） */
   isDark?: boolean;
   /**
-   * 内置配色主题名称（默认 "qiuvision"）
+   * 内置配色主题名称（默认 "github"）
    *
    * 与 isDark 配合使用，自动选择对应的浅色/深色面板配色。
    * 可选值: "qiuvision" | "github" | "one" | "dracula" | "nord" | "vitesse" | "monokai"
@@ -196,7 +199,7 @@ export function CodeBlockPanel({
   code,
   showCopyButton = true,
   isDark = true,
-  colorTheme = "qiuvision",
+  colorTheme = "github",
   children,
   className,
 }: CodeBlockPanelProps) {
@@ -229,7 +232,7 @@ export function CodeBlockPanel({
 
   // 解析面板配色
   const mode = isDark ? "dark" : "light";
-  const panelBg = PANEL_BG[colorTheme]?.[mode] ?? PANEL_BG.qiuvision[mode];
+  const panelBg = PANEL_BG[colorTheme]?.[mode] ?? PANEL_BG.github[mode];
   const text = PANEL_TEXT[mode];
 
   return (
@@ -297,7 +300,9 @@ export function CodeBlockPanel({
         }
         .cbp-copy-btn {
           color: var(--cbp-btn) !important;
-          transition: color 0.15s ease, background-color 0.15s ease;
+          transition:
+            color 0.15s ease,
+            background-color 0.15s ease;
         }
         .cbp-copy-btn:hover {
           color: var(--cbp-btn-hover) !important;

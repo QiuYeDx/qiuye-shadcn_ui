@@ -551,7 +551,7 @@ ls components/qiuye-ui/my-component.tsx
 
 ## 📄 许可证
 
-MIT License © 2025 秋夜
+MIT License © 2026 秋夜
 
 ## 🙏 致谢
 

@@ -679,7 +679,7 @@ function isThemeConfig(obj: unknown): obj is CodeBlockThemeConfig {
 /**
  * 解析代码块主题
  *
- * 优先级：customTheme > colorTheme > 默认（qiuvision）
+ * 优先级：customTheme > colorTheme > 默认（github）
  *
  * @param colorTheme - 内置主题名称
  * @param customTheme - 自定义主题（CodeBlockThemeConfig 或 PrismTheme）
@@ -702,8 +702,8 @@ export function resolveCodeBlockTheme(
   }
 
   // 使用内置主题
-  const themeName = colorTheme || "qiuvision";
-  const themePair = codeBlockThemes[themeName] || codeBlockThemes.qiuvision;
+  const themeName = colorTheme || "github";
+  const themePair = codeBlockThemes[themeName] || codeBlockThemes.github;
   return isDark ? themePair.dark : themePair.light;
 }
 

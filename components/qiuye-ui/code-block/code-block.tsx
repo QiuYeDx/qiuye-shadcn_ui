@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import { Highlight, type PrismTheme } from "prism-react-renderer";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { AnimatePresence } from "motion/react";
@@ -34,6 +40,68 @@ export {
 } from "./code-block-themes";
 
 // ============================================
+// Diff 模式工具
+// ============================================
+
+/** Diff 行的基色 (RGB) — 参考 GitHub diff 配色 */
+const DIFF_LINE_COLORS = {
+  add: [46, 160, 67] as const,
+  remove: [248, 81, 73] as const,
+  info: [56, 139, 253] as const,
+};
+
+/** 根据行首字符判断 diff 行类型 */
+function getDiffLineType(line: string): "add" | "remove" | "info" | null {
+  if (line.startsWith("@@")) return "info";
+  if (line.startsWith("+++") || line.startsWith("---")) return "info";
+  if (line.startsWith("+")) return "add";
+  if (line.startsWith("-")) return "remove";
+  return null;
+}
+
+/** 将前景色以 alpha 叠加到背景色上，返回不透明 hex（用于 sticky 行号的 diff 背景色） */
+function blendOnBg(
+  bgHex: string,
+  rgb: readonly [number, number, number],
+  alpha: number,
+): string {
+  const h = bgHex.replace("#", "");
+  const br = parseInt(h.slice(0, 2), 16);
+  const bg = parseInt(h.slice(2, 4), 16);
+  const bb = parseInt(h.slice(4, 6), 16);
+  const r = Math.round(rgb[0] * alpha + br * (1 - alpha));
+  const g = Math.round(rgb[1] * alpha + bg * (1 - alpha));
+  const b = Math.round(rgb[2] * alpha + bb * (1 - alpha));
+  return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+}
+
+// ============================================
+// 行高亮工具
+// ============================================
+
+/** 解析行高亮标记：支持行号数组或逗号分隔的范围字符串（行号从 1 开始） */
+function parseHighlightLines(input: number[] | string): Set<number> {
+  if (Array.isArray(input)) return new Set(input);
+  const set = new Set<number>();
+  for (const part of input.split(",")) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+    const dashIdx = trimmed.indexOf("-");
+    if (dashIdx > 0) {
+      const start = Number(trimmed.slice(0, dashIdx));
+      const end = Number(trimmed.slice(dashIdx + 1));
+      if (!isNaN(start) && !isNaN(end)) {
+        for (let i = start; i <= end; i++) set.add(i);
+      }
+    } else {
+      const n = Number(trimmed);
+      if (!isNaN(n)) set.add(n);
+    }
+  }
+  return set;
+}
+
+// ============================================
 // CodeBlock 组件
 // ============================================
 
@@ -53,7 +121,7 @@ export interface CodeBlockProps {
   /** 是否为深色模式（控制内置主题的浅色/深色变体选择，默认 true） */
   isDark?: boolean;
   /**
-   * 内置配色主题名称（默认 "qiuvision"）
+   * 内置配色主题名称（默认 "github"）
    *
    * 与 isDark 配合使用，自动选择对应的浅色/深色变体。
    * 可选值: "qiuvision" | "github" | "one" | "dracula" | "nord" | "vitesse" | "monokai"
@@ -71,7 +139,7 @@ export interface CodeBlockProps {
    * - "collapse": 展开/折叠模式，超出行数后显示渐变遮罩和展开按钮
    * - "scroll": 滚动模式，设置最大高度，超出部分纵向滚动
    * - "auto-height": 自适应高度模式，高度自动适配父容器，超出部分纵向滚动
-   * 
+   *
    * 不设置时代码块无高度限制，完整显示所有代码
    */
   displayMode?: CodeBlockDisplayMode;
@@ -79,9 +147,9 @@ export interface CodeBlockProps {
   maxLines?: number;
   /**
    * 最大高度（displayMode="scroll" 时生效）
-   * 
+   *
    * 支持 CSS 单位字符串（如 "400px"、"50vh"、"20rem"）或数字（单位为 px）
-   * 
+   *
    * 默认 "400px"
    */
   maxHeight?: string | number;
@@ -99,6 +167,25 @@ export interface CodeBlockProps {
   spotlightOnCollapse?: boolean;
   /** 是否隐藏容器周围的 box-shadow 阴影（默认 true） */
   noShadow?: boolean;
+  /**
+   * 是否启用 Diff 高亮模式
+   *
+   * 启用后自动识别代码行首的 `+` / `-` / `@@` 标记，
+   * 以绿色（新增）、红色（删除）、蓝色（信息）背景高亮显示，
+   * 并在行左侧显示彩色指示条。
+   * 搭配 `language="diff"` 使用效果最佳。
+   */
+  diff?: boolean;
+  /**
+   * 需要高亮标记的行号（行号从 1 开始）
+   *
+   * 高亮行以淡蓝色背景显示（与 Diff 模式的 info 行类似），
+   * 代码内容本身不附加任何特殊标记。
+   *
+   * - `number[]`：行号数组，如 `[1, 3, 5]`
+   * - `string`：逗号分隔的行号或范围，如 `"1,3,5-10,15"`
+   */
+  highlightLines?: number[] | string;
   /** 额外的 CSS 类名 */
   className?: string;
 }
@@ -114,6 +201,8 @@ export interface CodeBlockProps {
  *   - "collapse"：超出行数自动折叠，渐变遮罩 + 展开/收起按钮 + 聚光灯动画
  *   - "scroll"：设置最大高度，超出部分纵向滚动，带滚动阴影指示器
  *   - "auto-height"：自适应父容器高度，超出部分纵向滚动（适用于 flex/grid 布局）
+ * - **Diff 高亮模式**：自动识别 +/- 行首标记，绿色/红色背景 + 左侧彩色指示条
+ * - **行高亮标记**：通过 highlightLines 指定行号，淡蓝色背景标记关键代码行
  * - 自带完整样式，可独立于 MarkdownRenderer 使用
  *
  * @example
@@ -123,9 +212,14 @@ export interface CodeBlockProps {
  *   {code}
  * </CodeBlock>
  *
- * // 使用自定义主题
- * <CodeBlock language="python" customTheme={myThemeConfig}>
+ * // 行高亮标记
+ * <CodeBlock language="typescript" highlightLines={[3, 5, "8-12"]}>
  *   {code}
+ * </CodeBlock>
+ *
+ * // Diff 高亮模式
+ * <CodeBlock language="diff" isDark={isDark} diff>
+ *   {diffCode}
  * </CodeBlock>
  * ```
  */
@@ -142,6 +236,8 @@ export function CodeBlock({
   stickyLineNumbers = true,
   spotlightOnCollapse = true,
   noShadow = true,
+  diff = false,
+  highlightLines,
   className = "",
 }: CodeBlockProps) {
   const code = children.trim();
@@ -152,15 +248,48 @@ export function CodeBlock({
     [colorTheme, customTheme, isDark],
   );
 
-  const cssVars = useMemo(
-    () => themeVarsToCSSProperties(resolvedTheme.vars),
-    [resolvedTheme.vars],
+  // ---- 行高亮解析 ----
+  const highlightLineSet = useMemo(
+    () => (highlightLines != null ? parseHighlightLines(highlightLines) : null),
+    [highlightLines],
   );
+  const hasHighlights = highlightLineSet != null && highlightLineSet.size > 0;
+
+  const cssVars = useMemo(() => {
+    const base = themeVarsToCSSProperties(resolvedTheme.vars);
+    if (!diff && !hasHighlights) return base;
+
+    const bg = resolvedTheme.vars.bg;
+    const d = isDark;
+    const { add, remove, info } = DIFF_LINE_COLORS;
+    const rgbaStr = (c: readonly number[], a: number) =>
+      `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${a})`;
+
+    return {
+      ...base,
+      ...(diff && {
+        "--cb-diff-add-bg": rgbaStr(add, d ? 0.15 : 0.1),
+        "--cb-diff-add-bg-solid": blendOnBg(bg, add, d ? 0.15 : 0.1),
+        "--cb-diff-add-indicator": rgbaStr(add, d ? 0.6 : 0.5),
+        "--cb-diff-remove-bg": rgbaStr(remove, d ? 0.15 : 0.1),
+        "--cb-diff-remove-bg-solid": blendOnBg(bg, remove, d ? 0.15 : 0.1),
+        "--cb-diff-remove-indicator": rgbaStr(remove, d ? 0.6 : 0.5),
+        "--cb-diff-info-bg": rgbaStr(info, d ? 0.1 : 0.08),
+        "--cb-diff-info-bg-solid": blendOnBg(bg, info, d ? 0.1 : 0.08),
+        "--cb-diff-info-indicator": rgbaStr(info, d ? 0.4 : 0.35),
+      }),
+      ...(hasHighlights && {
+        "--cb-hl-bg": rgbaStr(info, d ? 0.1 : 0.08),
+        "--cb-hl-bg-solid": blendOnBg(bg, info, d ? 0.1 : 0.08),
+      }),
+    };
+  }, [resolvedTheme.vars, diff, isDark, hasHighlights]);
 
   // ---- 模式判定 ----
   const effectiveMode: CodeBlockDisplayMode | null = displayMode ?? null;
 
-  const lineCount = code.split("\n").length;
+  const rawLines = useMemo(() => code.split("\n"), [code]);
+  const lineCount = rawLines.length;
 
   // ---- 行号显示策略 ----
   const lineNumbersVisible =
@@ -230,8 +359,7 @@ export function CodeBlock({
       if (wrapperRef.current) {
         // 导航栏高度补偿 + 灵动岛高度 + 额外空间
         const offset = 142;
-        const elementPosition =
-          wrapperRef.current.getBoundingClientRect().top;
+        const elementPosition = wrapperRef.current.getBoundingClientRect().top;
         const currentScroll = window.scrollY || window.pageYOffset;
         const targetPosition = elementPosition + currentScroll - offset;
 
@@ -291,7 +419,16 @@ export function CodeBlock({
         <pre className={hlClassName} style={style}>
           <code>
             {tokens.map((line, i) => (
-              <div key={i} {...getLineProps({ line })}>
+              <div
+                key={i}
+                {...getLineProps({ line })}
+                data-diff={
+                  diff
+                    ? getDiffLineType(rawLines[i] ?? "") || undefined
+                    : undefined
+                }
+                data-highlight={highlightLineSet?.has(i + 1) || undefined}
+              >
                 <span className="line-number">{i + 1}</span>
                 <span className="line-content">
                   {line.map((token, key) => (
@@ -312,15 +449,12 @@ export function CodeBlock({
       : effectiveMode === "scroll"
         ? " scroll-mode"
         : "";
-  const wrapperClass = `qiuye-code-block${lineNumbersVisible ? "" : " hide-line-numbers"}${stickyLineNumbers && lineNumbersVisible ? " sticky-line-numbers" : ""}${noShadow ? " no-shadow" : ""}${modeClass}${className ? ` ${className}` : ""}`;
+  const wrapperClass = `qiuye-code-block${diff ? " diff-mode" : ""}${lineNumbersVisible ? "" : " hide-line-numbers"}${stickyLineNumbers && lineNumbersVisible ? " sticky-line-numbers" : ""}${noShadow ? " no-shadow" : ""}${modeClass}${className ? ` ${className}` : ""}`;
 
   // ---- 普通模式（无显示模式，或 collapse 模式但行数不够触发折叠） ----
   if (!effectiveMode || (effectiveMode === "collapse" && !shouldCollapse)) {
     return (
-      <div
-        className={wrapperClass}
-        style={cssVars as React.CSSProperties}
-      >
+      <div className={wrapperClass} style={cssVars as React.CSSProperties}>
         {highlightedCode}
         <CodeBlockStyles />
       </div>
@@ -333,10 +467,7 @@ export function CodeBlock({
     const collapsedMaxHeight = `${0.5 + maxLines * 1.4}rem`;
 
     return (
-      <div
-        className={wrapperClass}
-        style={cssVars as React.CSSProperties}
-      >
+      <div className={wrapperClass} style={cssVars as React.CSSProperties}>
         <div
           ref={wrapperRef}
           className={`collapsible-code-block ${isExpanded ? "is-expanded" : "is-collapsed"}`}
@@ -388,10 +519,7 @@ export function CodeBlock({
   // ---- Scroll / Auto-height 滚动模式 ----
   if (isScrollable) {
     return (
-      <div
-        className={wrapperClass}
-        style={cssVars as React.CSSProperties}
-      >
+      <div className={wrapperClass} style={cssVars as React.CSSProperties}>
         <div className="scrollable-code-block">
           <div
             ref={scrollContentRef}
@@ -419,10 +547,7 @@ export function CodeBlock({
 
   // Fallback
   return (
-    <div
-      className={wrapperClass}
-      style={cssVars as React.CSSProperties}
-    >
+    <div className={wrapperClass} style={cssVars as React.CSSProperties}>
       {highlightedCode}
       <CodeBlockStyles />
     </div>
@@ -673,13 +798,20 @@ function CodeBlockStyles() {
       /* 收起后聚光灯强调动画 —— 通过超大 box-shadow 暗化代码块之外的区域 */
       @keyframes code-block-spotlight {
         0% {
-          box-shadow: 0 4px 12px var(--cb-shadow-lg), 0 0 0 9999px transparent;
+          box-shadow:
+            0 4px 12px var(--cb-shadow-lg),
+            0 0 0 9999px transparent;
         }
-        15%, 50% {
-          box-shadow: 0 4px 12px var(--cb-shadow-lg), 0 0 0 9999px var(--cb-spotlight);
+        15%,
+        50% {
+          box-shadow:
+            0 4px 12px var(--cb-shadow-lg),
+            0 0 0 9999px var(--cb-spotlight);
         }
         100% {
-          box-shadow: 0 4px 12px var(--cb-shadow-lg), 0 0 0 9999px transparent;
+          box-shadow:
+            0 4px 12px var(--cb-shadow-lg),
+            0 0 0 9999px transparent;
         }
       }
       .qiuye-code-block .collapsible-code-block.spotlight-highlight {
@@ -743,7 +875,8 @@ function CodeBlockStyles() {
         transition: background 0.2s ease;
       }
 
-      .qiuye-code-block .scrollable-code-content::-webkit-scrollbar-thumb:hover {
+      .qiuye-code-block
+        .scrollable-code-content::-webkit-scrollbar-thumb:hover {
         background: var(--cb-sb-thumb-hover);
       }
 
@@ -863,6 +996,80 @@ function CodeBlockStyles() {
       .qiuye-code-block.no-shadow .collapsible-code-block,
       .qiuye-code-block.no-shadow .scrollable-code-block {
         box-shadow: none;
+      }
+
+      /* ============================================
+         Diff 高亮模式 —— 以行首 +/- 标记区分新增/删除行
+         ============================================ */
+
+      /* 新增行 - 绿色背景 + 左侧指示条 */
+      .qiuye-code-block.diff-mode pre code > div[data-diff="add"] {
+        background-color: var(--cb-diff-add-bg);
+        box-shadow: inset 3px 0 0 0 var(--cb-diff-add-indicator);
+      }
+
+      /* 删除行 - 红色背景 + 左侧指示条 */
+      .qiuye-code-block.diff-mode pre code > div[data-diff="remove"] {
+        background-color: var(--cb-diff-remove-bg);
+        box-shadow: inset 3px 0 0 0 var(--cb-diff-remove-indicator);
+      }
+
+      /* 信息行（@@ / +++ / ---） - 蓝色背景 + 左侧指示条 */
+      .qiuye-code-block.diff-mode pre code > div[data-diff="info"] {
+        background-color: var(--cb-diff-info-bg);
+        box-shadow: inset 3px 0 0 0 var(--cb-diff-info-indicator);
+      }
+
+      /* Diff 行取消圆角（让连续同类行视觉合并） */
+      .qiuye-code-block.diff-mode pre code > div[data-diff] {
+        border-radius: 0;
+      }
+
+      /* Sticky 行号 —— diff 行使用对应的不透明混合色 */
+      .qiuye-code-block.diff-mode.sticky-line-numbers
+        pre
+        code
+        > div[data-diff="add"]
+        .line-number {
+        background-color: var(--cb-diff-add-bg-solid);
+      }
+
+      .qiuye-code-block.diff-mode.sticky-line-numbers
+        pre
+        code
+        > div[data-diff="remove"]
+        .line-number {
+        background-color: var(--cb-diff-remove-bg-solid);
+      }
+
+      .qiuye-code-block.diff-mode.sticky-line-numbers
+        pre
+        code
+        > div[data-diff="info"]
+        .line-number {
+        background-color: var(--cb-diff-info-bg-solid);
+      }
+
+      /* ============================================
+         行高亮 —— 淡蓝色背景标记指定行（非 Diff 模式）
+         ============================================ */
+
+      .qiuye-code-block pre code > div[data-highlight] {
+        background-color: var(--cb-hl-bg);
+        border-radius: 0;
+      }
+
+      .qiuye-code-block pre code > div[data-highlight]:hover {
+        background-color: var(--cb-hl-bg);
+      }
+
+      /* Sticky 行号 —— 高亮行使用对应的不透明混合色 */
+      .qiuye-code-block.sticky-line-numbers
+        pre
+        code
+        > div[data-highlight]
+        .line-number {
+        background-color: var(--cb-hl-bg-solid);
       }
 
       /* ============================================

@@ -191,6 +191,49 @@ console.log(b);\`}
     </div>
   );
 }`,
+  highlightLines: `import { CodeBlock } from "@/components/qiuye-ui/code-block";
+
+function HighlightDemo() {
+  return (
+    <div className="space-y-6">
+      {/* 数组形式指定行号 */}
+      <CodeBlock language="tsx" highlightLines={[3, 4, 8, 9, 10]}>
+        {\`// code here...\`}
+      </CodeBlock>
+
+      {/* 范围字符串 */}
+      <CodeBlock language="tsx" highlightLines="3-4,8-10">
+        {\`// code here...\`}
+      </CodeBlock>
+    </div>
+  );
+}`,
+  diff: `import { CodeBlock, CodeBlockPanel } from "@/components/qiuye-ui/code-block";
+
+const diffCode = \`@@ -1,8 +1,12 @@
+ import { useState, useCallback } from "react";
+
+-export function useCounter(initial = 0) {
++interface CounterOptions { min?: number; max?: number }
++
++export function useCounter(initial = 0, opts?: CounterOptions) {
+   const [count, setCount] = useState(initial);
+-  const increment = useCallback(() => setCount(c => c + 1), []);
++  const increment = useCallback(() => {
++    setCount(c => opts?.max != null ? Math.min(c + 1, opts.max) : c + 1);
++  }, [opts?.max]);
+   return { count, increment };
+ }\`;
+
+function DiffDemo() {
+  return (
+    <CodeBlockPanel filename="hooks/use-counter.ts" code={diffCode}>
+      <CodeBlock language="diff" isDark diff>
+        {diffCode}
+      </CodeBlock>
+    </CodeBlockPanel>
+  );
+}`,
 };
 
 /* -------------------------------------------------------------------------- */
@@ -341,6 +384,32 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())`;
 
+const sampleDiff = `@@ -1,12 +1,18 @@
+ import { useState, useCallback } from "react";
+ 
+-export function useCounter(initial: number = 0) {
++interface UseCounterOptions {
++  min?: number;
++  max?: number;
++}
++
++export function useCounter(initial = 0, options?: UseCounterOptions) {
+   const [count, setCount] = useState(initial);
+ 
+-  const increment = useCallback(() => setCount(c => c + 1), []);
+-  const decrement = useCallback(() => setCount(c => c - 1), []);
++  const increment = useCallback(() => {
++    setCount(c => options?.max != null ? Math.min(c + 1, options.max) : c + 1);
++  }, [options?.max]);
++
++  const decrement = useCallback(() => {
++    setCount(c => options?.min != null ? Math.max(c - 1, options.min) : c - 1);
++  }, [options?.min]);
+ 
+-  return { count, increment, decrement };
++  return { count, increment, decrement, reset: () => setCount(initial) };
+ }`;
+
 const sampleJSX = `import React, { useState } from "react";
 
 export function Counter({ initial = 0 }) {
@@ -408,20 +477,29 @@ export function CodeBlockDemo() {
         </CardHeader>
         <CardContent className="space-y-6">
           {/* 带文件名 + 复制按钮 */}
-          <CodeBlockPanel filename="hooks/use-list-manager.ts" code={sampleTypeScript.slice(0, sampleTypeScript.indexOf("\n\n  // 过滤 + 排序"))}>
-            <CodeBlock
-              language="typescript"
-              isDark
-              colorTheme="qiuvision"
-            >
-              {sampleTypeScript.slice(0, sampleTypeScript.indexOf("\n\n  // 过滤 + 排序"))}
+          <CodeBlockPanel
+            filename="hooks/use-list-manager.ts"
+            code={sampleTypeScript.slice(
+              0,
+              sampleTypeScript.indexOf("\n\n  // 过滤 + 排序"),
+            )}
+          >
+            <CodeBlock language="typescript" isDark colorTheme="qiuvision">
+              {sampleTypeScript.slice(
+                0,
+                sampleTypeScript.indexOf("\n\n  // 过滤 + 排序"),
+              )}
             </CodeBlock>
           </CodeBlockPanel>
 
           {/* 不传 filename，自动显示语言类型标签 */}
           <div>
             <p className="text-sm text-muted-foreground mb-3">
-              不传 <code className="text-xs bg-muted px-1 py-0.5 rounded">filename</code> 时自动显示语言类型标签：
+              不传{" "}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                filename
+              </code>{" "}
+              时自动显示语言类型标签：
             </p>
             <CodeBlockPanel language="tsx" code={sampleJSX}>
               <CodeBlock language="tsx" isDark>
@@ -433,7 +511,15 @@ export function CodeBlockDemo() {
           {/* 不传 filename 和 language，显示 macOS 装饰圆点 */}
           <div>
             <p className="text-sm text-muted-foreground mb-3">
-              不传 <code className="text-xs bg-muted px-1 py-0.5 rounded">filename</code> 和 <code className="text-xs bg-muted px-1 py-0.5 rounded">language</code> 时，自动显示 macOS 风格装饰圆点：
+              不传{" "}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                filename
+              </code>{" "}
+              和{" "}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                language
+              </code>{" "}
+              时，自动显示 macOS 风格装饰圆点：
             </p>
             <CodeBlockPanel code={sampleJSX}>
               <CodeBlock language="tsx" isDark>
@@ -445,7 +531,11 @@ export function CodeBlockDemo() {
           {/* 面板 + 滚动模式组合 */}
           <div>
             <p className="text-sm text-muted-foreground mb-3">
-              搭配 <code className="text-xs bg-muted px-1 py-0.5 rounded">displayMode=&quot;scroll&quot;</code> 使用：
+              搭配{" "}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                displayMode=&quot;scroll&quot;
+              </code>{" "}
+              使用：
             </p>
             <CodeBlockPanel filename="api_client.py" code={samplePython}>
               <CodeBlock
@@ -505,7 +595,10 @@ export function CodeBlockDemo() {
           {showPanel ? (
             <CodeBlockPanel
               filename="example.ts"
-              code={sampleTypeScript.slice(0, sampleTypeScript.indexOf("\n\n  // 分页"))}
+              code={sampleTypeScript.slice(
+                0,
+                sampleTypeScript.indexOf("\n\n  // 分页"),
+              )}
               colorTheme={selectedTheme as "qiuvision"}
               isDark={isDark}
             >
@@ -514,7 +607,10 @@ export function CodeBlockDemo() {
                 colorTheme={selectedTheme as "qiuvision"}
                 isDark={isDark}
               >
-                {sampleTypeScript.slice(0, sampleTypeScript.indexOf("\n\n  // 分页"))}
+                {sampleTypeScript.slice(
+                  0,
+                  sampleTypeScript.indexOf("\n\n  // 分页"),
+                )}
               </CodeBlock>
             </CodeBlockPanel>
           ) : (
@@ -523,7 +619,10 @@ export function CodeBlockDemo() {
               colorTheme={selectedTheme as "qiuvision"}
               isDark={isDark}
             >
-              {sampleTypeScript.slice(0, sampleTypeScript.indexOf("\n\n  // 分页"))}
+              {sampleTypeScript.slice(
+                0,
+                sampleTypeScript.indexOf("\n\n  // 分页"),
+              )}
             </CodeBlock>
           )}
         </CardContent>
@@ -540,7 +639,9 @@ export function CodeBlockDemo() {
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="secondary">displayMode=&quot;collapse&quot;</Badge>
+              <Badge variant="secondary">
+                displayMode=&quot;collapse&quot;
+              </Badge>
               <ViewSourceButton code={sourceCodes.collapse} />
             </div>
           </div>
@@ -592,11 +693,14 @@ export function CodeBlockDemo() {
             <div>
               <CardTitle className="text-lg">自适应高度模式</CardTitle>
               <CardDescription>
-                高度自动适配父容器（如 Dialog），无需手动设置 maxHeight，适合弹窗 / Flex 布局场景
+                高度自动适配父容器（如 Dialog），无需手动设置
+                maxHeight，适合弹窗 / Flex 布局场景
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="secondary">displayMode=&quot;auto-height&quot;</Badge>
+              <Badge variant="secondary">
+                displayMode=&quot;auto-height&quot;
+              </Badge>
               <ViewSourceButton code={sourceCodes.autoHeight} />
             </div>
           </div>
@@ -644,11 +748,7 @@ export function CodeBlockDemo() {
           </div>
         </CardHeader>
         <CardContent>
-          <CodeBlock
-            language="python"
-            isDark={isDark}
-            colorTheme="vitesse"
-          >
+          <CodeBlock language="python" isDark={isDark} colorTheme="vitesse">
             {samplePython.slice(0, samplePython.indexOf("\n\nclass APIClient"))}
           </CodeBlock>
         </CardContent>
@@ -661,7 +761,8 @@ export function CodeBlockDemo() {
             <div>
               <CardTitle className="text-lg">容器阴影</CardTitle>
               <CardDescription>
-                默认不显示容器阴影；通过 noShadow=&#123;false&#125; 可启用 box-shadow，适合需要层次感的独立展示场景
+                默认不显示容器阴影；通过 noShadow=&#123;false&#125; 可启用
+                box-shadow，适合需要层次感的独立展示场景
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -673,14 +774,19 @@ export function CodeBlockDemo() {
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <p className="text-sm text-muted-foreground mb-2">默认（无阴影）</p>
+              <p className="text-sm text-muted-foreground mb-2">
+                默认（无阴影）
+              </p>
               <CodeBlock language="typescript" isDark={isDark}>
                 {`const a = "默认无阴影";\nconsole.log(a);`}
               </CodeBlock>
             </div>
             <div>
               <p className="text-sm text-muted-foreground mb-2">
-                <code className="text-xs bg-muted px-1 py-0.5 rounded">noShadow=&#123;false&#125;</code>（有阴影）
+                <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                  noShadow=&#123;false&#125;
+                </code>
+                （有阴影）
               </p>
               <CodeBlock language="typescript" isDark={isDark} noShadow={false}>
                 {`const b = "启用阴影";\nconsole.log(b);`}
@@ -697,7 +803,8 @@ export function CodeBlockDemo() {
             <div>
               <CardTitle className="text-lg">行号显示控制</CardTitle>
               <CardDescription>
-                通过 showLineNumbers 控制行号显示策略：始终显示、始终隐藏、或按行数阈值自动切换
+                通过 showLineNumbers
+                控制行号显示策略：始终显示、始终隐藏、或按行数阈值自动切换
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -710,7 +817,10 @@ export function CodeBlockDemo() {
           {/* 始终隐藏行号 */}
           <div>
             <p className="text-sm text-muted-foreground mb-2">
-              <code className="text-xs bg-muted px-1 py-0.5 rounded">showLineNumbers=&#123;false&#125;</code> — 始终隐藏行号
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                showLineNumbers=&#123;false&#125;
+              </code>{" "}
+              — 始终隐藏行号
             </p>
             <CodeBlock language="tsx" isDark={isDark} showLineNumbers={false}>
               {sampleJSX}
@@ -721,7 +831,10 @@ export function CodeBlockDemo() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <p className="text-sm text-muted-foreground mb-2">
-                <code className="text-xs bg-muted px-1 py-0.5 rounded">showLineNumbers=&#123;15&#125;</code> — 代码不足 15 行，自动隐藏
+                <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                  showLineNumbers=&#123;15&#125;
+                </code>{" "}
+                — 代码不足 15 行，自动隐藏
               </p>
               <CodeBlock language="tsx" isDark={isDark} showLineNumbers={15}>
                 {sampleJSX}
@@ -729,10 +842,20 @@ export function CodeBlockDemo() {
             </div>
             <div>
               <p className="text-sm text-muted-foreground mb-2">
-                <code className="text-xs bg-muted px-1 py-0.5 rounded">showLineNumbers=&#123;15&#125;</code> — 代码超过 15 行，自动显示
+                <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                  showLineNumbers=&#123;15&#125;
+                </code>{" "}
+                — 代码超过 15 行，自动显示
               </p>
-              <CodeBlock language="typescript" isDark={isDark} showLineNumbers={15}>
-                {sampleTypeScript.slice(0, sampleTypeScript.indexOf("\n\n  // 分页"))}
+              <CodeBlock
+                language="typescript"
+                isDark={isDark}
+                showLineNumbers={15}
+              >
+                {sampleTypeScript.slice(
+                  0,
+                  sampleTypeScript.indexOf("\n\n  // 分页"),
+                )}
               </CodeBlock>
             </div>
           </div>
@@ -746,14 +869,18 @@ export function CodeBlockDemo() {
             <div>
               <CardTitle className="text-lg">面板 + 折叠模式组合</CardTitle>
               <CardDescription>
-                CodeBlockPanel 搭配 displayMode=&quot;collapse&quot; 使用，面板自动重置内部样式
+                CodeBlockPanel 搭配 displayMode=&quot;collapse&quot;
+                使用，面板自动重置内部样式
               </CardDescription>
             </div>
             <Badge variant="secondary">组合用法</Badge>
           </div>
         </CardHeader>
         <CardContent>
-          <CodeBlockPanel filename="hooks/use-list-manager.ts" code={sampleTypeScript}>
+          <CodeBlockPanel
+            filename="hooks/use-list-manager.ts"
+            code={sampleTypeScript}
+          >
             <CodeBlock
               language="typescript"
               isDark
@@ -763,6 +890,124 @@ export function CodeBlockDemo() {
               {sampleTypeScript}
             </CodeBlock>
           </CodeBlockPanel>
+        </CardContent>
+      </Card>
+
+      {/* 11. Diff 高亮模式 */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg">Diff 高亮模式</CardTitle>
+              <CardDescription>
+                自动识别 +/- 行首标记，以绿色（新增）/
+                红色（删除）背景高亮显示代码变更，搭配左侧彩色指示条
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary">diff</Badge>
+              <ViewSourceButton code={sourceCodes.diff} />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <CodeBlockPanel
+            filename="hooks/use-counter.ts"
+            code={sampleDiff}
+            isDark={isDark}
+            colorTheme="github"
+          >
+            <CodeBlock colorTheme="github" language="ts" isDark={isDark} diff>
+              {sampleDiff}
+            </CodeBlock>
+          </CodeBlockPanel>
+
+          <div>
+            <p className="text-sm text-muted-foreground mb-3">
+              搭配{" "}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                displayMode=&quot;scroll&quot;
+              </code>{" "}
+              使用：
+            </p>
+            <CodeBlockPanel
+              filename="hooks/use-counter.ts"
+              code={sampleDiff}
+              isDark={isDark}
+              colorTheme="github"
+            >
+              <CodeBlock
+                colorTheme="github"
+                language="ts"
+                isDark={isDark}
+                diff
+                displayMode="scroll"
+                maxHeight="200px"
+              >
+                {sampleDiff}
+              </CodeBlock>
+            </CodeBlockPanel>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 12. 行高亮 */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg">行高亮</CardTitle>
+              <CardDescription>
+                通过 highlightLines
+                标记指定行号，以淡蓝色背景高亮显示关键代码行，代码内容不附加任何标记
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary">highlightLines</Badge>
+              <ViewSourceButton code={sourceCodes.highlightLines} />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div>
+            <p className="text-sm text-muted-foreground mb-3">
+              数组形式{" "}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                highlightLines=&#123;[3, 4, 8, 9, 10]&#125;
+              </code>
+              ：
+            </p>
+            <CodeBlock
+              language="tsx"
+              isDark={isDark}
+              highlightLines={[3, 4, 8, 9, 10]}
+            >
+              {sampleJSX}
+            </CodeBlock>
+          </div>
+
+          <div>
+            <p className="text-sm text-muted-foreground mb-3">
+              范围字符串{" "}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                highlightLines=&quot;3-4,8-10&quot;
+              </code>
+              （等价写法）：
+            </p>
+            <CodeBlockPanel
+              filename="components/counter.tsx"
+              code={sampleJSX}
+              isDark={isDark}
+            >
+              <CodeBlock
+                language="tsx"
+                isDark={isDark}
+                highlightLines="3-4,8-10"
+              >
+                {sampleJSX}
+              </CodeBlock>
+            </CodeBlockPanel>
+          </div>
         </CardContent>
       </Card>
     </div>
