@@ -981,6 +981,7 @@ export function CodeBlockDemo() {
               language="tsx"
               isDark={isDark}
               highlightLines={[3, 4, 8, 9, 10]}
+              showLineNumbers={false}
             >
               {sampleJSX}
             </CodeBlock>

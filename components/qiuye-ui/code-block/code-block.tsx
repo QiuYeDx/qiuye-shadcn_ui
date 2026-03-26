@@ -600,7 +600,16 @@ function CodeBlockStyles() {
         min-height: 1.6em;
         padding: 0 0.25rem;
         /* margin: 0 -0.5rem; */
-        border-radius: 4px;
+        border-radius: 0;
+      }
+      
+      .qiuye-code-block.hide-line-numbers pre code > div {
+        display: flex;
+        align-items: flex-start;
+        min-height: 1.6em;
+        padding: 0 0.75rem;
+        /* margin: 0 -0.5rem; */
+        border-radius: 0;
       }
 
       /* 代码行悬停效果 */
@@ -981,12 +990,12 @@ function CodeBlockStyles() {
       }
 
       .qiuye-code-block.hide-line-numbers pre {
-        padding-left: 1rem;
+        padding-left: 0;
       }
 
       .qiuye-code-block.hide-line-numbers .collapsible-code-block pre,
       .qiuye-code-block.hide-line-numbers .scrollable-code-block pre {
-        padding-left: 1rem;
+        padding-left: 0;
       }
 
       /* ============================================
