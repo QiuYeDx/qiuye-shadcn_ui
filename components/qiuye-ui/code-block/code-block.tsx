@@ -281,6 +281,7 @@ export function CodeBlock({
       ...(hasHighlights && {
         "--cb-hl-bg": rgbaStr(info, d ? 0.1 : 0.08),
         "--cb-hl-bg-solid": blendOnBg(bg, info, d ? 0.1 : 0.08),
+        "--cb-hl-indicator": rgbaStr(info, d ? 0.5 : 0.45),
       }),
     };
   }, [resolvedTheme.vars, diff, isDark, hasHighlights]);
@@ -597,8 +598,8 @@ function CodeBlockStyles() {
         display: flex;
         align-items: flex-start;
         min-height: 1.6em;
-        padding: 0 0.5rem;
-        margin: 0 -0.5rem;
+        padding: 0 0.25rem;
+        /* margin: 0 -0.5rem; */
         border-radius: 4px;
       }
 
@@ -615,9 +616,9 @@ function CodeBlockStyles() {
         display: inline-block;
         width: 3rem;
         min-width: 3rem;
-        padding-right: 1rem;
-        margin-right: 1rem;
-        text-align: right;
+        padding-right: 0.25rem;
+        margin-right: 0.5rem;
+        text-align: center;
         color: var(--cb-ln-color);
         user-select: none;
         border-right: 1px solid var(--cb-ln-border);
@@ -1057,6 +1058,7 @@ function CodeBlockStyles() {
       .qiuye-code-block pre code > div[data-highlight] {
         background-color: var(--cb-hl-bg);
         border-radius: 0;
+        box-shadow: inset 3px 0 0 0 var(--cb-hl-indicator);
       }
 
       .qiuye-code-block pre code > div[data-highlight]:hover {
