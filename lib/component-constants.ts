@@ -12,6 +12,7 @@ export enum ComponentId {
   IMAGE_VIEWER = "image-viewer",
   DUAL_STATE_TOGGLE = "dual-state-toggle",
   CODE_BLOCK = "code-block",
+  TYPEWRITER = "typewriter",
 }
 
 // 组件 ID 数组，方便遍历
@@ -126,6 +127,14 @@ return (
     {code}
   </CodeBlock>
 </CodeBlockPanel>`,
+  },
+  [ComponentId.TYPEWRITER]: {
+    import: `import { Typewriter } from "@/components/qiuye-ui/typewriter";`,
+    usage: `<Typewriter
+  phrases={["Hello", "World", "React"]}
+  typingSpeed={90}
+  loop
+/>`,
   },
 };
 

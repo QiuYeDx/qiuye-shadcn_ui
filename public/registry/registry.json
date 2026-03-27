@@ -132,6 +132,22 @@
           "path": "components/qiuye-ui/scrollable-dialog.tsx"
         }
       ]
+    },
+    {
+      "name": "typewriter",
+      "type": "registry:component",
+      "title": "Typewriter",
+      "author": "QiuYeDx <me@qiuyedx.com>",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/typewriter.tsx"
+        }
+      ]
     }
   ]
 }

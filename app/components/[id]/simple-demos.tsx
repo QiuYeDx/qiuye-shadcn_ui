@@ -15,6 +15,7 @@ import { DotGlass } from "@/components/qiuye-ui/dot-glass";
 import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
 import { DualStateToggle } from "@/components/qiuye-ui/dual-state-toggle";
 import { CodeBlock, CodeBlockPanel } from "@/components/qiuye-ui/code-block";
+import { Typewriter } from "@/components/qiuye-ui/typewriter";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Menu, X, Sun, Moon, Volume2, VolumeOff } from "lucide-react";
@@ -202,6 +203,19 @@ export function DualStateToggleSimpleDemo() {
         inactiveIcon={<Volume2 />}
         effect="scale"
         variant="ghost"
+      />
+    </div>
+  );
+}
+
+// Typewriter 简单演示
+export function TypewriterSimpleDemo() {
+  return (
+    <div className="flex items-center gap-2 text-xl font-semibold">
+      <span>I&apos;m a</span>
+      <Typewriter
+        phrases={["Developer", "Designer", "Creator"]}
+        className="text-primary"
       />
     </div>
   );

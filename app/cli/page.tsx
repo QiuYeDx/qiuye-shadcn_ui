@@ -610,6 +610,7 @@ export default function App() {
                                 ComponentId.IMAGE_VIEWER,
                                 ComponentId.DUAL_STATE_TOGGLE,
                                 ComponentId.CODE_BLOCK,
+                                ComponentId.TYPEWRITER,
                               ].map((component) => (
                                 <div
                                   key={component}

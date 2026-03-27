@@ -900,6 +900,104 @@ export const componentRegistry: ComponentRegistry = {
     cliName: "code-block",
     basicUsage: basicUsageExamples[ComponentId.CODE_BLOCK],
   },
+
+  [ComponentId.TYPEWRITER]: {
+    name: "Typewriter",
+    description:
+      "平滑打字机效果组件：弹簧宽度跟随（useSpring）实现无顿挫的容器缩放，全文渲染 + overflow 裁剪避免字符闪现，支持多文案轮播、单次打字、自定义光标与弹簧参数。",
+    category: "特效",
+    dependencies: ["motion"],
+    files: {
+      component: "components/qiuye-ui/typewriter.tsx",
+      demo: "components/qiuye-ui/demos/typewriter-demo.tsx",
+    },
+    props: [
+      {
+        name: "phrases",
+        type: "string | string[]",
+        description:
+          "要打字的文案，传入字符串为单次打字，传入字符串数组为多文案轮播",
+        required: true,
+      },
+      {
+        name: "typingSpeed",
+        type: "number",
+        description: "打字速度（毫秒/字符）",
+        required: false,
+        default: "90",
+      },
+      {
+        name: "deletingSpeed",
+        type: "number",
+        description: "删除速度（毫秒/字符）",
+        required: false,
+        default: "45",
+      },
+      {
+        name: "pauseDuration",
+        type: "number",
+        description: "打完一段后的停顿时长（毫秒）",
+        required: false,
+        default: "1800",
+      },
+      {
+        name: "loop",
+        type: "boolean",
+        description:
+          "是否循环轮播，false 时打完最后一段后停止，光标保持闪烁",
+        required: false,
+        default: "true",
+      },
+      {
+        name: "cursor",
+        type: "boolean | React.ReactNode",
+        description:
+          "光标配置：true 显示默认竖线闪烁光标，false 隐藏，传入 ReactNode 渲染自定义光标",
+        required: false,
+        default: "true",
+      },
+      {
+        name: "cursorClassName",
+        type: "string",
+        description:
+          "默认光标的自定义类名，可覆盖颜色、宽度等，仅在 cursor={true} 时生效",
+        required: false,
+      },
+      {
+        name: "springConfig",
+        type: "{ stiffness?: number; damping?: number }",
+        description: "容器宽度弹簧动画配置，控制宽度跟随文本变化时的弹簧物理参数",
+        required: false,
+        default: "{ stiffness: 300, damping: 30 }",
+      },
+      {
+        name: "className",
+        type: "string",
+        description: "最外层容器类名",
+        required: false,
+      },
+      {
+        name: "textClassName",
+        type: "string",
+        description: "文本裁剪容器的额外类名",
+        required: false,
+      },
+    ],
+    version: "1.0.0",
+    author: "QiuYeDx",
+    tags: [
+      "typewriter",
+      "typing",
+      "animation",
+      "text",
+      "motion",
+      "spring",
+      "effect",
+      "carousel",
+    ],
+    cliName: "typewriter",
+    basicUsage: basicUsageExamples[ComponentId.TYPEWRITER],
+  },
 };
 
 // 获取所有组件分类
