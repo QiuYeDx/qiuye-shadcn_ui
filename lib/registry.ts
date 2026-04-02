@@ -941,6 +941,14 @@ export const componentRegistry: ComponentRegistry = {
         default: "1800",
       },
       {
+        name: "switchInterval",
+        type: "number",
+        description:
+          "删完一段后、开始打下一段之前的停顿时长（毫秒），值为 0 时删除完立即开始打字",
+        required: false,
+        default: "500",
+      },
+      {
         name: "loop",
         type: "boolean",
         description:

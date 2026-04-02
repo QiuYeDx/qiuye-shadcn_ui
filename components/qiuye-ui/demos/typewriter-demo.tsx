@@ -40,7 +40,11 @@ export function TypewriterDemo() {
       <section className="space-y-3">
         <h3 className="text-lg font-semibold">单次打字（不循环）</h3>
         <p className="text-sm text-muted-foreground">
-          传入单个字符串并设置 <code className="text-xs bg-muted px-1 py-0.5 rounded">loop=false</code>，打完后光标保持闪烁。
+          传入单个字符串并设置{" "}
+          <code className="text-xs bg-muted px-1 py-0.5 rounded">
+            loop=false
+          </code>
+          ，打完后光标保持闪烁。
         </p>
         <div className="rounded-lg border p-6 text-xl">
           <Typewriter
@@ -57,7 +61,13 @@ export function TypewriterDemo() {
       <section className="space-y-3">
         <h3 className="text-lg font-semibold">自定义光标</h3>
         <p className="text-sm text-muted-foreground">
-          通过 <code className="text-xs bg-muted px-1 py-0.5 rounded">cursor</code> 传入自定义 ReactNode 或 <code className="text-xs bg-muted px-1 py-0.5 rounded">cursorClassName</code> 覆盖样式。
+          通过{" "}
+          <code className="text-xs bg-muted px-1 py-0.5 rounded">cursor</code>{" "}
+          传入自定义 ReactNode 或{" "}
+          <code className="text-xs bg-muted px-1 py-0.5 rounded">
+            cursorClassName
+          </code>{" "}
+          覆盖样式。
         </p>
         <div className="space-y-4">
           <div className="rounded-lg border p-6 text-lg">
@@ -141,15 +151,68 @@ export function TypewriterDemo() {
 
       <Separator />
 
+      {/* 切换停顿 */}
+      <section className="space-y-3">
+        <h3 className="text-lg font-semibold">切换停顿（switchInterval）</h3>
+        <p className="text-sm text-muted-foreground">
+          控制删完一段后、打下一段之前的等待时间，值越大"清空后等一下"的节奏感越明显。
+        </p>
+        <div className="space-y-4">
+          <div className="rounded-lg border p-6">
+            <Badge variant="secondary" className="mb-3">
+              无停顿（0ms）
+            </Badge>
+            <div className="text-lg font-medium">
+              <Typewriter
+                phrases={["Hello", "World", "React"]}
+                switchInterval={0}
+                className="text-primary"
+              />
+            </div>
+          </div>
+          <div className="rounded-lg border p-6">
+            <Badge variant="secondary" className="mb-3">
+              默认停顿（500ms）
+            </Badge>
+            <div className="text-lg font-medium">
+              <Typewriter
+                phrases={["Hello", "World", "React"]}
+                className="text-primary"
+              />
+            </div>
+          </div>
+          <div className="rounded-lg border p-6">
+            <Badge variant="secondary" className="mb-3">
+              长停顿（1200ms）
+            </Badge>
+            <div className="text-lg font-medium">
+              <Typewriter
+                phrases={["Hello", "World", "React"]}
+                switchInterval={1200}
+                className="text-primary"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Separator />
+
       {/* 弹簧配置 */}
       <section className="space-y-3">
         <h3 className="text-lg font-semibold">弹簧参数对比</h3>
         <p className="text-sm text-muted-foreground">
-          通过 <code className="text-xs bg-muted px-1 py-0.5 rounded">springConfig</code> 调整容器宽度跟随的弹簧物理参数。
+          通过{" "}
+          <code className="text-xs bg-muted px-1 py-0.5 rounded">
+            springConfig
+          </code>{" "}
+          调整容器宽度跟随的弹簧物理参数。
         </p>
         <div className="space-y-4">
           <div className="rounded-lg border p-6">
-            <Badge variant="secondary" className="mb-3">默认弹簧</Badge>
+            <Badge variant="secondary" className="mb-3">
+              默认弹簧
+            </Badge>
             <div className="text-lg font-medium">
               <Typewriter
                 phrases={["stiffness: 300", "damping: 30"]}
@@ -158,7 +221,9 @@ export function TypewriterDemo() {
             </div>
           </div>
           <div className="rounded-lg border p-6">
-            <Badge variant="secondary" className="mb-3">柔和弹簧</Badge>
+            <Badge variant="secondary" className="mb-3">
+              柔和弹簧
+            </Badge>
             <div className="text-lg font-medium">
               <Typewriter
                 phrases={["stiffness: 120", "damping: 15"]}
@@ -168,7 +233,9 @@ export function TypewriterDemo() {
             </div>
           </div>
           <div className="rounded-lg border p-6">
-            <Badge variant="secondary" className="mb-3">强力弹簧</Badge>
+            <Badge variant="secondary" className="mb-3">
+              强力弹簧
+            </Badge>
             <div className="text-lg font-medium">
               <Typewriter
                 phrases={["stiffness: 500", "damping: 40"]}

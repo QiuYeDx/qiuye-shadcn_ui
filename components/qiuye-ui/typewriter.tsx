@@ -32,6 +32,14 @@ export interface TypewriterProps {
    */
   pauseDuration?: number;
   /**
+   * 删完一段后、开始打下一段之前的停顿时长（毫秒）
+   *
+   * 值为 `0` 时删除完立即开始打字，视觉上没有"清空后等一下"的节奏感；
+   * 推荐 300–800 之间取值。
+   * @default 500
+   */
+  switchInterval?: number;
+  /**
    * 是否循环轮播
    * - `true`（默认）：打完最后一段后回到第一段继续
    * - `false`：打完最后一段后停止，光标保持闪烁
@@ -93,6 +101,12 @@ export interface TypewriterProps {
  *   cursorClassName="bg-blue-500 w-0.5"
  * />
  *
+ * // 自定义切换停顿
+ * <Typewriter
+ *   phrases={["Hello", "World"]}
+ *   switchInterval={800}
+ * />
+ *
  * // 自定义光标元素
  * <Typewriter
  *   phrases={["Custom cursor"]}
@@ -105,6 +119,7 @@ export function Typewriter({
   typingSpeed = 90,
   deletingSpeed = 45,
   pauseDuration = 1800,
+  switchInterval = 500,
   loop = true,
   cursor = true,
   cursorClassName,
@@ -129,7 +144,9 @@ export function Typewriter({
   const currentPhrase = safePhrases[phraseIndex] ?? safePhrases[0];
 
   useEffect(() => {
-    if (measureRef.current) {
+    if (!displayText) {
+      smoothWidth.set(0);
+    } else if (measureRef.current) {
       smoothWidth.set(measureRef.current.scrollWidth);
     }
   }, [displayText, smoothWidth]);
@@ -166,7 +183,7 @@ export function Typewriter({
       },
       isDeleting
         ? isPhraseEmpty
-          ? typingSpeed
+          ? switchInterval
           : deletingSpeed
         : isPhraseComplete
           ? pauseDuration
@@ -184,6 +201,7 @@ export function Typewriter({
     pauseDuration,
     phraseIndex,
     safePhrases.length,
+    switchInterval,
     typingSpeed,
   ]);
 
