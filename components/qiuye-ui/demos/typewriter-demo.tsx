@@ -155,7 +155,7 @@ export function TypewriterDemo() {
       <section className="space-y-3">
         <h3 className="text-lg font-semibold">切换停顿（switchInterval）</h3>
         <p className="text-sm text-muted-foreground">
-          控制删完一段后、打下一段之前的等待时间，值越大"清空后等一下"的节奏感越明显。
+          {`控制删完一段后、打下一段之前的等待时间，值越大"清空后等一下"的节奏感越明显。`}
         </p>
         <div className="space-y-4">
           <div className="rounded-lg border p-6">
