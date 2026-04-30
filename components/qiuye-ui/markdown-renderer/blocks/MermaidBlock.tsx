@@ -6,7 +6,6 @@ import React, {
   useRef,
   useId,
   useCallback,
-  useMemo,
 } from "react";
 import {
   Code,
@@ -21,7 +20,6 @@ import {
 import { useTheme } from "next-themes";
 import {
   CodeBlock,
-  resolveCodeBlockTheme,
   type CodeBlockColorThemeName,
   type CodeBlockThemeConfig,
 } from "@/components/qiuye-ui/code-block";
@@ -52,106 +50,203 @@ function loadMermaid(): Promise<MermaidAPI> {
 const MERMAID_FONT_FAMILY =
   '"Inter", "Fira Code", "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace';
 
-function getSyntaxColor(
-  theme: CodeBlockThemeConfig,
-  tokenType: string,
-  fallback: string,
-) {
-  return (
-    theme.syntax.styles.find((style) => style.types.includes(tokenType))?.style
-      .color ?? fallback
-  );
+interface MermaidThemePalette {
+  background: string;
+  text: string;
+  mutedText: string;
+  nodeFill: string;
+  nodeStroke: string;
+  clusterFill: string;
+  clusterStroke: string;
+  edgeLabelFill: string;
+  edgeLabelStroke: string;
+  noteFill: string;
+  noteStroke: string;
+  line: string;
+  grid: string;
+  pie: string[];
 }
 
-function getMermaidThemeVariables(
-  theme: CodeBlockThemeConfig,
+function getMermaidPalette(
+  colorTheme: CodeBlockColorThemeName | undefined,
   isDark: boolean,
-) {
-  const bg = theme.syntax.plain.backgroundColor ?? theme.vars.bg;
-  const fg = theme.syntax.plain.color ?? (isDark ? "#e6edf3" : "#24292f");
-  const accent = getSyntaxColor(
-    theme,
-    "keyword",
-    isDark ? "#ff7b72" : "#cf222e",
-  );
-  const secondary = getSyntaxColor(
-    theme,
-    "function",
-    isDark ? "#d2a8ff" : "#8250df",
-  );
-  const muted = getSyntaxColor(
-    theme,
-    "comment",
-    isDark ? "#8b949e" : "#6e7781",
-  );
+): MermaidThemePalette {
+  const isQiuvision = colorTheme === "qiuvision";
+
+  if (isQiuvision) {
+    return isDark
+      ? {
+          background: "#1A1A1A",
+          text: "#ECECEC",
+          mutedText: "#B8B1A2",
+          nodeFill: "#25231E",
+          nodeStroke: "#D6C8A6",
+          clusterFill: "#1F1E1A",
+          clusterStroke: "rgba(214, 200, 166, 0.42)",
+          edgeLabelFill: "#1A1A1A",
+          edgeLabelStroke: "rgba(214, 200, 166, 0.28)",
+          noteFill: "#2B271E",
+          noteStroke: "#D6C8A6",
+          line: "#C9B889",
+          grid: "rgba(214, 200, 166, 0.18)",
+          pie: [
+            "#D6C8A6",
+            "#BFA66F",
+            "#9D7A43",
+            "#E7DCC3",
+            "#8E714A",
+            "#CBB98D",
+          ],
+        }
+      : {
+          background: "#FAFAFA",
+          text: "#1F1F1F",
+          mutedText: "#6F6659",
+          nodeFill: "#FBF8F0",
+          nodeStroke: "#A07A44",
+          clusterFill: "#F7F2E8",
+          clusterStroke: "rgba(160, 122, 68, 0.36)",
+          edgeLabelFill: "#FAFAFA",
+          edgeLabelStroke: "rgba(160, 122, 68, 0.24)",
+          noteFill: "#F6EEDC",
+          noteStroke: "#A07A44",
+          line: "#9B7847",
+          grid: "rgba(160, 122, 68, 0.16)",
+          pie: [
+            "#A07A44",
+            "#C2A36E",
+            "#E4D3AD",
+            "#765932",
+            "#B78D4C",
+            "#F1E7D1",
+          ],
+        };
+  }
 
   return {
-    darkMode: isDark,
-    background: bg,
-    primaryColor: theme.vars.hoverSolid,
-    primaryTextColor: fg,
-    primaryBorderColor: accent,
-    lineColor: muted,
-    secondaryColor: bg,
-    tertiaryColor: bg,
-    mainBkg: theme.vars.hoverSolid,
-    nodeBorder: accent,
-    clusterBkg: bg,
-    clusterBorder: theme.vars.border,
-    edgeLabelBackground: bg,
-    textColor: fg,
-    nodeTextColor: fg,
-    titleColor: fg,
-    noteBkgColor: theme.vars.hoverSolid,
-    noteTextColor: fg,
-    noteBorderColor: secondary,
+    background: isDark ? "#09090B" : "#FFFFFF",
+    text: isDark ? "#FAFAFA" : "#18181B",
+    mutedText: isDark ? "#A1A1AA" : "#71717A",
+    nodeFill: isDark ? "#18181B" : "#F4F4F5",
+    nodeStroke: isDark ? "#52525B" : "#A1A1AA",
+    clusterFill: isDark ? "#111113" : "#FAFAFA",
+    clusterStroke: isDark ? "#3F3F46" : "#D4D4D8",
+    edgeLabelFill: isDark ? "#09090B" : "#FFFFFF",
+    edgeLabelStroke: isDark ? "#27272A" : "#E4E4E7",
+    noteFill: isDark ? "#18181B" : "#F4F4F5",
+    noteStroke: isDark ? "#52525B" : "#A1A1AA",
+    line: isDark ? "#A1A1AA" : "#71717A",
+    grid: isDark ? "rgba(161, 161, 170, 0.18)" : "rgba(113, 113, 122, 0.16)",
+    pie: isDark
+      ? ["#FAFAFA", "#D4D4D8", "#A1A1AA", "#71717A", "#52525B", "#3F3F46"]
+      : ["#18181B", "#3F3F46", "#71717A", "#A1A1AA", "#D4D4D8", "#E4E4E7"],
   };
 }
 
-function getMermaidThemeCss(theme: CodeBlockThemeConfig, isDark: boolean): string {
-  const bg = theme.syntax.plain.backgroundColor ?? theme.vars.bg;
-  const nodeFill = theme.vars.hoverSolid;
-  const nodeStroke = getSyntaxColor(
-    theme,
-    "keyword",
-    isDark ? "#ff7b72" : "#cf222e",
-  );
-  const clusterFill = bg;
-  const clusterStroke = theme.vars.border;
-  const edgeLabelFill = bg;
-  const edgeLabelStroke = theme.vars.border;
+function getMermaidThemeVariables(palette: MermaidThemePalette, isDark: boolean) {
+  const [pie1, pie2, pie3, pie4, pie5, pie6] = palette.pie;
 
+  return {
+    darkMode: isDark,
+    background: palette.background,
+    primaryColor: palette.nodeFill,
+    primaryTextColor: palette.text,
+    primaryBorderColor: palette.nodeStroke,
+    lineColor: palette.line,
+    secondaryColor: palette.clusterFill,
+    tertiaryColor: palette.noteFill,
+    mainBkg: palette.nodeFill,
+    secondBkg: palette.clusterFill,
+    tertiaryBkg: palette.noteFill,
+    nodeBorder: palette.nodeStroke,
+    clusterBkg: palette.clusterFill,
+    clusterBorder: palette.clusterStroke,
+    edgeLabelBackground: palette.edgeLabelFill,
+    textColor: palette.text,
+    nodeTextColor: palette.text,
+    titleColor: palette.text,
+    noteBkgColor: palette.noteFill,
+    noteTextColor: palette.text,
+    noteBorderColor: palette.noteStroke,
+    actorBkg: palette.nodeFill,
+    actorBorder: palette.nodeStroke,
+    actorTextColor: palette.text,
+    signalColor: palette.line,
+    signalTextColor: palette.text,
+    labelBoxBkgColor: palette.edgeLabelFill,
+    labelBoxBorderColor: palette.edgeLabelStroke,
+    labelTextColor: palette.text,
+    loopTextColor: palette.text,
+    activationBkgColor: palette.clusterFill,
+    activationBorderColor: palette.nodeStroke,
+    sequenceNumberColor: palette.background,
+    sectionBkgColor: palette.nodeFill,
+    altSectionBkgColor: palette.clusterFill,
+    gridColor: palette.grid,
+    taskBorderColor: palette.nodeStroke,
+    taskBkgColor: palette.nodeFill,
+    activeTaskBkgColor: palette.clusterFill,
+    activeTaskBorderColor: palette.nodeStroke,
+    doneTaskBkgColor: palette.clusterFill,
+    doneTaskBorderColor: palette.clusterStroke,
+    critBorderColor: palette.nodeStroke,
+    critBkgColor: palette.noteFill,
+    todayLineColor: palette.line,
+    pie1,
+    pie2,
+    pie3,
+    pie4,
+    pie5,
+    pie6,
+    pieOuterStrokeColor: palette.background,
+    pieTitleTextSize: "18px",
+    pieSectionTextColor: palette.text,
+    pieLegendTextColor: palette.text,
+    pieStrokeColor: palette.background,
+  };
+}
+
+function getMermaidThemeCss(palette: MermaidThemePalette): string {
   return `
     .node rect,
-    .cluster rect,
+    .node circle,
+    .node ellipse,
+    .node polygon,
+    .node path,
     .classGroup rect,
+    .classGroup line,
     .stateGroup rect,
     .note rect,
-    .actor {
+    rect.actor {
       rx: 10px;
       ry: 10px;
     }
 
     .node rect,
+    .node circle,
+    .node ellipse,
+    .node polygon,
+    .node path,
     .classGroup rect,
     .stateGroup rect,
     .note rect,
-    .actor {
-      fill: ${nodeFill};
-      stroke: ${nodeStroke};
+    rect.actor {
+      fill: ${palette.nodeFill};
+      stroke: ${palette.nodeStroke};
       stroke-width: 1.15px;
     }
 
     .cluster rect {
-      fill: ${clusterFill};
-      stroke: ${clusterStroke};
+      fill: ${palette.clusterFill};
+      stroke: ${palette.clusterStroke};
       stroke-width: 1.05px;
     }
 
     .edgeLabel rect,
+    .edgeLabel .labelBkg,
     .label-container {
-      fill: ${edgeLabelFill};
-      stroke: ${edgeLabelStroke};
+      fill: ${palette.edgeLabelFill};
+      stroke: ${palette.edgeLabelStroke};
       rx: 8px;
       ry: 8px;
     }
@@ -163,6 +258,43 @@ function getMermaidThemeCss(theme: CodeBlockThemeConfig, isDark: boolean): strin
     .messageLine1 {
       stroke-linecap: round;
       stroke-linejoin: round;
+    }
+
+    .flowchart-link,
+    .edgePath .path,
+    path.relation,
+    .messageLine0,
+    .messageLine1 {
+      stroke: ${palette.line};
+    }
+
+    marker path,
+    .arrowheadPath {
+      fill: ${palette.line};
+      stroke: ${palette.line};
+    }
+
+    text,
+    .label,
+    .nodeLabel,
+    .edgeLabel,
+    .messageText,
+    text.actor,
+    .titleText {
+      fill: ${palette.text};
+      color: ${palette.text};
+    }
+
+    .edgeLabel {
+      color: ${palette.text};
+    }
+
+    .cluster text,
+    .noteText,
+    .loopText,
+    .labelText {
+      fill: ${palette.mutedText};
+      color: ${palette.mutedText};
     }
   `;
 }
@@ -192,10 +324,6 @@ export function MermaidBlock({
   const [isTouchDevice, setIsTouchDevice] = useState<boolean | null>(null);
   const { resolvedTheme } = useTheme();
   const isDark = !mounted || resolvedTheme !== "light";
-  const resolvedMermaidTheme = useMemo(
-    () => resolveCodeBlockTheme(colorTheme, customTheme, isDark),
-    [colorTheme, customTheme, isDark],
-  );
   const containerRef = useRef<HTMLDivElement>(null);
   const contentMeasureRef = useRef<HTMLDivElement>(null);
   const uniqueId = useId();
@@ -322,6 +450,8 @@ export function MermaidBlock({
         const mermaid = await loadMermaid();
         if (cancelled) return;
 
+        const mermaidPalette = getMermaidPalette(colorTheme, isDark);
+
         mermaid.initialize({
           startOnLoad: false,
           theme: "base",
@@ -331,8 +461,8 @@ export function MermaidBlock({
           flowchart: {
             curve: "natural",
           },
-          themeVariables: getMermaidThemeVariables(resolvedMermaidTheme, isDark),
-          themeCSS: getMermaidThemeCss(resolvedMermaidTheme, isDark),
+          themeVariables: getMermaidThemeVariables(mermaidPalette, isDark),
+          themeCSS: getMermaidThemeCss(mermaidPalette),
         });
 
         const isValid = await mermaid.parse(code);
@@ -366,7 +496,7 @@ export function MermaidBlock({
     code,
     showPreview,
     mermaidIdBase,
-    resolvedMermaidTheme,
+    colorTheme,
     isDark,
   ]);
 

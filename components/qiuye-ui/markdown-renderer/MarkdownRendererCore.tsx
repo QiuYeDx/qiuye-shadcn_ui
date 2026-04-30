@@ -34,6 +34,59 @@ function alphaFromMode(isDark: boolean, darkAlpha: number, lightAlpha: number) {
   return isDark ? darkAlpha : lightAlpha;
 }
 
+function getMermaidSurfaceTheme(
+  colorTheme: string | undefined,
+  isDark: boolean,
+) {
+  const isQiuvision = colorTheme === "qiuvision";
+
+  if (isQiuvision) {
+    return isDark
+      ? {
+          bg: "#1A1A1A",
+          border: "rgba(214, 200, 166, 0.24)",
+          accent: "#D6C8A6",
+          toolbarBg: "rgba(214, 200, 166, 0.055)",
+          scrollbarTrack: "rgba(255, 255, 255, 0.045)",
+          scrollbarThumb: "rgba(214, 200, 166, 0.32)",
+          scrollbarThumbHover: "rgba(214, 200, 166, 0.48)",
+          focusRing: "rgba(214, 200, 166, 0.42)",
+        }
+      : {
+          bg: "#FAFAFA",
+          border: "rgba(160, 122, 68, 0.22)",
+          accent: "#A07A44",
+          toolbarBg: "rgba(160, 122, 68, 0.05)",
+          scrollbarTrack: "rgba(31, 31, 31, 0.045)",
+          scrollbarThumb: "rgba(160, 122, 68, 0.34)",
+          scrollbarThumbHover: "rgba(160, 122, 68, 0.52)",
+          focusRing: "rgba(160, 122, 68, 0.38)",
+        };
+  }
+
+  return isDark
+    ? {
+        bg: "#09090B",
+        border: "#27272A",
+        accent: "#A1A1AA",
+        toolbarBg: "rgba(255, 255, 255, 0.035)",
+        scrollbarTrack: "rgba(255, 255, 255, 0.045)",
+        scrollbarThumb: "rgba(161, 161, 170, 0.28)",
+        scrollbarThumbHover: "rgba(161, 161, 170, 0.42)",
+        focusRing: "rgba(161, 161, 170, 0.36)",
+      }
+    : {
+        bg: "#FFFFFF",
+        border: "#E4E4E7",
+        accent: "#71717A",
+        toolbarBg: "rgba(24, 24, 27, 0.028)",
+        scrollbarTrack: "rgba(24, 24, 27, 0.045)",
+        scrollbarThumb: "rgba(113, 113, 122, 0.25)",
+        scrollbarThumbHover: "rgba(113, 113, 122, 0.4)",
+        focusRing: "rgba(113, 113, 122, 0.34)",
+      };
+}
+
 /** MarkdownRendererCore 内部属性 */
 export interface MarkdownRendererCoreInternalProps
   extends MarkdownRendererCoreProps {
@@ -112,6 +165,7 @@ export function MarkdownRendererCore({
     const muted = getSyntaxColor(resolved, "comment", vars.lnColor);
     const shadowAlpha = alphaFromMode(isDark, 0.3, 0.12);
     const fullscreenShadowAlpha = alphaFromMode(isDark, 0.45, 0.16);
+    const mermaid = getMermaidSurfaceTheme(codeBlock.colorTheme, isDark);
 
     return {
       "--qv-md-bg": bg,
@@ -123,14 +177,16 @@ export function MarkdownRendererCore({
       "--qv-md-inline-bg": vars.hover,
       "--qv-md-inline-color": inlineColor,
       "--qv-md-inline-border": vars.border,
-      "--qv-md-mermaid-bg": bg,
-      "--qv-md-mermaid-border": vars.border,
+      "--qv-md-mermaid-bg": mermaid.bg,
+      "--qv-md-mermaid-border": mermaid.border,
+      "--qv-md-mermaid-accent": mermaid.accent,
+      "--qv-md-mermaid-toolbar-bg": mermaid.toolbarBg,
       "--qv-md-mermaid-shadow": `rgba(0, 0, 0, ${shadowAlpha})`,
-      "--qv-md-scrollbar-track": vars.sbTrack,
-      "--qv-md-scrollbar-thumb": vars.sbThumb,
-      "--qv-md-scrollbar-thumb-hover": vars.sbThumbHover,
+      "--qv-md-mermaid-scrollbar-track": mermaid.scrollbarTrack,
+      "--qv-md-mermaid-scrollbar-thumb": mermaid.scrollbarThumb,
+      "--qv-md-mermaid-scrollbar-thumb-hover": mermaid.scrollbarThumbHover,
       "--qv-md-fullscreen-shadow": `rgba(0, 0, 0, ${fullscreenShadowAlpha})`,
-      "--qv-md-focus-ring": vars.btnHoverBorder,
+      "--qv-md-focus-ring": mermaid.focusRing,
     } as React.CSSProperties;
   }, [codeBlock.colorTheme, codeBlock.customTheme, isDark]);
 

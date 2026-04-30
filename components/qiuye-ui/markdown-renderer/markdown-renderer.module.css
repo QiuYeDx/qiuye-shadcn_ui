@@ -22,11 +22,13 @@
 }
 
 .root :global(.mermaid-toolbar) {
-  background: linear-gradient(
-    to right,
-    color-mix(in srgb, var(--qv-md-accent) 6%, transparent),
-    color-mix(in srgb, var(--qv-md-secondary) 6%, transparent)
-  );
+  background:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--qv-md-mermaid-accent) 7%, transparent),
+      transparent 68%
+    ),
+    var(--qv-md-mermaid-toolbar-bg);
   border-bottom: 1px solid var(--qv-md-mermaid-border);
 }
 
@@ -37,7 +39,8 @@
   display: flex;
   justify-content: center;
   scrollbar-width: thin;
-  scrollbar-color: var(--qv-md-scrollbar-thumb) var(--qv-md-scrollbar-track);
+  scrollbar-color: var(--qv-md-mermaid-scrollbar-thumb)
+    var(--qv-md-mermaid-scrollbar-track);
 }
 
 .root :global(.mermaid-svg-container svg) {
@@ -62,18 +65,18 @@
 }
 
 .root :global(.mermaid-svg-container::-webkit-scrollbar-track) {
-  background: var(--qv-md-scrollbar-track);
+  background: var(--qv-md-mermaid-scrollbar-track);
   border-radius: 5px;
 }
 
 .root :global(.mermaid-svg-container::-webkit-scrollbar-thumb) {
-  background: var(--qv-md-scrollbar-thumb);
+  background: var(--qv-md-mermaid-scrollbar-thumb);
   border-radius: 5px;
   transition: background 0.2s ease;
 }
 
 .root :global(.mermaid-svg-container::-webkit-scrollbar-thumb:hover) {
-  background: var(--qv-md-scrollbar-thumb-hover);
+  background: var(--qv-md-mermaid-scrollbar-thumb-hover);
 }
 
 .root :global(.mermaid-fullscreen-overlay .mermaid-svg-container) {
@@ -124,4 +127,3 @@
     min-width: auto;
   }
 }
-
