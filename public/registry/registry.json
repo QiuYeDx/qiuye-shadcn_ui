@@ -23,7 +23,7 @@
         },
         {
           "type": "registry:component",
-          "path": "components/qiuye-ui/code-block/code-block.tsx"
+          "path": "components/qiuye-ui/code-block/code-block-root.tsx"
         },
         {
           "type": "registry:component",

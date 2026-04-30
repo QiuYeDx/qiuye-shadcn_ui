@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CodeBlock as CodeBlockDisplay } from "@/components/qiuye-ui/code-block/code-block";
+import { CodeBlock as CodeBlockDisplay } from "@/components/qiuye-ui/code-block";
 import {
   ResponsiveTabs,
   type TabItem,
