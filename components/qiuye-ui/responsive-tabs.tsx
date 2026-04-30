@@ -499,7 +499,7 @@ const ResponsiveTabs = React.forwardRef<
           </TabsList>
         </div>
 
-        {children != null && <div className="mt-4">{children}</div>}
+        {children != null && <div className="mt-3">{children}</div>}
       </Tabs>
     );
   }

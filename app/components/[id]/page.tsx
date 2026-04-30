@@ -159,7 +159,7 @@ export default async function ComponentDetailPage({
   return (
     <div className="container mx-auto px-6 py-8">
       {/* Header */}
-      <div className="mb-10 lg:mb-12">
+      <div className="mb-6 lg:mb-6">
         {/* 顶部返回 + 分类 */}
         <div className="flex items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
@@ -214,24 +214,24 @@ export default async function ComponentDetailPage({
             <div className="space-y-4 lg:sticky lg:top-24">
               {/* 安装命令 */}
               <Card>
-                <CardHeader className="pb-3">
+                <CardHeader className="p-4 pb-3">
                   <CardTitle className="text-base lg:text-lg">
                     安装命令
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="p-4 pt-0 space-y-3">
                   <CopyCommandButton cliName={component.cliName} />
                 </CardContent>
               </Card>
 
               {/* 导入代码 */}
               <Card>
-                <CardHeader className="pb-3">
+                <CardHeader className="p-4 pb-3">
                   <CardTitle className="text-base lg:text-lg">
                     导入代码
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="p-4 pt-0 space-y-3">
                   <div className="bg-muted/50 rounded-md p-3">
                     <code className="text-xs lg:text-sm font-mono break-all">
                       {`import { ${String(component.name || "").replace(/\s+/g, "")} } from "@/components/qiuye-ui/${component.cliName}";`}
@@ -246,12 +246,12 @@ export default async function ComponentDetailPage({
 
               {/* 组件信息 */}
               <Card>
-                <CardHeader className="pb-3">
+                <CardHeader className="p-4 pb-3">
                   <CardTitle className="text-base lg:text-lg">
                     组件信息
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2 text-sm">
+                <CardContent className="p-4 pt-0 space-y-2 text-sm">
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-muted-foreground">版本</span>
                     <span className="truncate">{component.version}</span>

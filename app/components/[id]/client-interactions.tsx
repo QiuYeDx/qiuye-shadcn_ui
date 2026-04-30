@@ -101,7 +101,7 @@ export function BackButton() {
       variant="ghost"
       size="sm"
       onClick={() => router.back()}
-      className="flex items-center gap-2 cursor-pointer"
+      className="flex items-center gap-2 cursor-pointer -translate-x-3"
     >
       <ArrowLeft className="h-4 w-4" />
       返回
