@@ -267,7 +267,7 @@ export function MarkdownRendererSimpleDemo() {
   ].join("\n");
 
   return (
-    <div className="max-h-[420px] overflow-y-auto rounded-lg border bg-background px-5 py-2">
+    <div className="">
       <MarkdownRenderer
         content={content}
         codeBlockDisplayMode="scroll"
