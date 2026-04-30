@@ -16,6 +16,7 @@ import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
 import { DualStateToggle } from "@/components/qiuye-ui/dual-state-toggle";
 import { CodeBlock, CodeBlockPanel } from "@/components/qiuye-ui/code-block";
 import { Typewriter } from "@/components/qiuye-ui/typewriter";
+import { MarkdownRenderer } from "@/components/qiuye-ui/markdown-renderer";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Menu, X, Sun, Moon, Volume2, VolumeOff } from "lucide-react";
@@ -243,5 +244,35 @@ export function Counter({ initial = 0 }) {
         {sampleCode}
       </CodeBlock>
     </CodeBlockPanel>
+  );
+}
+
+// MarkdownRenderer 简单演示
+export function MarkdownRendererSimpleDemo() {
+  const content = [
+    "## MarkdownRenderer",
+    "",
+    "支持 **GFM**、`inline code`、表格和代码块。",
+    "",
+    "| 场景 | 预设 |",
+    "| --- | --- |",
+    "| 长文 | Blog |",
+    "| 会话 | Chat |",
+    "",
+    "```tsx title=\"demo.tsx\" {2}",
+    "export function Demo() {",
+    "  return <MarkdownRenderer content={content} />;",
+    "}",
+    "```",
+  ].join("\n");
+
+  return (
+    <div className="max-h-[420px] overflow-y-auto rounded-lg border bg-background px-5 py-2">
+      <MarkdownRenderer
+        content={content}
+        codeBlockDisplayMode="scroll"
+        codeBlockMaxHeight={180}
+      />
+    </div>
   );
 }

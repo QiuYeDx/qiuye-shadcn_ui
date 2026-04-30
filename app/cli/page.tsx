@@ -611,6 +611,7 @@ export default function App() {
                                 ComponentId.DUAL_STATE_TOGGLE,
                                 ComponentId.CODE_BLOCK,
                                 ComponentId.TYPEWRITER,
+                                ComponentId.MARKDOWN_RENDERER,
                               ].map((component) => (
                                 <div
                                   key={component}

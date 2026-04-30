@@ -1006,6 +1006,161 @@ export const componentRegistry: ComponentRegistry = {
     cliName: "typewriter",
     basicUsage: basicUsageExamples[ComponentId.TYPEWRITER],
   },
+
+  [ComponentId.MARKDOWN_RENDERER]: {
+    name: "Markdown Renderer",
+    description:
+      "通用 Markdown 渲染器：内置 Blog / Chat 两套预设，支持 GFM、标题锚点、代码块高亮、Mermaid 图表、图片预览、安全链接策略与可扩展 Widget 运行时。",
+    category: "内容展示",
+    dependencies: [
+      "react-markdown",
+      "remark-gfm",
+      "rehype-raw",
+      "mermaid",
+      "motion",
+      "lucide-react",
+      "next-themes",
+      "prism-react-renderer",
+    ],
+    files: {
+      component: "components/qiuye-ui/markdown-renderer/markdown-renderer.tsx",
+      demo: "components/qiuye-ui/demos/markdown-renderer-demo.tsx",
+      types: "components/qiuye-ui/markdown-renderer/markdown-types.ts",
+    },
+    propsInfo: [
+      {
+        componentName: "MarkdownRenderer",
+        props: [
+          {
+            name: "content",
+            type: "string",
+            description: "需要渲染的 Markdown 原文",
+            required: true,
+          },
+          {
+            name: "className",
+            type: "string",
+            description: "根容器额外类名",
+            required: false,
+          },
+          {
+            name: "codeBlockDisplayMode",
+            type: '"collapse" | "scroll" | "auto-height"',
+            description:
+              "博客预设代码块的溢出处理策略，透传给 CodeBlock",
+            required: false,
+          },
+          {
+            name: "codeBlockMaxLines",
+            type: "number",
+            description: "折叠模式下的最大显示行数",
+            required: false,
+          },
+          {
+            name: "codeBlockMaxHeight",
+            type: "string | number",
+            description: "滚动模式下的最大高度",
+            required: false,
+          },
+          {
+            name: "stickyLineNumbers",
+            type: "boolean",
+            description: "代码块横向滚动时是否固定行号列",
+            required: false,
+          },
+          {
+            name: "codeBlockColorTheme",
+            type: "CodeBlockColorThemeName",
+            description: "代码块内置配色主题名称",
+            required: false,
+            default: "github",
+          },
+          {
+            name: "components",
+            type: "Components",
+            description: "覆盖或扩展 react-markdown 的 components 映射",
+            required: false,
+          },
+          {
+            name: "widgetRegistry",
+            type: "MarkdownWidgetRegistry",
+            description: "自定义 Widget 注册表",
+            required: false,
+          },
+          {
+            name: "widgetContext",
+            type: "MarkdownWidgetContext",
+            description: "传递给 Widget 的运行上下文",
+            required: false,
+          },
+        ],
+      },
+      {
+        componentName: "ChatMarkdownRenderer",
+        props: [
+          {
+            name: "content",
+            type: "string",
+            description: "需要渲染的 Markdown 原文",
+            required: true,
+          },
+          {
+            name: "className",
+            type: "string",
+            description: "根容器额外类名",
+            required: false,
+          },
+          {
+            name: "components",
+            type: "Components",
+            description: "覆盖或扩展 react-markdown 的 components 映射",
+            required: false,
+          },
+          {
+            name: "widgetRegistry",
+            type: "MarkdownWidgetRegistry",
+            description: "Widget 注册表；不传时使用内置 tool-call / artifact / reference-card",
+            required: false,
+          },
+          {
+            name: "widgetContext",
+            type: "MarkdownWidgetContext",
+            description: "传递给 Widget 的运行上下文",
+            required: false,
+          },
+          {
+            name: "codeBlock",
+            type: "MarkdownCodeBlockOptions",
+            description: "会话预设代码块配置覆盖",
+            required: false,
+          },
+          {
+            name: "enableRawHtml",
+            type: "boolean",
+            description: "是否启用原始 HTML；Chat 预设默认关闭",
+            required: false,
+            default: "false",
+          },
+        ],
+      },
+    ],
+    version: "1.0.0",
+    author: "QiuYeDx",
+    tags: [
+      "markdown",
+      "gfm",
+      "content",
+      "blog",
+      "chat",
+      "mermaid",
+      "code-block",
+      "widget",
+      "renderer",
+      "security",
+    ],
+    cliName: "markdown-renderer",
+    basicUsage: basicUsageExamples[ComponentId.MARKDOWN_RENDERER],
+  },
 };
 
 // 获取所有组件分类

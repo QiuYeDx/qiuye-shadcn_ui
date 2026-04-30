@@ -94,6 +94,122 @@
       ]
     },
     {
+      "name": "markdown-renderer",
+      "type": "registry:component",
+      "title": "MarkdownRenderer",
+      "author": "QiuYeDx <me@qiuyedx.com>",
+      "dependencies": [
+        "react-markdown",
+        "remark-gfm",
+        "rehype-raw",
+        "mermaid",
+        "motion",
+        "lucide-react",
+        "next-themes",
+        "prism-react-renderer"
+      ],
+      "registryDependencies": [
+        "@qiuye-ui/code-block",
+        "@qiuye-ui/image-viewer",
+        "button",
+        "table"
+      ],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/markdown-renderer/index.ts"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/markdown-renderer/markdown-renderer.tsx"
+        },
+        {
+          "type": "registry:style",
+          "path": "components/qiuye-ui/markdown-renderer/markdown-renderer.module.css"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/markdown-renderer/BlogMarkdownRenderer.tsx"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/markdown-renderer/ChatMarkdownRenderer.tsx"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/markdown-renderer/MarkdownRendererCore.tsx"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/markdown-renderer/MarkdownWidgetRenderer.tsx"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/markdown-renderer/blocks/MermaidBlock.tsx"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/markdown-renderer/presets/blog-preset.tsx"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/markdown-renderer/presets/chat-preset.tsx"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/markdown-renderer/widgets/ArtifactWidget.tsx"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/markdown-renderer/widgets/ReferenceCardWidget.tsx"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/markdown-renderer/widgets/ToolCallWidget.tsx"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/markdown-renderer/widgets/UnknownWidget.tsx"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/markdown-renderer/widgets/WidgetErrorBoundary.tsx"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/markdown-renderer/widgets/builtin-registry.tsx"
+        },
+        {
+          "type": "registry:lib",
+          "path": "components/qiuye-ui/markdown-renderer/markdown-types.ts"
+        },
+        {
+          "type": "registry:lib",
+          "path": "lib/heading-ids.ts"
+        },
+        {
+          "type": "registry:lib",
+          "path": "lib/markdown/link-policy.ts"
+        },
+        {
+          "type": "registry:lib",
+          "path": "lib/markdown/parse-code-block-meta.ts"
+        },
+        {
+          "type": "registry:lib",
+          "path": "lib/markdown/parse-widget-fence.ts"
+        },
+        {
+          "type": "registry:lib",
+          "path": "lib/markdown/remark-code-meta.ts"
+        },
+        {
+          "type": "registry:lib",
+          "path": "lib/markdown/sanitize-url.ts"
+        }
+      ]
+    },
+    {
       "name": "responsive-tabs",
       "type": "registry:component",
       "title": "ResponsiveTabs",

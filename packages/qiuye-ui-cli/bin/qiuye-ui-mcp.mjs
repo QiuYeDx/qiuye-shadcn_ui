@@ -16,6 +16,10 @@ const DEFAULT_COMPONENT_NAMES = [
   "scrollable-dialog",
   "dot-glass",
   "image-viewer",
+  "dual-state-toggle",
+  "code-block",
+  "typewriter",
+  "markdown-renderer",
 ];
 
 function parseArgs(argv) {

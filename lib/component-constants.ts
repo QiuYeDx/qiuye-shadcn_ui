@@ -13,6 +13,7 @@ export enum ComponentId {
   DUAL_STATE_TOGGLE = "dual-state-toggle",
   CODE_BLOCK = "code-block",
   TYPEWRITER = "typewriter",
+  MARKDOWN_RENDERER = "markdown-renderer",
 }
 
 // 组件 ID 数组，方便遍历
@@ -135,6 +136,21 @@ return (
   typingSpeed={90}
   loop
 />`,
+  },
+  [ComponentId.MARKDOWN_RENDERER]: {
+    import: `import { MarkdownRenderer } from "@/components/qiuye-ui/markdown-renderer";`,
+    usage: `const content = \`# MarkdownRenderer
+
+支持 **GFM**、表格、代码块、Mermaid 和图片预览。
+
+\`\`\`tsx title="hello.tsx" {2}
+export function Hello() {
+  return <span>Hello QiuYe UI</span>;
+}
+\`\`\`
+\`;
+
+return <MarkdownRenderer content={content} />;`,
   },
 };
 

@@ -48,6 +48,7 @@ import { ImageViewerDemo } from "@/components/qiuye-ui/demos/image-viewer-demo";
 import { DualStateToggleDemo } from "@/components/qiuye-ui/demos/dual-state-toggle-demo";
 import { CodeBlockDemo } from "@/components/qiuye-ui/demos/code-block-demo";
 import { TypewriterDemo } from "@/components/qiuye-ui/demos/typewriter-demo";
+import { MarkdownRendererDemo } from "@/components/qiuye-ui/demos/markdown-renderer-demo";
 
 // TODO: 新增 qiuye-ui 自定义组件时需要完善 demo 文件
 const demoComponents = {
@@ -58,6 +59,7 @@ const demoComponents = {
   [ComponentId.DUAL_STATE_TOGGLE]: DualStateToggleDemo,
   [ComponentId.CODE_BLOCK]: CodeBlockDemo,
   [ComponentId.TYPEWRITER]: TypewriterDemo,
+  [ComponentId.MARKDOWN_RENDERER]: MarkdownRendererDemo,
 };
 
 // 导入简单演示组件
@@ -69,6 +71,7 @@ import {
   DualStateToggleSimpleDemo,
   CodeBlockSimpleDemo,
   TypewriterSimpleDemo,
+  MarkdownRendererSimpleDemo,
 } from "./simple-demos";
 
 // 精简的单例演示组件
@@ -80,6 +83,7 @@ const simpleDemoComponents = {
   [ComponentId.DUAL_STATE_TOGGLE]: DualStateToggleSimpleDemo,
   [ComponentId.CODE_BLOCK]: CodeBlockSimpleDemo,
   [ComponentId.TYPEWRITER]: TypewriterSimpleDemo,
+  [ComponentId.MARKDOWN_RENDERER]: MarkdownRendererSimpleDemo,
 };
 
 // 简单的演示预览组件
