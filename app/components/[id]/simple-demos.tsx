@@ -17,6 +17,7 @@ import { DualStateToggle } from "@/components/qiuye-ui/dual-state-toggle";
 import { CodeBlock, CodeBlockPanel } from "@/components/qiuye-ui/code-block";
 import { Typewriter } from "@/components/qiuye-ui/typewriter";
 import { MarkdownRenderer } from "@/components/qiuye-ui/markdown-renderer";
+import { ColorPicker } from "@/components/qiuye-ui/color-picker";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Menu, X, Sun, Moon, Volume2, VolumeOff } from "lucide-react";
@@ -273,6 +274,18 @@ export function MarkdownRendererSimpleDemo() {
         codeBlockDisplayMode="scroll"
         codeBlockMaxHeight={180}
       />
+    </div>
+  );
+}
+
+// ColorPicker 简单演示
+export function ColorPickerSimpleDemo() {
+  const [color, setColor] = React.useState("#6366F1");
+
+  return (
+    <div className="flex items-center gap-4">
+      <ColorPicker value={color} onChange={setColor} />
+      <span className="text-sm font-mono text-muted-foreground">{color}</span>
     </div>
   );
 }

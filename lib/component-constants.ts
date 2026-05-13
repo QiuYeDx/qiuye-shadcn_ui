@@ -14,6 +14,7 @@ export enum ComponentId {
   CODE_BLOCK = "code-block",
   TYPEWRITER = "typewriter",
   MARKDOWN_RENDERER = "markdown-renderer",
+  COLOR_PICKER = "color-picker",
 }
 
 // 组件 ID 数组，方便遍历
@@ -151,6 +152,18 @@ export function Hello() {
 \`;
 
 return <MarkdownRenderer content={content} />;`,
+  },
+  [ComponentId.COLOR_PICKER]: {
+    import: `import { ColorPicker } from "@/components/qiuye-ui/color-picker";
+import { useState } from "react";`,
+    usage: `const [color, setColor] = useState("#6366F1");
+
+return (
+  <div className="flex items-center gap-4">
+    <ColorPicker value={color} onChange={setColor} />
+    <span className="font-mono text-sm">{color}</span>
+  </div>
+);`,
   },
 };
 

@@ -36,6 +36,23 @@
       ]
     },
     {
+      "name": "color-picker",
+      "type": "registry:component",
+      "title": "ColorPicker",
+      "author": "QiuYeDx <me@qiuyedx.com>",
+      "dependencies": [],
+      "registryDependencies": [
+        "popover",
+        "input"
+      ],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/color-picker.tsx"
+        }
+      ]
+    },
+    {
       "name": "dot-glass",
       "type": "registry:component",
       "title": "DotGlass",

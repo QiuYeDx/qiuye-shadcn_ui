@@ -612,6 +612,7 @@ export default function App() {
                                 ComponentId.CODE_BLOCK,
                                 ComponentId.TYPEWRITER,
                                 ComponentId.MARKDOWN_RENDERER,
+                                ComponentId.COLOR_PICKER,
                               ].map((component) => (
                                 <div
                                   key={component}

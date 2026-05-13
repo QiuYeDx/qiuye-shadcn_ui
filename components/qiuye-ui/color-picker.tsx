@@ -1,0 +1,783 @@
+"use client";
+
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  useMemo,
+} from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+
+/* ────────────────────────────────────────────────────────────── */
+/*  颜色转换工具                                                   */
+/* ────────────────────────────────────────────────────────────── */
+
+interface HSV {
+  h: number;
+  s: number;
+  v: number;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+function clampPercent(value: number): number {
+  return Math.round(clamp(value, 0, 100));
+}
+
+function clampHue(value: number): number {
+  return clamp(Math.round(value), 0, 360);
+}
+
+function hueForRgb(value: number): number {
+  const hue = clampHue(value);
+  return hue === 360 ? 0 : hue;
+}
+
+function sanitizeHsv(hsv: HSV): HSV {
+  return {
+    h: clampHue(hsv.h),
+    s: clampPercent(hsv.s),
+    v: clampPercent(hsv.v),
+  };
+}
+
+function preserveHueForAchromatic(next: HSV, fallbackHue: number): HSV {
+  const sanitized = sanitizeHsv(next);
+  if (sanitized.s === 0 || sanitized.v === 0) {
+    return { ...sanitized, h: clampHue(fallbackHue) };
+  }
+  return sanitized;
+}
+
+function getPaintRect(el: HTMLElement) {
+  const rect = el.getBoundingClientRect();
+  const styles = window.getComputedStyle(el);
+  const borderLeft = parseFloat(styles.borderLeftWidth) || 0;
+  const borderRight = parseFloat(styles.borderRightWidth) || 0;
+  const borderTop = parseFloat(styles.borderTopWidth) || 0;
+  const borderBottom = parseFloat(styles.borderBottomWidth) || 0;
+  const width = rect.width - borderLeft - borderRight;
+  const height = rect.height - borderTop - borderBottom;
+
+  if (width <= 0 || height <= 0) return null;
+
+  return {
+    left: rect.left + borderLeft,
+    top: rect.top + borderTop,
+    width,
+    height,
+  };
+}
+
+function rgbToHsv(r: number, g: number, b: number): HSV {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const delta = max - min;
+  let h = 0;
+  if (delta !== 0) {
+    switch (max) {
+      case r:
+        h = ((g - b) / delta) % 6;
+        break;
+      case g:
+        h = (b - r) / delta + 2;
+        break;
+      case b:
+        h = (r - g) / delta + 4;
+        break;
+    }
+    h *= 60;
+    if (h < 0) h += 360;
+  }
+  const roundedHue = Math.round(h);
+  return {
+    h: roundedHue === 360 ? 0 : roundedHue,
+    s: max === 0 ? 0 : Math.round((delta / max) * 100),
+    v: Math.round(max * 100),
+  };
+}
+
+function hsvToRgb(
+  h: number,
+  s: number,
+  v: number,
+): { r: number; g: number; b: number } {
+  s = clamp(s, 0, 100) / 100;
+  v = clamp(v, 0, 100) / 100;
+  h = hueForRgb(h) / 60;
+  const c = v * s;
+  const x = c * (1 - Math.abs((h % 2) - 1));
+  const m = v - c;
+  let r = 0,
+    g = 0,
+    b = 0;
+  if (h >= 0 && h < 1) {
+    r = c;
+    g = x;
+  } else if (h < 2) {
+    r = x;
+    g = c;
+  } else if (h < 3) {
+    g = c;
+    b = x;
+  } else if (h < 4) {
+    g = x;
+    b = c;
+  } else if (h < 5) {
+    r = x;
+    b = c;
+  } else if (h < 6) {
+    r = c;
+    b = x;
+  }
+  return {
+    r: Math.round((r + m) * 255),
+    g: Math.round((g + m) * 255),
+    b: Math.round((b + m) * 255),
+  };
+}
+
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return m
+    ? { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) }
+    : null;
+}
+
+function rgbToHex(r: number, g: number, b: number): string {
+  return `#${[r, g, b].map((c) => c.toString(16).padStart(2, "0")).join("")}`.toUpperCase();
+}
+
+function hexToHsv(hex: string): HSV | null {
+  const rgb = hexToRgb(hex);
+  return rgb ? rgbToHsv(rgb.r, rgb.g, rgb.b) : null;
+}
+
+function hsvToHex(h: number, s: number, v: number): string {
+  const { r, g, b } = hsvToRgb(h, s, v);
+  return rgbToHex(r, g, b);
+}
+
+/**
+ * 校验并规范化十六进制颜色字符串
+ * - 支持 3 位简写（`#RGB` → `#RRGGBB`）
+ * - 校验失败时回退到 fallback
+ */
+function normalizeHex(raw: string, fallback: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed) return fallback;
+  let hex = trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
+  if (/^#[0-9A-Fa-f]{3}$/.test(hex)) {
+    const [r, g, b] = hex.slice(1);
+    hex = `#${r}${r}${g}${g}${b}${b}`;
+  }
+  return /^#[0-9A-Fa-f]{6}$/.test(hex) ? hex.toUpperCase() : fallback;
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/*  默认预设色卡                                                   */
+/* ────────────────────────────────────────────────────────────── */
+
+const DEFAULT_PRESET_COLORS = [
+  // 灰度
+  "#000000", "#434343", "#666666", "#999999",
+  "#B7B7B7", "#CCCCCC", "#D9D9D9", "#FFFFFF",
+  // 饱和色
+  "#FF0000", "#FF9900", "#FFFF00", "#00FF00",
+  "#00FFFF", "#0000FF", "#9900FF", "#FF00FF",
+  // 浅色
+  "#F4CCCC", "#FCE5CD", "#FFF2CC", "#D9EAD3",
+  "#D0E0E3", "#CFE2F3", "#D9D2E9", "#EAD1DC",
+  // 中等色
+  "#E06666", "#F6B26B", "#FFD966", "#93C47D",
+  "#76A5AF", "#6FA8DC", "#8E7CC3", "#C27BA0",
+  // 深色
+  "#CC0000", "#E69138", "#F1C232", "#6AA84F",
+  "#45818E", "#3D85C6", "#674EA7", "#A64D79",
+];
+
+/* ────────────────────────────────────────────────────────────── */
+/*  内部子组件：SV 面板                                             */
+/* ────────────────────────────────────────────────────────────── */
+
+interface SvPanelProps {
+  hsv: HSV;
+  width: number;
+  height: number;
+  onChange: (s: number, v: number) => void;
+}
+
+function SvPanel({ hsv, width, height, onChange }: SvPanelProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
+
+  const update = useCallback(
+    (clientX: number, clientY: number) => {
+      const el = ref.current;
+      if (!el) return;
+      const rect = getPaintRect(el);
+      if (!rect) return;
+      const x = clamp(clientX - rect.left, 0, rect.width);
+      const y = clamp(clientY - rect.top, 0, rect.height);
+      onChange(
+        clampPercent((x / rect.width) * 100),
+        clampPercent(100 - (y / rect.height) * 100),
+      );
+    },
+    [onChange],
+  );
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      e.preventDefault();
+      dragging.current = true;
+      e.currentTarget.setPointerCapture(e.pointerId);
+      update(e.clientX, e.clientY);
+    },
+    [update],
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!dragging.current) return;
+      update(e.clientX, e.clientY);
+    },
+    [update],
+  );
+
+  const handlePointerEnd = useCallback((e: React.PointerEvent) => {
+    dragging.current = false;
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+  }, []);
+
+  const hueColor = hsvToHex(hsv.h, 100, 100);
+
+  return (
+    <div
+      ref={ref}
+      className="relative cursor-crosshair rounded-md border border-border overflow-hidden touch-none"
+      style={{
+        width,
+        height,
+        backgroundImage: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, ${hueColor})`,
+        backgroundClip: "padding-box",
+      }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerEnd}
+      onPointerCancel={handlePointerEnd}
+      onLostPointerCapture={handlePointerEnd}
+    >
+      <div
+        className="absolute size-3.5 rounded-full border-2 border-white pointer-events-none -translate-x-1/2 -translate-y-1/2"
+        style={{
+          left: `${clamp(hsv.s, 0, 100)}%`,
+          top: `${100 - clamp(hsv.v, 0, 100)}%`,
+          boxShadow:
+            "0 0 0 1px rgba(0,0,0,.3), inset 0 0 0 1px rgba(0,0,0,.15)",
+        }}
+      />
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/*  内部子组件：色相条                                               */
+/* ────────────────────────────────────────────────────────────── */
+
+interface HueSliderProps {
+  hue: number;
+  width: number;
+  onChange: (h: number) => void;
+}
+
+function HueSlider({ hue, width, onChange }: HueSliderProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
+
+  const update = useCallback(
+    (clientX: number) => {
+      const el = ref.current;
+      if (!el) return;
+      const rect = getPaintRect(el);
+      if (!rect) return;
+      const x = clamp(clientX - rect.left, 0, rect.width);
+      onChange(clampHue((x / rect.width) * 360));
+    },
+    [onChange],
+  );
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      e.preventDefault();
+      dragging.current = true;
+      e.currentTarget.setPointerCapture(e.pointerId);
+      update(e.clientX);
+    },
+    [update],
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!dragging.current) return;
+      update(e.clientX);
+    },
+    [update],
+  );
+
+  const handlePointerEnd = useCallback((e: React.PointerEvent) => {
+    dragging.current = false;
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+  }, []);
+
+  const handleHue = clampHue(hue);
+
+  return (
+    <div
+      ref={ref}
+      className="relative cursor-pointer rounded-md border border-border overflow-hidden touch-none"
+      style={{
+        width,
+        height: 14,
+        backgroundImage:
+          "linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)",
+        backgroundClip: "padding-box",
+      }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerEnd}
+      onPointerCancel={handlePointerEnd}
+      onLostPointerCapture={handlePointerEnd}
+    >
+      <div
+        className="absolute top-0 h-full w-1 rounded-sm border border-white/80 pointer-events-none -translate-x-1/2"
+        style={{
+          left: `${(handleHue / 360) * 100}%`,
+          boxShadow: "0 0 2px rgba(0,0,0,.4)",
+        }}
+      />
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/*  色块按钮                                                       */
+/* ────────────────────────────────────────────────────────────── */
+
+interface SwatchProps {
+  color: string;
+  active?: boolean;
+  size?: "sm" | "md";
+  onClick?: () => void;
+}
+
+function Swatch({ color, active, size = "md", onClick }: SwatchProps) {
+  const dim = size === "sm" ? "size-5" : "size-7";
+  const isLight = useMemo(() => {
+    const rgb = hexToRgb(color);
+    if (!rgb) return false;
+    return rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114 > 186;
+  }, [color]);
+
+  return (
+    <button
+      type="button"
+      className={cn(
+        dim,
+        "rounded-md border-2 cursor-pointer transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
+        active
+          ? "border-primary ring-1 ring-primary/40"
+          : isLight
+            ? "border-border"
+            : "border-transparent",
+      )}
+      style={{ backgroundColor: color }}
+      onClick={onClick}
+      title={color}
+    />
+  );
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/*  取色器面板（拆出来以便 popover / inline 复用）                      */
+/* ────────────────────────────────────────────────────────────── */
+
+interface ColorPickerPanelProps {
+  color: string;
+  hsv: HSV;
+  onHsvChange: (hsv: HSV) => void;
+  onColorSelect: (color: string) => void;
+  presetColors: string[] | false;
+  showRecent: boolean;
+  recentColors: string[];
+  showHexInput: boolean;
+  panelWidth: number;
+  panelHeight: number;
+}
+
+function ColorPickerPanel({
+  color,
+  hsv,
+  onHsvChange,
+  onColorSelect,
+  presetColors,
+  showRecent,
+  recentColors,
+  showHexInput,
+  panelWidth,
+  panelHeight,
+}: ColorPickerPanelProps) {
+  const [hexInput, setHexInput] = useState(color);
+
+  useEffect(() => {
+    setHexInput(color);
+  }, [color]);
+
+  const applyHex = useCallback(
+    (raw: string) => {
+      const validated = normalizeHex(raw, color);
+      setHexInput(validated);
+      if (validated !== color) {
+        onColorSelect(validated);
+      }
+    },
+    [color, onColorSelect],
+  );
+
+  const handleSvChange = useCallback(
+    (s: number, v: number) => {
+      const next: HSV = { ...hsv, s, v };
+      onHsvChange(next);
+    },
+    [hsv, onHsvChange],
+  );
+
+  const handleHueChange = useCallback(
+    (h: number) => {
+      const next: HSV = { ...hsv, h };
+      onHsvChange(next);
+    },
+    [hsv, onHsvChange],
+  );
+
+  return (
+    <div className="space-y-3" style={{ width: panelWidth }}>
+      {/* SV 面板 + 色相条 */}
+      <div className="space-y-2">
+        <SvPanel
+          hsv={hsv}
+          width={panelWidth}
+          height={panelHeight}
+          onChange={handleSvChange}
+        />
+        <HueSlider hue={hsv.h} width={panelWidth} onChange={handleHueChange} />
+      </div>
+
+      {/* Hex 输入 + 预览 */}
+      {showHexInput && (
+        <div className="flex items-center gap-2">
+          <div
+            className="size-8 shrink-0 rounded-md border border-border"
+            style={{ backgroundColor: color }}
+          />
+          <Input
+            value={hexInput}
+            onChange={(e) => setHexInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && applyHex(hexInput)}
+            onBlur={() => applyHex(hexInput)}
+            placeholder="#000000"
+            maxLength={7}
+            className="h-8 font-mono text-xs"
+          />
+        </div>
+      )}
+
+      {/* 预设色卡 */}
+      {presetColors !== false && presetColors.length > 0 && (
+        <div className="space-y-1.5">
+          <p className="text-[11px] font-medium text-muted-foreground">预设</p>
+          <div className="grid grid-cols-8 gap-1">
+            {presetColors.map((c) => (
+              <Swatch
+                key={c}
+                color={c}
+                active={color.toUpperCase() === c.toUpperCase()}
+                size="sm"
+                onClick={() => onColorSelect(c)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 最近使用 */}
+      {showRecent && recentColors.length > 0 && (
+        <div className="space-y-1.5">
+          <p className="text-[11px] font-medium text-muted-foreground">
+            最近使用
+          </p>
+          <div className="grid grid-cols-8 gap-1">
+            {recentColors.map((c) => (
+              <Swatch
+                key={c}
+                color={c}
+                active={color.toUpperCase() === c.toUpperCase()}
+                size="sm"
+                onClick={() => onColorSelect(c)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/*  主组件                                                         */
+/* ────────────────────────────────────────────────────────────── */
+
+const TRIGGER_SIZES = {
+  sm: "size-7",
+  md: "size-9",
+  lg: "size-11",
+} as const;
+
+/** ColorPicker 组件的属性 */
+export interface ColorPickerProps {
+  /**
+   * 当前颜色值（受控模式，十六进制格式如 `#FF0000`）
+   */
+  value?: string;
+  /**
+   * 默认颜色值（非受控模式）
+   * @default "#000000"
+   */
+  defaultValue?: string;
+  /**
+   * 颜色变化时的回调
+   */
+  onChange?: (color: string) => void;
+  /**
+   * 自定义预设色卡数组，传入 `false` 可隐藏预设区域
+   * @default DEFAULT_PRESET_COLORS
+   */
+  presetColors?: string[] | false;
+  /**
+   * 是否显示最近使用的颜色
+   * @default true
+   */
+  showRecent?: boolean;
+  /**
+   * 最近使用颜色的最大数量
+   * @default 16
+   */
+  maxRecentColors?: number;
+  /**
+   * 是否显示十六进制输入框
+   * @default true
+   */
+  showHexInput?: boolean;
+  /**
+   * 是否禁用
+   * @default false
+   */
+  disabled?: boolean;
+  /**
+   * 展示模式
+   * - `"popover"` 点击触发器弹出面板
+   * - `"inline"` 直接内嵌展示面板
+   * @default "popover"
+   */
+  mode?: "popover" | "inline";
+  /**
+   * 饱和度/亮度面板宽度（像素）
+   * @default 224
+   */
+  panelWidth?: number;
+  /**
+   * 饱和度/亮度面板高度（像素）
+   * @default 150
+   */
+  panelHeight?: number;
+  /**
+   * Popover 模式下触发器色块的尺寸
+   * @default "md"
+   */
+  triggerSize?: "sm" | "md" | "lg";
+  /**
+   * 触发器额外类名（仅 popover 模式）
+   */
+  triggerClassName?: string;
+  /**
+   * 面板容器额外类名
+   */
+  contentClassName?: string;
+  /**
+   * 根容器额外类名
+   */
+  className?: string;
+}
+
+/**
+ * ColorPicker — 通用取色器组件
+ *
+ * 基于 HSV 色彩模型的完整取色器：
+ * - 饱和度/亮度（SV）面板 + 色相条拖拽选色，支持鼠标与触屏
+ * - 十六进制颜色输入框（支持 3 位简写自动补全）
+ * - 内置 40 色预设色卡，支持自定义或隐藏
+ * - 自动记录最近使用颜色，方便快速回选
+ * - 支持 popover 弹出与 inline 内嵌两种布局模式
+ * - 受控 / 非受控双模式
+ *
+ * @example
+ * ```tsx
+ * <ColorPicker
+ *   defaultValue="#6366F1"
+ *   onChange={(color) => console.log(color)}
+ * />
+ * ```
+ */
+export function ColorPicker({
+  value: controlledValue,
+  defaultValue = "#000000",
+  onChange,
+  presetColors = DEFAULT_PRESET_COLORS,
+  showRecent = true,
+  maxRecentColors = 16,
+  showHexInput = true,
+  disabled = false,
+  mode = "popover",
+  panelWidth = 224,
+  panelHeight = 150,
+  triggerSize = "md",
+  triggerClassName,
+  contentClassName,
+  className,
+}: ColorPickerProps) {
+  const isControlled = controlledValue !== undefined;
+  const [internal, setInternal] = useState(
+    () => normalizeHex(controlledValue ?? defaultValue, "#000000"),
+  );
+  const color = isControlled
+    ? normalizeHex(controlledValue, "#000000")
+    : internal;
+
+  const [hsv, setHsv] = useState<HSV>(
+    () => hexToHsv(color) ?? { h: 0, s: 0, v: 0 },
+  );
+  const [recentColors, setRecentColors] = useState<string[]>([]);
+
+  // 同步外部受控值 → 内部 HSV
+  useEffect(() => {
+    const parsed = hexToHsv(color);
+    if (!parsed) return;
+    setHsv((prev) => {
+      const current = sanitizeHsv(prev);
+      if (hsvToHex(current.h, current.s, current.v) === color) {
+        return current;
+      }
+      return preserveHueForAchromatic(parsed, current.h);
+    });
+  }, [color]);
+
+  const commitColor = useCallback(
+    (hex: string) => {
+      const upper = hex.toUpperCase();
+      if (!isControlled) setInternal(upper);
+      onChange?.(upper);
+      setRecentColors((prev) => {
+        const next = [upper, ...prev.filter((c) => c !== upper)];
+        return next.slice(0, maxRecentColors);
+      });
+    },
+    [isControlled, onChange, maxRecentColors],
+  );
+
+  const handleHsvChange = useCallback(
+    (next: HSV) => {
+      const sanitized = sanitizeHsv(next);
+      setHsv(sanitized);
+      const hex = hsvToHex(sanitized.h, sanitized.s, sanitized.v);
+      commitColor(hex);
+    },
+    [commitColor],
+  );
+
+  const handleColorSelect = useCallback(
+    (hex: string) => {
+      const normalized = normalizeHex(hex, color);
+      const parsed = hexToHsv(normalized);
+      if (parsed) {
+        setHsv((prev) => preserveHueForAchromatic(parsed, prev.h));
+      }
+      commitColor(normalized);
+    },
+    [color, commitColor],
+  );
+
+  const panel = (
+    <ColorPickerPanel
+      color={color}
+      hsv={hsv}
+      onHsvChange={handleHsvChange}
+      onColorSelect={handleColorSelect}
+      presetColors={presetColors}
+      showRecent={showRecent}
+      recentColors={recentColors}
+      showHexInput={showHexInput}
+      panelWidth={panelWidth}
+      panelHeight={panelHeight}
+    />
+  );
+
+  if (mode === "inline") {
+    return (
+      <div className={cn("inline-block", className)}>
+        <div className={cn("p-1", contentClassName)}>{panel}</div>
+      </div>
+    );
+  }
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild disabled={disabled}>
+        <button
+          type="button"
+          className={cn(
+            TRIGGER_SIZES[triggerSize],
+            "rounded-md border-2 border-border shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+            triggerClassName,
+            className,
+          )}
+          style={{ backgroundColor: color }}
+          disabled={disabled}
+          aria-label={`当前颜色 ${color}`}
+        />
+      </PopoverTrigger>
+      <PopoverContent
+        className={cn("w-auto p-3", contentClassName)}
+        align="start"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        {panel}
+      </PopoverContent>
+    </Popover>
+  );
+}
