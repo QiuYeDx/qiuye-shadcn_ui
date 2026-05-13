@@ -1011,7 +1011,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Markdown Renderer",
     description:
       "通用 Markdown 渲染器：内置 Blog / Chat 两套预设，支持 GFM、标题锚点、代码块高亮、Mermaid 图表、图片预览、安全链接策略与可扩展 Widget 运行时。",
-    category: "内容展示",
+    category: "展示",
     dependencies: [
       "react-markdown",
       "remark-gfm",
