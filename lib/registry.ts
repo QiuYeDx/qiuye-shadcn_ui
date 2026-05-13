@@ -1164,7 +1164,7 @@ export const componentRegistry: ComponentRegistry = {
   [ComponentId.COLOR_PICKER]: {
     name: "Color Picker",
     description:
-      "通用取色器组件：基于 HSV 色彩模型的饱和度/亮度面板与色相条拖拽选色，支持触屏操作、十六进制输入、40 色预设色卡、最近使用颜色记录，提供 Popover 弹出与 Inline 内嵌两种布局模式。",
+      "通用取色器组件：基于 HSV 色彩模型的饱和度/亮度面板与色相条拖拽选色，支持可选透明度（Alpha）选择、触屏操作、十六进制输入、40 色预设色卡、最近使用颜色记录，提供 Popover 弹出与 Inline 内嵌两种布局模式。",
     category: "表单",
     dependencies: [],
     files: {
@@ -1175,7 +1175,8 @@ export const componentRegistry: ComponentRegistry = {
       {
         name: "value",
         type: "string",
-        description: "当前颜色值（受控模式，十六进制格式如 #FF0000）",
+        description:
+          "当前颜色值（受控模式）；showAlpha 关闭时使用 #RRGGBB，开启时支持 #RRGGBBAA",
         required: false,
       },
       {
@@ -1188,8 +1189,17 @@ export const componentRegistry: ComponentRegistry = {
       {
         name: "onChange",
         type: "(color: string) => void",
-        description: "颜色变化时的回调",
+        description:
+          "颜色变化时的回调；showAlpha 关闭时返回 #RRGGBB，开启时返回 #RRGGBBAA",
         required: false,
+      },
+      {
+        name: "showAlpha",
+        type: "boolean",
+        description:
+          "是否显示透明度（Alpha）选择，开启后面板增加透明度滑条及百分比输入",
+        required: false,
+        default: "false",
       },
       {
         name: "presetColors",
@@ -1282,6 +1292,8 @@ export const componentRegistry: ComponentRegistry = {
       "picker",
       "hsv",
       "hex",
+      "alpha",
+      "transparency",
       "palette",
       "swatch",
       "form",

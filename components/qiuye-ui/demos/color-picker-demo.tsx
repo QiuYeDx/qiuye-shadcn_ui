@@ -86,6 +86,39 @@ function CustomPresetsDemo() {
     />
   );
 }`,
+  alpha: `import { useState } from "react";
+import { ColorPicker } from "@/components/qiuye-ui/color-picker";
+
+function AlphaDemo() {
+  const [color, setColor] = useState("#6366F180");
+
+  return (
+    <div className="flex items-center gap-4">
+      <ColorPicker value={color} onChange={setColor} showAlpha />
+      <span className="text-sm font-mono">{color}</span>
+    </div>
+  );
+}`,
+  alphaInline: `import { useState } from "react";
+import { ColorPicker } from "@/components/qiuye-ui/color-picker";
+
+function AlphaInlineDemo() {
+  const [color, setColor] = useState("#3B82F6B3");
+
+  return (
+    <div className="space-y-3">
+      <ColorPicker
+        mode="inline"
+        value={color}
+        onChange={setColor}
+        showAlpha
+      />
+      <p className="text-sm text-muted-foreground">
+        当前颜色: <span className="font-mono">{color}</span>
+      </p>
+    </div>
+  );
+}`,
   noPresets: `import { ColorPicker } from "@/components/qiuye-ui/color-picker";
 
 function NoPresetsDemo() {
@@ -138,6 +171,8 @@ export function ColorPickerDemo() {
   const [bgColor, setBgColor] = useState("#6366F1");
   const [textColor, setTextColor] = useState("#FFFFFF");
   const [uncontrolledLog, setUncontrolledLog] = useState<string | null>(null);
+  const [alphaColor, setAlphaColor] = useState("#6366F180");
+  const [alphaInlineColor, setAlphaInlineColor] = useState("#3B82F6B3");
 
   const brandColors = [
     "#FF6900", "#FCB900", "#7BDCB5", "#00D084",
@@ -292,6 +327,69 @@ export function ColorPickerDemo() {
             <span className="text-sm font-mono text-muted-foreground">
               {customColor}
             </span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 透明度选择 */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="space-y-1.5">
+              <CardTitle>透明度选择</CardTitle>
+              <CardDescription>
+                启用 showAlpha 后可选择颜色透明度，输出 8 位十六进制格式
+                (#RRGGBBAA)
+              </CardDescription>
+            </div>
+            <ViewSourceButton
+              code={sourceCodes.alpha}
+              title="透明度选择 - 源码"
+            />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-4">
+            <ColorPicker
+              value={alphaColor}
+              onChange={setAlphaColor}
+              showAlpha
+            />
+            <span className="text-sm font-mono text-muted-foreground">
+              {alphaColor}
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 透明度 + 内嵌模式 */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="space-y-1.5">
+              <CardTitle>透明度 + 内嵌模式</CardTitle>
+              <CardDescription>
+                showAlpha 与 mode=&quot;inline&quot; 可组合使用
+              </CardDescription>
+            </div>
+            <ViewSourceButton
+              code={sourceCodes.alphaInline}
+              title="透明度内嵌模式 - 源码"
+            />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <ColorPicker
+              mode="inline"
+              value={alphaInlineColor}
+              onChange={setAlphaInlineColor}
+              showAlpha
+            />
+            <p className="text-sm text-muted-foreground">
+              当前颜色:{" "}
+              <code className="font-mono">{alphaInlineColor}</code>
+            </p>
           </div>
         </CardContent>
       </Card>

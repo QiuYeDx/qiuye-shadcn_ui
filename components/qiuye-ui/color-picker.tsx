@@ -37,6 +37,15 @@ function clampHue(value: number): number {
   return clamp(Math.round(value), 0, 360);
 }
 
+function clampAlpha(value: number): number {
+  return Math.round(clamp(value, 0, 100));
+}
+
+function alphaToHex(alpha: number): string {
+  const byte = Math.round((clamp(alpha, 0, 100) / 100) * 255);
+  return byte.toString(16).padStart(2, "0").toUpperCase();
+}
+
 function hueForRgb(value: number): number {
   const hue = clampHue(value);
   return hue === 360 ? 0 : hue;
@@ -150,7 +159,7 @@ function hsvToRgb(
 }
 
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})(?:[a-f\d]{2})?$/i.exec(hex);
   return m
     ? { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) }
     : null;
@@ -170,9 +179,17 @@ function hsvToHex(h: number, s: number, v: number): string {
   return rgbToHex(r, g, b);
 }
 
+function hexToRgbaString(hex: string, alpha: number): string {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return hex;
+  return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha / 100})`;
+}
+
 /**
- * 校验并规范化十六进制颜色字符串
+ * 校验并规范化十六进制颜色字符串（始终输出 6 位 `#RRGGBB`）
  * - 支持 3 位简写（`#RGB` → `#RRGGBB`）
+ * - 支持 4 位简写（`#RGBA` → 取前 3 位展开）
+ * - 支持 8 位（`#RRGGBBAA` → 截取前 6 位）
  * - 校验失败时回退到 fallback
  */
 function normalizeHex(raw: string, fallback: string): string {
@@ -183,7 +200,49 @@ function normalizeHex(raw: string, fallback: string): string {
     const [r, g, b] = hex.slice(1);
     hex = `#${r}${r}${g}${g}${b}${b}`;
   }
+  if (/^#[0-9A-Fa-f]{4}$/.test(hex)) {
+    const [r, g, b] = hex.slice(1);
+    hex = `#${r}${r}${g}${g}${b}${b}`;
+  }
+  if (/^#[0-9A-Fa-f]{8}$/.test(hex)) {
+    hex = hex.slice(0, 7);
+  }
   return /^#[0-9A-Fa-f]{6}$/.test(hex) ? hex.toUpperCase() : fallback;
+}
+
+/**
+ * 从任意格式的 hex 字符串解析出 6 位颜色和 alpha（0-100）
+ * - 支持 `#RGB` / `#RGBA` / `#RRGGBB` / `#RRGGBBAA`
+ */
+function parseHexColor(
+  raw: string,
+  fallback: string,
+): { hex6: string; alpha: number } {
+  const trimmed = raw.trim();
+  if (!trimmed) return { hex6: fallback, alpha: 100 };
+  const prefixed = trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
+
+  if (/^#[0-9A-Fa-f]{4}$/.test(prefixed)) {
+    const [r, g, b, a] = prefixed.slice(1);
+    return {
+      hex6: `#${r}${r}${g}${g}${b}${b}`.toUpperCase(),
+      alpha: clampAlpha(Math.round((parseInt(`${a}${a}`, 16) / 255) * 100)),
+    };
+  }
+
+  const m8 = /^#([0-9A-Fa-f]{6})([0-9A-Fa-f]{2})$/.exec(prefixed);
+  if (m8) {
+    return {
+      hex6: `#${m8[1]}`.toUpperCase(),
+      alpha: clampAlpha(Math.round((parseInt(m8[2], 16) / 255) * 100)),
+    };
+  }
+
+  return { hex6: normalizeHex(prefixed, fallback), alpha: 100 };
+}
+
+function buildHexWithAlpha(hex6: string, alpha: number): string {
+  return `${hex6}${alphaToHex(alpha)}`;
 }
 
 /* ────────────────────────────────────────────────────────────── */
@@ -207,6 +266,14 @@ const DEFAULT_PRESET_COLORS = [
   "#CC0000", "#E69138", "#F1C232", "#6AA84F",
   "#45818E", "#3D85C6", "#674EA7", "#A64D79",
 ];
+
+const CHECKERBOARD_STYLE: React.CSSProperties = {
+  backgroundColor: "#fff",
+  backgroundImage:
+    "linear-gradient(45deg, #e0e0e0 25%, transparent 25%, transparent 75%, #e0e0e0 75%), linear-gradient(45deg, #e0e0e0 25%, transparent 25%, transparent 75%, #e0e0e0 75%)",
+  backgroundSize: "8px 8px",
+  backgroundPosition: "0 0, 4px 4px",
+};
 
 /* ────────────────────────────────────────────────────────────── */
 /*  内部子组件：SV 面板                                             */
@@ -377,6 +444,96 @@ function HueSlider({ hue, width, onChange }: HueSliderProps) {
 }
 
 /* ────────────────────────────────────────────────────────────── */
+/*  内部子组件：透明度条                                              */
+/* ────────────────────────────────────────────────────────────── */
+
+interface AlphaSliderProps {
+  alpha: number;
+  solidColor: string;
+  width: number;
+  onChange: (alpha: number) => void;
+}
+
+function AlphaSlider({
+  alpha,
+  solidColor,
+  width,
+  onChange,
+}: AlphaSliderProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
+
+  const update = useCallback(
+    (clientX: number) => {
+      const el = ref.current;
+      if (!el) return;
+      const rect = getPaintRect(el);
+      if (!rect) return;
+      const x = clamp(clientX - rect.left, 0, rect.width);
+      onChange(clampAlpha((x / rect.width) * 100));
+    },
+    [onChange],
+  );
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      e.preventDefault();
+      dragging.current = true;
+      e.currentTarget.setPointerCapture(e.pointerId);
+      update(e.clientX);
+    },
+    [update],
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!dragging.current) return;
+      update(e.clientX);
+    },
+    [update],
+  );
+
+  const handlePointerEnd = useCallback((e: React.PointerEvent) => {
+    dragging.current = false;
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+  }, []);
+
+  const handleAlpha = clamp(alpha, 0, 100);
+
+  return (
+    <div
+      className="relative cursor-pointer rounded-md overflow-hidden touch-none"
+      style={{ width, height: 14 }}
+    >
+      <div className="absolute inset-0 rounded-md" style={CHECKERBOARD_STYLE} />
+      <div
+        ref={ref}
+        className="absolute inset-0 rounded-md border border-border"
+        style={{
+          backgroundImage: `linear-gradient(to right, transparent, ${solidColor})`,
+          backgroundClip: "padding-box",
+        }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerEnd}
+        onPointerCancel={handlePointerEnd}
+        onLostPointerCapture={handlePointerEnd}
+      >
+        <div
+          className="absolute top-0 h-full w-1 rounded-sm border border-white/80 pointer-events-none -translate-x-1/2"
+          style={{
+            left: `${handleAlpha}%`,
+            boxShadow: "0 0 2px rgba(0,0,0,.4)",
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────── */
 /*  色块按钮                                                       */
 /* ────────────────────────────────────────────────────────────── */
 
@@ -427,6 +584,9 @@ interface ColorPickerPanelProps {
   showRecent: boolean;
   recentColors: string[];
   showHexInput: boolean;
+  showAlpha: boolean;
+  alpha: number;
+  onAlphaChange: (alpha: number) => void;
   panelWidth: number;
   panelHeight: number;
 }
@@ -440,14 +600,22 @@ function ColorPickerPanel({
   showRecent,
   recentColors,
   showHexInput,
+  showAlpha,
+  alpha,
+  onAlphaChange,
   panelWidth,
   panelHeight,
 }: ColorPickerPanelProps) {
   const [hexInput, setHexInput] = useState(color);
+  const [alphaInput, setAlphaInput] = useState(String(alpha));
 
   useEffect(() => {
     setHexInput(color);
   }, [color]);
+
+  useEffect(() => {
+    setAlphaInput(String(alpha));
+  }, [alpha]);
 
   const applyHex = useCallback(
     (raw: string) => {
@@ -458,6 +626,18 @@ function ColorPickerPanel({
       }
     },
     [color, onColorSelect],
+  );
+
+  const applyAlpha = useCallback(
+    (raw: string) => {
+      const num = parseInt(raw, 10);
+      const validated = isNaN(num) ? alpha : clampAlpha(num);
+      setAlphaInput(String(validated));
+      if (validated !== alpha) {
+        onAlphaChange(validated);
+      }
+    },
+    [alpha, onAlphaChange],
   );
 
   const handleSvChange = useCallback(
@@ -478,7 +658,7 @@ function ColorPickerPanel({
 
   return (
     <div className="space-y-3" style={{ width: panelWidth }}>
-      {/* SV 面板 + 色相条 */}
+      {/* SV 面板 + 色相条 + 透明度条 */}
       <div className="space-y-2">
         <SvPanel
           hsv={hsv}
@@ -487,15 +667,43 @@ function ColorPickerPanel({
           onChange={handleSvChange}
         />
         <HueSlider hue={hsv.h} width={panelWidth} onChange={handleHueChange} />
+        {showAlpha && (
+          <AlphaSlider
+            alpha={alpha}
+            solidColor={hsvToHex(hsv.h, hsv.s, hsv.v)}
+            width={panelWidth}
+            onChange={onAlphaChange}
+          />
+        )}
       </div>
 
-      {/* Hex 输入 + 预览 */}
+      {/* Hex 输入 + 预览 + 透明度输入 */}
       {showHexInput && (
         <div className="flex items-center gap-2">
           <div
-            className="size-8 shrink-0 rounded-md border border-border"
-            style={{ backgroundColor: color }}
-          />
+            className={cn(
+              "size-8 shrink-0 rounded-md border border-border",
+              showAlpha && "relative overflow-hidden",
+            )}
+            style={
+              showAlpha ? undefined : { backgroundColor: color }
+            }
+          >
+            {showAlpha && (
+              <>
+                <div
+                  className="absolute inset-0"
+                  style={CHECKERBOARD_STYLE}
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    backgroundColor: hexToRgbaString(color, alpha),
+                  }}
+                />
+              </>
+            )}
+          </div>
           <Input
             value={hexInput}
             onChange={(e) => setHexInput(e.target.value)}
@@ -505,6 +713,20 @@ function ColorPickerPanel({
             maxLength={7}
             className="h-8 font-mono text-xs"
           />
+          {showAlpha && (
+            <div className="flex items-center gap-0.5 shrink-0">
+              <Input
+                value={alphaInput}
+                onChange={(e) => setAlphaInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && applyAlpha(alphaInput)}
+                onBlur={() => applyAlpha(alphaInput)}
+                className="h-8 w-12 font-mono text-xs text-center px-1"
+              />
+              <span className="text-xs text-muted-foreground select-none">
+                %
+              </span>
+            </div>
+          )}
         </div>
       )}
 
@@ -562,7 +784,9 @@ const TRIGGER_SIZES = {
 /** ColorPicker 组件的属性 */
 export interface ColorPickerProps {
   /**
-   * 当前颜色值（受控模式，十六进制格式如 `#FF0000`）
+   * 当前颜色值（受控模式）
+   * - `showAlpha = false` 时使用 6 位十六进制格式（如 `#FF0000`）
+   * - `showAlpha = true` 时支持 8 位十六进制格式（如 `#FF000080`），也兼容 6 位输入
    */
   value?: string;
   /**
@@ -572,8 +796,17 @@ export interface ColorPickerProps {
   defaultValue?: string;
   /**
    * 颜色变化时的回调
+   * - `showAlpha = false` 时返回 `#RRGGBB` 格式
+   * - `showAlpha = true` 时返回 `#RRGGBBAA` 格式
    */
   onChange?: (color: string) => void;
+  /**
+   * 是否显示透明度（Alpha）选择
+   * - 开启后面板底部增加透明度滑条及百分比输入
+   * - `onChange` 返回值变为 8 位十六进制格式（`#RRGGBBAA`）
+   * @default false
+   */
+  showAlpha?: boolean;
   /**
    * 自定义预设色卡数组，传入 `false` 可隐藏预设区域
    * @default DEFAULT_PRESET_COLORS
@@ -640,6 +873,7 @@ export interface ColorPickerProps {
  *
  * 基于 HSV 色彩模型的完整取色器：
  * - 饱和度/亮度（SV）面板 + 色相条拖拽选色，支持鼠标与触屏
+ * - 可选透明度（Alpha）滑条，支持百分比输入与棋盘格预览
  * - 十六进制颜色输入框（支持 3 位简写自动补全）
  * - 内置 40 色预设色卡，支持自定义或隐藏
  * - 自动记录最近使用颜色，方便快速回选
@@ -653,11 +887,18 @@ export interface ColorPickerProps {
  *   onChange={(color) => console.log(color)}
  * />
  * ```
+ *
+ * @example
+ * ```tsx
+ * // 开启透明度选择，onChange 返回 8 位十六进制格式
+ * <ColorPicker showAlpha defaultValue="#6366F180" />
+ * ```
  */
 export function ColorPicker({
   value: controlledValue,
   defaultValue = "#000000",
   onChange,
+  showAlpha = false,
   presetColors = DEFAULT_PRESET_COLORS,
   showRecent = true,
   maxRecentColors = 16,
@@ -672,11 +913,20 @@ export function ColorPicker({
   className,
 }: ColorPickerProps) {
   const isControlled = controlledValue !== undefined;
-  const [internal, setInternal] = useState(
-    () => normalizeHex(controlledValue ?? defaultValue, "#000000"),
+
+  const initialParsed = useMemo(
+    () => parseHexColor(controlledValue ?? defaultValue, "#000000"),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
+
+  const [internal, setInternal] = useState(initialParsed.hex6);
+  const [alpha, setAlpha] = useState<number>(
+    showAlpha ? initialParsed.alpha : 100,
+  );
+
   const color = isControlled
-    ? normalizeHex(controlledValue, "#000000")
+    ? parseHexColor(controlledValue!, "#000000").hex6
     : internal;
 
   const [hsv, setHsv] = useState<HSV>(
@@ -697,17 +947,25 @@ export function ColorPicker({
     });
   }, [color]);
 
+  // 同步外部受控值 → 内部 alpha
+  useEffect(() => {
+    if (!showAlpha || !isControlled || controlledValue === undefined) return;
+    const { alpha: newAlpha } = parseHexColor(controlledValue, "#000000");
+    setAlpha(newAlpha);
+  }, [showAlpha, isControlled, controlledValue]);
+
   const commitColor = useCallback(
-    (hex: string) => {
+    (hex: string, currentAlpha: number = alpha) => {
       const upper = hex.toUpperCase();
       if (!isControlled) setInternal(upper);
-      onChange?.(upper);
+      const output = showAlpha ? buildHexWithAlpha(upper, currentAlpha) : upper;
+      onChange?.(output);
       setRecentColors((prev) => {
         const next = [upper, ...prev.filter((c) => c !== upper)];
         return next.slice(0, maxRecentColors);
       });
     },
-    [isControlled, onChange, maxRecentColors],
+    [isControlled, onChange, maxRecentColors, showAlpha, alpha],
   );
 
   const handleHsvChange = useCallback(
@@ -718,6 +976,15 @@ export function ColorPicker({
       commitColor(hex);
     },
     [commitColor],
+  );
+
+  const handleAlphaChange = useCallback(
+    (newAlpha: number) => {
+      const clamped = clampAlpha(newAlpha);
+      setAlpha(clamped);
+      commitColor(color, clamped);
+    },
+    [color, commitColor],
   );
 
   const handleColorSelect = useCallback(
@@ -742,10 +1009,15 @@ export function ColorPicker({
       showRecent={showRecent}
       recentColors={recentColors}
       showHexInput={showHexInput}
+      showAlpha={showAlpha}
+      alpha={alpha}
+      onAlphaChange={handleAlphaChange}
       panelWidth={panelWidth}
       panelHeight={panelHeight}
     />
   );
+
+  const outputColor = showAlpha ? buildHexWithAlpha(color, alpha) : color;
 
   if (mode === "inline") {
     return (
@@ -762,14 +1034,30 @@ export function ColorPicker({
           type="button"
           className={cn(
             TRIGGER_SIZES[triggerSize],
+            showAlpha && "relative overflow-hidden",
             "rounded-md border-2 border-border shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
             triggerClassName,
             className,
           )}
-          style={{ backgroundColor: color }}
+          style={showAlpha ? undefined : { backgroundColor: color }}
           disabled={disabled}
-          aria-label={`当前颜色 ${color}`}
-        />
+          aria-label={`当前颜色 ${outputColor}`}
+        >
+          {showAlpha && (
+            <>
+              <div
+                className="absolute inset-0"
+                style={CHECKERBOARD_STYLE}
+              />
+              <div
+                className="absolute inset-0"
+                style={{
+                  backgroundColor: hexToRgbaString(color, alpha),
+                }}
+              />
+            </>
+          )}
+        </button>
       </PopoverTrigger>
       <PopoverContent
         className={cn("w-auto p-3", contentClassName)}
