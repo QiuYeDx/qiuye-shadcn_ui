@@ -5,13 +5,6 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { ArrowLeft, Copy, CheckCircle, Code } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { CodeBlock as CodeBlockDisplay } from "@/components/qiuye-ui/code-block";
 import {
   ResponsiveTabs,
@@ -73,7 +66,7 @@ function PackageManagerSelector() {
   const { packageManager, setPackageManager } = usePackageManager();
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       <span className="text-sm text-muted-foreground shrink-0">包管理器:</span>
       <ResponsiveTabs
         value={packageManager}
@@ -138,14 +131,16 @@ export function CopyCommandButton({ cliName }: CopyCommandButtonProps) {
     <div className="space-y-3">
       <PackageManagerSelector />
 
-      <div className="bg-muted/50 rounded-lg p-3">
-        <div className="flex items-center justify-between">
-          <code className="text-sm font-mono">{generateCommand()}</code>
+      <div className="rounded-md bg-background/70 p-3 ring-1 ring-border/60">
+        <div className="flex min-w-0 items-center gap-2">
+          <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap text-xs font-mono sm:text-sm">
+            {generateCommand()}
+          </code>
           <Button
             onClick={handleCopyCommand}
             size="sm"
             variant="ghost"
-            className="h-6 w-6 p-0"
+            className="h-6 w-6 shrink-0 p-0"
           >
             {copiedCommand ? (
               <CheckCircle className="h-3 w-3 text-green-500" />
@@ -318,9 +313,9 @@ export function DependenciesSection({
         {dependencies.map((dep) => (
           <div
             key={dep}
-            className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+            className="flex min-w-0 items-center justify-between gap-2 rounded-md bg-muted/50 p-3"
           >
-            <code className="font-mono text-sm">{dep}</code>
+            <code className="min-w-0 truncate font-mono text-sm">{dep}</code>
             <CopyDependencyButton dependency={dep} />
           </div>
         ))}
@@ -358,31 +353,39 @@ export function BasicUsageBlock({
   const isDark = resolvedTheme === "dark";
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">基本用法</CardTitle>
-        <CardDescription>使用 {componentName} 组件的基础示例</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div>
-            <h4 className="text-sm font-medium mb-2 text-muted-foreground">
-              导入组件
-            </h4>
-            <CodeBlockDisplay language="tsx" isDark={isDark} className="[&_pre]:my-0!">
-              {importCode}
-            </CodeBlockDisplay>
-          </div>
-          <div>
-            <h4 className="text-sm font-medium mb-2 text-muted-foreground">
-              使用组件
-            </h4>
-            <CodeBlockDisplay language="tsx" isDark={isDark} className="[&_pre]:my-0!">
-              {usageCode}
-            </CodeBlockDisplay>
-          </div>
+    <section className="space-y-3">
+      <div>
+        <h2 className="text-lg font-semibold">基本用法</h2>
+        <p className="text-sm text-muted-foreground">
+          使用 {componentName} 组件的基础示例
+        </p>
+      </div>
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-sm font-medium mb-2 text-muted-foreground">
+            导入组件
+          </h3>
+          <CodeBlockDisplay
+            language="tsx"
+            isDark={isDark}
+            className="[&_pre]:my-0!"
+          >
+            {importCode}
+          </CodeBlockDisplay>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 className="text-sm font-medium mb-2 text-muted-foreground">
+            使用组件
+          </h3>
+          <CodeBlockDisplay
+            language="tsx"
+            isDark={isDark}
+            className="[&_pre]:my-0!"
+          >
+            {usageCode}
+          </CodeBlockDisplay>
+        </div>
+      </div>
+    </section>
   );
 }
