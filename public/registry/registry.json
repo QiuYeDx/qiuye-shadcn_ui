@@ -267,6 +267,26 @@
       ]
     },
     {
+      "name": "tour",
+      "type": "registry:component",
+      "title": "Tour",
+      "author": "QiuYeDx <me@qiuyedx.com>",
+      "dependencies": [
+        "motion",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "badge"
+      ],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/tour.tsx"
+        }
+      ]
+    },
+    {
       "name": "typewriter",
       "type": "registry:component",
       "title": "Typewriter",

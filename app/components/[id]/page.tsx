@@ -50,6 +50,7 @@ import { CodeBlockDemo } from "@/components/qiuye-ui/demos/code-block-demo";
 import { TypewriterDemo } from "@/components/qiuye-ui/demos/typewriter-demo";
 import { MarkdownRendererDemo } from "@/components/qiuye-ui/demos/markdown-renderer-demo";
 import { ColorPickerDemo } from "@/components/qiuye-ui/demos/color-picker-demo";
+import { TourDemo } from "@/components/qiuye-ui/demos/tour-demo";
 
 // TODO: 新增 qiuye-ui 自定义组件时需要完善 demo 文件
 const demoComponents = {
@@ -62,6 +63,7 @@ const demoComponents = {
   [ComponentId.TYPEWRITER]: TypewriterDemo,
   [ComponentId.MARKDOWN_RENDERER]: MarkdownRendererDemo,
   [ComponentId.COLOR_PICKER]: ColorPickerDemo,
+  [ComponentId.TOUR]: TourDemo,
 };
 
 // 导入简单演示组件
@@ -75,6 +77,7 @@ import {
   TypewriterSimpleDemo,
   MarkdownRendererSimpleDemo,
   ColorPickerSimpleDemo,
+  TourSimpleDemo,
 } from "./simple-demos";
 
 // 精简的单例演示组件
@@ -88,6 +91,7 @@ const simpleDemoComponents = {
   [ComponentId.TYPEWRITER]: TypewriterSimpleDemo,
   [ComponentId.MARKDOWN_RENDERER]: MarkdownRendererSimpleDemo,
   [ComponentId.COLOR_PICKER]: ColorPickerSimpleDemo,
+  [ComponentId.TOUR]: TourSimpleDemo,
 };
 
 // 简单的演示预览组件

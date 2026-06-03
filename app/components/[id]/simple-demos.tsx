@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useTheme } from "next-themes";
 import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
 import {
   ScrollableDialog,
@@ -18,9 +17,19 @@ import { CodeBlock, CodeBlockPanel } from "@/components/qiuye-ui/code-block";
 import { Typewriter } from "@/components/qiuye-ui/typewriter";
 import { MarkdownRenderer } from "@/components/qiuye-ui/markdown-renderer";
 import { ColorPicker } from "@/components/qiuye-ui/color-picker";
+import { Tour, type TourStep } from "@/components/qiuye-ui/tour";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Menu, X, Sun, Moon, Volume2, VolumeOff } from "lucide-react";
+import {
+  FolderKanban,
+  Menu,
+  Search,
+  Sun,
+  Moon,
+  Volume2,
+  VolumeOff,
+  X,
+} from "lucide-react";
 
 // ResponsiveTabs 简单演示
 export function ResponsiveTabsSimpleDemo() {
@@ -286,6 +295,76 @@ export function ColorPickerSimpleDemo() {
     <div className="flex items-center gap-4">
       <ColorPicker value={color} onChange={setColor} />
       <span className="text-sm font-mono text-muted-foreground">{color}</span>
+    </div>
+  );
+}
+
+// Tour 简单演示
+export function TourSimpleDemo() {
+  const [open, setOpen] = React.useState(false);
+  const steps = React.useMemo<TourStep[]>(
+    () => [
+      {
+        target: "#tour-simple-search",
+        title: "Search",
+        content: "Use this field to jump across your workspace.",
+        placement: "bottom",
+      },
+      {
+        target: "#tour-simple-projects",
+        title: "Projects",
+        content: "Track the most important project status from this card.",
+        placement: "top",
+      },
+    ],
+    []
+  );
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button type="button" size="sm" onClick={() => setOpen(true)}>
+          Start tour
+        </Button>
+      </div>
+
+      <div className="grid gap-3 rounded-lg border bg-muted/20 p-3">
+        <div
+          id="tour-simple-search"
+          className="flex min-h-11 items-center gap-2 rounded-md border bg-background px-3 text-sm text-muted-foreground"
+        >
+          <Search className="size-4" />
+          Search workspace
+        </div>
+
+        <div
+          id="tour-simple-projects"
+          className="rounded-md border bg-background p-4"
+        >
+          <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
+            <FolderKanban className="size-4 text-primary" />
+            Project health
+          </div>
+          <div className="grid gap-2 sm:grid-cols-3">
+            {["Design", "Build", "Review"].map((item, index) => (
+              <div
+                key={item}
+                className="rounded-md bg-muted/60 px-3 py-2 text-xs"
+              >
+                <div className="font-medium">{item}</div>
+                <div className="mt-2 h-1.5 rounded-full bg-background">
+                  <div
+                    className="h-full rounded-full bg-primary"
+                    style={{ width: `${72 - index * 16}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <Tour open={open} onOpenChange={setOpen} steps={steps} />
     </div>
   );
 }

@@ -15,6 +15,7 @@ export enum ComponentId {
   TYPEWRITER = "typewriter",
   MARKDOWN_RENDERER = "markdown-renderer",
   COLOR_PICKER = "color-picker",
+  TOUR = "tour",
 }
 
 // 组件 ID 数组，方便遍历
@@ -163,6 +164,36 @@ return (
     <ColorPicker value={color} onChange={setColor} />
     <span className="font-mono text-sm">{color}</span>
   </div>
+);`,
+  },
+  [ComponentId.TOUR]: {
+    import: `import { Tour } from "@/components/qiuye-ui/tour";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";`,
+    usage: `const [open, setOpen] = useState(false);
+
+return (
+  <>
+    <Button onClick={() => setOpen(true)}>Start tour</Button>
+    <Tour
+      open={open}
+      onOpenChange={setOpen}
+      steps={[
+        {
+          target: "#sidebar",
+          title: "Navigation",
+          content: "Browse your projects here.",
+          placement: "right",
+        },
+        {
+          target: "#search",
+          title: "Search",
+          content: "Find anything in your workspace.",
+          placement: "bottom",
+        },
+      ]}
+    />
+  </>
 );`,
   },
 };
