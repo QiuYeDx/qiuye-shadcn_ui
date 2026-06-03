@@ -1077,7 +1077,7 @@ export function Tour({
                       transition={
                         prefersReducedMotion
                           ? reducedTransition
-                          : { duration: 0.16, ease: "easeOut" }
+                          : layoutTransition
                       }
                     >
                       {activeStep.content}
