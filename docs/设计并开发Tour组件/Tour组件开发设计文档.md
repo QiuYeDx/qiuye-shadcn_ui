@@ -343,7 +343,7 @@ const tourTransition = {
 - portal 根节点使用 `AnimatePresence` 淡入淡出。
 - spotlight 首次进入从 `opacity: 0` 到 `opacity: 1`，退出时淡出。
 - popover 首次进入轻微 `opacity + scale + y`，步骤切换主要交给 `layoutId` 迁移。
-- 内容区内部可使用 `AnimatePresence mode="wait"` 轻微 fade，避免文字跳变。
+- 内容区内部使用参与 layout 的容器 + `AnimatePresence mode="popLayout"`，让新内容立即进入布局、旧内容弹出淡出，从而让 popover 高度在内容行数变化时平滑过渡。
 
 无障碍动效：
 

@@ -197,9 +197,8 @@ const ARROW_SAFE_OFFSET = 18;
 
 const layoutTransition = {
   type: "spring" as const,
-  stiffness: 420,
-  damping: 34,
-  mass: 0.75,
+  duration: 0.5,
+  bounce: 0,
 };
 
 const reducedTransition = {
@@ -1028,8 +1027,16 @@ export function Tour({
                 />
               )}
 
-              <div className="relative z-10 space-y-4 p-4">
-                <div className="flex items-start justify-between gap-3">
+              <motion.div
+                layout
+                className="relative z-10 space-y-4 p-4"
+                transition={transition}
+              >
+                <motion.div
+                  layout
+                  className="flex items-start justify-between gap-3"
+                  transition={transition}
+                >
                   <div className="min-w-0 space-y-1">
                     <h2
                       id={titleId}
@@ -1047,36 +1054,55 @@ export function Tour({
                   >
                     {stepIndex + 1} / {steps.length}
                   </Badge>
-                </div>
+                </motion.div>
 
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.div
-                    key={stepKey}
-                    id={contentId}
-                    className="text-sm leading-6 text-muted-foreground"
-                    initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -4 }}
-                    transition={prefersReducedMotion ? reducedTransition : { duration: 0.16 }}
-                  >
-                    {activeStep.content}
-                    {missingTarget && (
-                      <p className="mt-2 rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
-                        当前目标暂不可见，你仍然可以继续下一步或跳过引导。
-                      </p>
-                    )}
-                  </motion.div>
-                </AnimatePresence>
+                <motion.div
+                  layout
+                  className="relative overflow-hidden"
+                  transition={transition}
+                >
+                  <AnimatePresence mode="popLayout" initial={false}>
+                    <motion.div
+                      layout
+                      key={stepKey}
+                      id={contentId}
+                      className="text-sm leading-6 text-muted-foreground"
+                      initial={
+                        prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 4 }
+                      }
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={
+                        prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -4 }
+                      }
+                      transition={
+                        prefersReducedMotion
+                          ? reducedTransition
+                          : { duration: 0.16, ease: "easeOut" }
+                      }
+                    >
+                      {activeStep.content}
+                      {missingTarget && (
+                        <p className="mt-2 rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
+                          当前目标暂不可见，你仍然可以继续下一步或跳过引导。
+                        </p>
+                      )}
+                    </motion.div>
+                  </AnimatePresence>
+                </motion.div>
 
                 {renderFooter && renderContext ? (
                   renderFooter(renderContext)
                 ) : (
-                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                  <motion.div
+                    layout
+                    className="flex flex-wrap items-center justify-between gap-2 pt-1"
+                    transition={transition}
+                  >
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="h-8 gap-1.5 px-2 text-muted-foreground"
+                      className="h-8 gap-1.5 px-2 text-muted-foreground cursor-pointer"
                       onClick={skip}
                     >
                       <X className="size-3.5" />
@@ -1088,7 +1114,7 @@ export function Tour({
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="h-8 gap-1.5 px-2.5"
+                        className="h-8 gap-1.5 px-2.5 cursor-pointer"
                         disabled={isFirstStep}
                         onClick={previous}
                       >
@@ -1098,16 +1124,16 @@ export function Tour({
                       <Button
                         type="button"
                         size="sm"
-                        className="h-8 gap-1.5 px-3"
+                        className="h-8 gap-1.5 px-3 cursor-pointer"
                         onClick={next}
                       >
                         {isLastStep ? "Done" : "Next"}
                         {!isLastStep && <ChevronRight className="size-3.5" />}
                       </Button>
                     </div>
-                  </div>
+                  </motion.div>
                 )}
-              </div>
+              </motion.div>
             </motion.div>
           )}
         </LayoutGroup>
