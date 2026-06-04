@@ -28,6 +28,7 @@
 | REG-1 Registry 与站点接入 | 已完成 | 2026-06-03 | `lib/component-constants.ts`, `lib/registry.ts`, `app/components/[id]/page.tsx`, `app/cli/page.tsx`, `public/registry/tour.json`, `public/registry/registry.json` | `pnpm update-registry`, `pnpm update-registry:dry` | `docs/设计并开发Tour组件/Tour组件实施记录/2026-06-03_FE-1-REG-1_Tour组件完整实现.md` | 无 |
 | QA-1 本地验证 | 已完成 | 2026-06-03 | - | `pnpm lint`, `pnpm build`, `pnpm update-registry:dry` | `docs/设计并开发Tour组件/Tour组件实施记录/2026-06-03_FE-1-REG-1_Tour组件完整实现.md` | `pnpm lint` / `pnpm build` 仍显示项目既有未使用 import warning，无新增错误 |
 | FIX-1 Popover 高度切换突变修复 | 已完成 | 2026-06-03 | `components/qiuye-ui/tour.tsx`, `public/registry/tour.json` | `pnpm lint`, `pnpm build`, `pnpm update-registry` | `docs/设计并开发Tour组件/fix/2026-06-03_tour_popover-height-transition.md` | 无 |
+| FIX-2 自动滚动与 Motion 位移交接优化 | 已完成 | 2026-06-04 | `components/qiuye-ui/tour.tsx`, `components/qiuye-ui/demos/tour-demo.tsx`, `public/registry/tour.json` | `pnpm lint`, `pnpm build`, `pnpm update-registry`, `pnpm update-registry:dry` | `docs/设计并开发Tour组件/fix/2026-06-04_tour-scroll-motion-handoff.md` | 无 |
 
 ## 工程约束
 

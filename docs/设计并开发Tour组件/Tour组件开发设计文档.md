@@ -1,6 +1,7 @@
 # Tour 组件开发设计文档
 
 创建日期：2026-06-03
+更新日期：2026-06-04
 
 ## 需求摘要
 
@@ -355,13 +356,15 @@ const tourTransition = {
 组件内部状态分为：
 
 - `resolvedOpen`：受控/非受控合并后的打开状态。
-- `resolvedStepIndex`：受控/非受控合并后的当前步骤。
-- `activeStep`：根据 `resolvedStepIndex` 从 `steps` 读取。
+- `resolvedStepIndex`：受控/非受控合并后的逻辑步骤，步骤变化回调以它为准。
+- `visualStepIndex`：当前真正渲染在屏幕上的视觉步骤；自动滚动期间暂时保持旧步骤。
+- `activeStep`：根据 `visualStepIndex` 从 `steps` 读取，用于渲染完整的 spotlight、popover 与内容。
 - `targetElement`：当前步骤解析出来的 DOM 元素。
 - `targetRect`：目标元素的 viewport rect。
 - `spotlightRect`：目标 rect 加上 `spotlightPadding` 后的高亮区域。
 - `popoverRect`：popover 自身尺寸，用于碰撞计算。
 - `computedPlacement`：最终展示方向，可能因视口碰撞从优先方向 fallback。
+- `scrollPhase`：自动滚动与 Motion 位移交接状态，分为 `idle`、`scrolling`、`settling`。
 
 受控规则：
 
@@ -391,7 +394,11 @@ const tourTransition = {
 当 `scrollIntoView=true`：
 
 1. 进入步骤后先解析目标。
-2. 如果目标不在安全视口范围内，执行：
+2. 检查目标是否在安全可见范围内：
+   - 目标矩形需要完整位于浏览器视口的 `viewportPadding` 范围内。
+   - 目标不能被任意 `overflow: auto | scroll | hidden | clip` 祖先裁切。
+3. 若目标已经可见，不调用 `scrollIntoView`，步骤切换继续使用 spotlight 与 popover 的 Motion layout 过渡。
+4. 若目标需要滚动，进入 `scrolling` 阶段并执行：
 
 ```ts
 target.scrollIntoView({
@@ -401,7 +408,18 @@ target.scrollIntoView({
 });
 ```
 
-3. 等待两帧 `requestAnimationFrame` 后重新测量，减少滚动中途定位抖动。
+5. 若目标需要滚动，不立即提交新步骤的 `visualStepIndex`。旧步骤的 spotlight、popover、标题、content 与 footer 作为一个完整视觉单元淡出，避免外层容器与内层 layout 元素切换到不同坐标系。
+6. `scrolling` 阶段仍通过 scroll 事件逐帧测量旧视觉步骤的目标，但整棵 popover layout transition 临时设为 `duration: 0`，让旧视觉单元在淡出期间保持内部一致，不再出现容器瞬移、content 留在原位的分离现象。
+7. 使用新目标 `getBoundingClientRect()` 的稳定帧检测判断滚动结束：
+   - 连续 3 帧位置与尺寸变化不超过 `0.5px`。
+   - 至少等待一段淡出时间，避免滚动启动前误判稳定，也确保旧视觉步骤已经不可见。
+   - 未观察到位移时等待更长时间后允许结束，处理浏览器无法继续滚动的情况。
+   - 使用最大等待时间兜底，避免异常情况下永远停留在滚动阶段。
+8. 滚动结束后进入 `settling` 阶段，一次性提交新步骤的 `visualStepIndex`、最终目标位置与内容；等待两帧 `requestAnimationFrame` 后恢复 `idle`，让新视觉步骤整组淡入。
+
+若目标不需要滚动，`resolvedStepIndex` 与 `visualStepIndex` 会在同一轮更新，spotlight 和 popover 继续使用原有的 Motion `layoutId` 位移、resize 与内容高度过渡。
+
+这个分阶段策略的核心是：页面滚动和跨目标共享布局位移不同时竞争同一段视觉坐标；滚动场景使用整组淡出/淡入，无滚动场景继续使用 Motion 共享布局过渡。
 
 ### 自动更新
 
@@ -414,6 +432,8 @@ target.scrollIntoView({
 - 当前目标的 `ResizeObserver`
 
 测量更新统一通过 `requestAnimationFrame` 节流，避免滚动中高频 setState。
+
+自动滚动期间不会停止测量，否则旧视觉步骤在淡出时会脱离目标；区别只在于滚动阶段关闭整棵视觉树的位置 spring，并在 `settling` 阶段忽略迟到的 scroll/resize 测量。
 
 ## Popover 定位算法
 
@@ -527,6 +547,7 @@ Demo 需要展示：
 - 上一步/下一步/跳过/完成。
 - 步骤切换时 spotlight 和 popover 的 layoutId 动画。
 - 目标 resize 场景：其中一个目标可在 demo 中通过按钮切换宽度，验证 spotlight resize 过渡。
+- 自动滚动场景：新增一个固定高度、可滚动的 Release timeline，从顶部 Planning 切换到底部 Launch readiness，稳定触发 `scrollIntoView`，验证滚动期间 spotlight 与 popover 连贯跟随。
 
 快速预览 demo 只保留 2-3 个目标，避免详情页首屏过重。
 
@@ -569,6 +590,9 @@ pnpm update-registry:dry
 - 最后一步按钮为 Done，点击后关闭并触发 `onFinish`。
 - Skip 和 Escape 均关闭并触发 `onSkip`。
 - 页面 resize、滚动、目标尺寸变化后 spotlight 和 popover 能重新定位。
+- 在 Release timeline demo 中从 Planning 切换到 Launch readiness 时，旧 spotlight 和 popover 整组淡出，滚动结束后新步骤整组淡入。
+- 自动滚动期间不会出现 Popover 容器瞬移到新位置、标题/Content/Footer 残留在旧位置的分离现象。
+- 自动滚动结束后再切换步骤，spotlight 和 popover 会恢复正常的 Motion layoutId 过渡。
 - 移动端宽度下 popover 不溢出视口，按钮不挤压变形。
 - `allowTargetInteraction=true` 时可以点击聚焦区域内目标；false 时被阻断。
 
@@ -584,7 +608,7 @@ pnpm update-registry:dry
 | 风险 | 处理 |
 | --- | --- |
 | selector 目标尚未渲染 | 进入步骤后延迟一帧重试；仍缺失时显示 fallback popover 并允许 Next/Skip |
-| 目标在滚动容器中 | 使用 `scrollIntoView`，并在滚动后重新测量 |
+| 目标在滚动容器中 | 检查 overflow 祖先裁切；保持旧视觉步骤整组淡出，稳定后一次性提交新视觉步骤并整组淡入 |
 | 父级 transform / overflow 影响浮层 | Tour 使用 `createPortal(document.body)` 和 fixed 定位 |
 | CSS mask 透明洞不等于点击穿透 | 使用 box-shadow spotlight 做视觉，透明 hit layer 做命中控制 |
 | popover 在边缘溢出 | 定位结果 clamp 到 viewportPadding，并做 placement fallback |
