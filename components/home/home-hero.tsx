@@ -26,7 +26,7 @@ export function HomeHero({ componentCount }: HomeHeroProps) {
           然后把它变成你自己的设计系统。
         </p>
 
-        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
+        <div className="mt-8 flex flex-row items-center gap-3">
           <Button asChild size="lg">
             <Link href="/components">
               浏览组件

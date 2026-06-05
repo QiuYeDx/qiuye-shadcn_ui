@@ -24,7 +24,7 @@ export function SiteHeader() {
           <span className="font-semibold">QiuYe UI</span>
         </Link>
 
-        <div className="md:hidden">
+        <div className="ml-auto md:hidden">
           <SiteMobileNav />
         </div>
 
@@ -70,7 +70,6 @@ export function SiteHeader() {
             <Link href="/cli">Install</Link>
           </Button>
         </div>
-
       </div>
     </header>
   );
