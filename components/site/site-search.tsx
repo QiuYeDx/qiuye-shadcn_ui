@@ -22,9 +22,14 @@ import { cn } from "@/lib/utils";
 interface SiteSearchProps {
   compact?: boolean;
   className?: string;
+  fullWidth?: boolean;
 }
 
-export function SiteSearch({ compact = false, className }: SiteSearchProps) {
+export function SiteSearch({
+  compact = false,
+  className,
+  fullWidth = false,
+}: SiteSearchProps) {
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -71,7 +76,8 @@ export function SiteSearch({ compact = false, className }: SiteSearchProps) {
           <Button
             variant="outline"
             className={cn(
-              "hidden h-9 w-[240px] justify-start gap-2 rounded-md bg-muted/45 px-3 text-muted-foreground shadow-none lg:flex xl:w-[300px]",
+              "h-9 justify-start gap-2 rounded-md bg-muted/45 px-3 text-muted-foreground shadow-none",
+              fullWidth ? "flex w-full" : "hidden w-[240px] lg:flex xl:w-[300px]",
               className
             )}
           >
@@ -79,7 +85,12 @@ export function SiteSearch({ compact = false, className }: SiteSearchProps) {
             <span className="min-w-0 flex-1 truncate text-left">
               Search components...
             </span>
-            <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground xl:inline-flex">
+            <kbd
+              className={cn(
+                "pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground",
+                fullWidth ? "sm:inline-flex" : "xl:inline-flex"
+              )}
+            >
               ⌘K
             </kbd>
           </Button>
