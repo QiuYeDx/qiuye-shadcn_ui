@@ -62,7 +62,7 @@ export function HomeComponentWall() {
   return (
     <section className="border-y bg-muted/30 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-screen-2xl">
-        <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+        <div className="mb-5">
           <div>
             <p className="text-sm font-medium text-muted-foreground">
               Component previews
@@ -71,10 +71,6 @@ export function HomeComponentWall() {
               真实组件，轻量展示
             </h2>
           </div>
-          <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-            首页直接读取 registry，展示当前所有可安装组件；点击详情可进入完整
-            Demo、API 和 CLI 命令。
-          </p>
         </div>
 
         <div className="grid auto-rows-[minmax(240px,auto)] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
