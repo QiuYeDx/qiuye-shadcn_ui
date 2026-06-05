@@ -17,7 +17,7 @@ export function DotGlassDemo() {
   const [dotFade, setDotFade] = useState(0);
   const [blur, setBlur] = useState(4);
   const [saturation, setSaturation] = useState(130);
-  const [glassAlpha, setGlassAlpha] = useState(0.45);
+  const [glassAlpha, setGlassAlpha] = useState(0);
 
   // 两个场景各自的盖板颜色（更贴近真实使用：浅色页/深色页）
   const [coverColorLight, setCoverColorLight] = useState("#ffffff");
@@ -99,7 +99,7 @@ export function DotGlassDemo() {
     setDotFade(0);
     setBlur(4);
     setSaturation(130);
-    setGlassAlpha(0.45);
+    setGlassAlpha(0);
     setCoverColorLight("#ffffff");
     setCoverColorDark("#000000");
     setSplit(50);

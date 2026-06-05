@@ -121,7 +121,7 @@ export function DotGlassSimpleDemo() {
           dotFade={0}
           blur={4}
           saturation={140}
-          glassAlpha={0.45}
+          glassAlpha={0}
           coverColor="#ffffff"
         />
         <div className="absolute inset-y-0 left-1/2 w-px bg-black/15" />
@@ -157,7 +157,7 @@ export function DotGlassSimpleDemo() {
           dotFade={0}
           blur={4}
           saturation={140}
-          glassAlpha={0.45}
+          glassAlpha={0}
           coverColor="#000000"
         />
         <div className="absolute inset-y-0 left-1/2 w-px bg-white/20" />
