@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useReducedMotion, type Variants } from "motion/react";
 import * as React from "react";
 
 import { HomePreviewCard } from "@/components/home/home-preview-card";
@@ -16,6 +17,68 @@ type PreviewItem = {
   config: HomePreviewConfig;
   Preview: React.ComponentType;
 };
+
+const WALL_EASE = [0.22, 1, 0.36, 1] as const;
+
+const wallSectionVariants = {
+  hidden: {
+    opacity: 0,
+    y: 12,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.42,
+      ease: WALL_EASE,
+    },
+  },
+} satisfies Variants;
+
+const wallHeaderVariants = {
+  hidden: {
+    opacity: 0,
+    y: 10,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.38,
+      ease: WALL_EASE,
+    },
+  },
+} satisfies Variants;
+
+const wallGridVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      delayChildren: 0.1,
+      staggerChildren: 0.045,
+    },
+  },
+} satisfies Variants;
+
+const wallCardVariants = {
+  hidden: {
+    opacity: 0,
+    y: 18,
+    scale: 0.985,
+    filter: "blur(4px)",
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: {
+      type: "spring",
+      duration: 0.5,
+      bounce: 0.12,
+    },
+  },
+} satisfies Variants;
 
 function createPreviewItems(): PreviewItem[] {
   const configuredIds = new Set(homePreviewConfigs.map((config) => config.id));
@@ -58,11 +121,19 @@ function createPreviewItems(): PreviewItem[] {
 
 export function HomeComponentWall() {
   const items = React.useMemo(() => createPreviewItems(), []);
+  const prefersReducedMotion = useReducedMotion();
+  const initialState = prefersReducedMotion ? "visible" : "hidden";
 
   return (
-    <section className="border-y bg-muted/30 px-4 py-6 sm:px-6 lg:px-8">
+    <motion.section
+      className="border-y bg-muted/30 px-4 py-6 sm:px-6 lg:px-8"
+      variants={wallSectionVariants}
+      initial={initialState}
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.16 }}
+    >
       <div className="mx-auto max-w-screen-2xl">
-        <div className="mb-5">
+        <motion.div className="mb-5" variants={wallHeaderVariants}>
           <div>
             <p className="text-sm font-medium text-muted-foreground">
               Component previews
@@ -71,21 +142,26 @@ export function HomeComponentWall() {
               真实组件，轻量展示
             </h2>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="grid auto-rows-[minmax(240px,auto)] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <motion.div
+          className="grid auto-rows-[minmax(240px,auto)] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          variants={wallGridVariants}
+        >
           {items.map(({ component, config, Preview }) => (
             <HomePreviewCard
               key={component.cliName}
               component={component}
               size={config.size}
               featured={config.featured}
+              variants={wallCardVariants}
+              className="will-change-transform"
             >
               <Preview />
             </HomePreviewCard>
           ))}
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 }

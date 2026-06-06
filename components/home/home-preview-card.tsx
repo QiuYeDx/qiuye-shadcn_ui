@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion, type HTMLMotionProps } from "motion/react";
 import * as React from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -23,18 +24,25 @@ interface HomePreviewCardProps {
   children: React.ReactNode;
 }
 
+type MotionHomePreviewCardProps = HomePreviewCardProps &
+  Omit<HTMLMotionProps<"article">, keyof HomePreviewCardProps>;
+
 export function HomePreviewCard({
   component,
   size,
   featured,
   children,
-}: HomePreviewCardProps) {
+  className,
+  ...motionProps
+}: MotionHomePreviewCardProps) {
   return (
-    <article
+    <motion.article
+      {...motionProps}
       className={cn(
         "group flex h-full flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-colors hover:border-foreground/20",
         sizeClassName[size],
-        featured && "border-foreground/15"
+        featured && "border-foreground/15",
+        className
       )}
     >
       <div className="flex items-start justify-between gap-3 border-b p-4">
@@ -69,6 +77,6 @@ export function HomePreviewCard({
           <Link href={`/components/${component.cliName}`}>详情</Link>
         </Button>
       </div>
-    </article>
+    </motion.article>
   );
 }
