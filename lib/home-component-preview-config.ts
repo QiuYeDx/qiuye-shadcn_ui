@@ -47,7 +47,7 @@ export const homePreviewConfigs: HomePreviewConfig[] = [
   },
   {
     id: ComponentId.IMAGE_VIEWER,
-    size: "wide",
+    size: "tall",
   },
   {
     id: ComponentId.TYPEWRITER,

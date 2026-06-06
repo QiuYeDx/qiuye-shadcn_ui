@@ -343,16 +343,27 @@ function DotGlassPreview() {
   );
 }
 
+const imageViewerPreviewSrc =
+  "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=720&h=1080&q=80";
+
 function ImageViewerPreview() {
   return (
-    <div className="w-full max-w-lg">
+    <div className="relative flex h-full min-h-[320px] w-full items-center justify-center overflow-visible py-3">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute h-[82%] max-h-[360px] w-[72%] max-w-[260px] rounded-2xl bg-cover bg-center opacity-20 blur-xl saturate-125 dark:opacity-25"
+        style={{ backgroundImage: `url(${imageViewerPreviewSrc})` }}
+      />
       <ImageViewer
-        src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"
+        src={imageViewerPreviewSrc}
         alt="Road crossing a desert landscape"
-        maxHeight={220}
-        hoverScale={1.03}
-        className="w-full"
-        wrapperClassName="flex items-center justify-center overflow-hidden rounded-lg border"
+        maxHeight={340}
+        maxWidth={250}
+        hoverScale={1.045}
+        rounded="2xl"
+        lightboxRounded="2xl"
+        className="shadow-2xl shadow-black/25 dark:shadow-black/45"
+        wrapperClassName="relative z-10 my-0 flex w-full items-center justify-center overflow-visible py-4"
       />
     </div>
   );
