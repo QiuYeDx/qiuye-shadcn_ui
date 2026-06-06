@@ -27,6 +27,7 @@ import { DotGlass } from "@/components/qiuye-ui/dot-glass";
 import { DualStateToggle } from "@/components/qiuye-ui/dual-state-toggle";
 import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
 import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
+import { Tour, type TourStep } from "@/components/qiuye-ui/tour";
 import { Typewriter } from "@/components/qiuye-ui/typewriter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -515,36 +516,143 @@ function ColorPickerPreview() {
 }
 
 function TourPreview() {
+  const [open, setOpen] = React.useState(false);
+  const navigationRef = React.useRef<HTMLDivElement>(null);
+  const searchRef = React.useRef<HTMLDivElement>(null);
+  const projectsRef = React.useRef<HTMLDivElement>(null);
+
+  const steps = React.useMemo<TourStep[]>(
+    () => [
+      {
+        id: "home-tour-navigation",
+        target: () => navigationRef.current,
+        title: "Navigation",
+        content: "Guide users from the workspace navigation first.",
+        placement: "right",
+      },
+      {
+        id: "home-tour-search",
+        target: () => searchRef.current,
+        title: "Quick search",
+        content: "Move the spotlight to the next target with layout motion.",
+        placement: "bottom",
+      },
+      {
+        id: "home-tour-projects",
+        target: () => projectsRef.current,
+        title: "Project status",
+        content: "Finish the tour after highlighting the key work area.",
+        placement: "top",
+      },
+    ],
+    [],
+  );
+
   return (
-    <div className="relative h-[230px] w-full max-w-sm overflow-hidden rounded-lg border bg-background p-4">
-      <div className="mb-4 flex items-center gap-2">
-        <div className="size-8 rounded-full bg-primary" />
-        <div className="space-y-1">
-          <div className="h-2 w-24 rounded bg-foreground/20" />
-          <div className="h-2 w-16 rounded bg-foreground/10" />
+    <div className="w-full max-w-sm space-y-3">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <div className="text-sm font-semibold">Product workspace</div>
+          <div className="text-xs text-muted-foreground">Live Tour preview</div>
         </div>
+        <Button
+          type="button"
+          size="sm"
+          className="h-8 gap-1.5"
+          onClick={() => setOpen(true)}
+        >
+          <SparklesIcon className="size-3.5" />
+          Start
+        </Button>
       </div>
-      <div className="grid grid-cols-[88px_1fr] gap-3">
-        <div className="space-y-2 rounded-md border bg-muted/30 p-2">
-          <div className="h-7 rounded bg-background" />
-          <div className="h-7 rounded bg-background" />
-          <div className="h-7 rounded bg-primary/15" />
+
+      <div className="relative h-[220px] overflow-hidden rounded-lg border bg-background p-3">
+        <div className="mb-3 flex items-center gap-2">
+          <div className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+            <SparklesIcon className="size-4" />
+          </div>
+          <div className="min-w-0">
+            <div className="text-sm font-medium">Release hub</div>
+            <div className="text-xs text-muted-foreground">3 guided steps</div>
+          </div>
+          <Badge variant="secondary" className="ml-auto hidden sm:inline-flex">
+            demo
+          </Badge>
         </div>
-        <div className="space-y-3">
-          <div className="h-16 rounded-md border bg-muted/30" />
-          <div className="h-16 rounded-md border bg-muted/30" />
+
+        <div className="grid grid-cols-[96px_1fr] gap-3">
+          <div
+            ref={navigationRef}
+            className="space-y-2 rounded-md border bg-muted/30 p-2"
+          >
+            {["Roadmap", "Tasks", "Launch"].map((item, index) => (
+              <button
+                key={item}
+                type="button"
+                className={
+                  index === 1
+                    ? "h-8 w-full rounded-md bg-primary px-2 text-left text-xs font-medium text-primary-foreground"
+                    : "h-8 w-full rounded-md bg-background px-2 text-left text-xs text-muted-foreground"
+                }
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+
+          <div className="min-w-0 space-y-3">
+            <div
+              ref={searchRef}
+              className="flex h-11 items-center gap-2 rounded-md border bg-muted/30 px-3 text-xs text-muted-foreground"
+            >
+              <SparklesIcon className="size-3.5 text-primary" />
+              Search releases
+              <Badge variant="outline" className="ml-auto text-[10px]">
+                K
+              </Badge>
+            </div>
+
+            <div
+              ref={projectsRef}
+              className="rounded-md border bg-muted/30 p-3"
+            >
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <div className="text-xs font-semibold">Project status</div>
+                <Badge variant="secondary" className="text-[10px]">
+                  live
+                </Badge>
+              </div>
+              <div className="space-y-2">
+                {["Design", "Build"].map((item, index) => (
+                  <div key={item} className="rounded bg-background px-2 py-1.5">
+                    <div className="mb-1 flex items-center justify-between text-[11px]">
+                      <span>{item}</span>
+                      <span className="text-muted-foreground">
+                        {index === 0 ? "82%" : "64%"}
+                      </span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-muted">
+                      <div
+                        className="h-full rounded-full bg-primary"
+                        style={{ width: index === 0 ? "82%" : "64%" }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="absolute inset-0 bg-background/65" />
-      <div className="absolute left-4 top-[92px] h-12 w-[88px] rounded-md ring-2 ring-primary ring-offset-4 ring-offset-background" />
-      <div className="absolute right-5 top-20 w-44 rounded-lg border bg-popover p-3 text-popover-foreground shadow-md">
-        <div className="mb-2 flex items-center gap-2 text-sm font-medium">
-          <SparklesIcon className="size-4" />
-          Guided step
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Highlight, explain and move to the next target.
-        </p>
+
+        <Tour
+          open={open}
+          onOpenChange={setOpen}
+          steps={steps}
+          allowTargetInteraction
+          maskClosable
+          popoverWidth={280}
+          viewportPadding={12}
+        />
       </div>
     </div>
   );
