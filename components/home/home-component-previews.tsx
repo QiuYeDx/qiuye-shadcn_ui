@@ -537,22 +537,22 @@ function TourPreview() {
       {
         id: "home-tour-navigation",
         target: () => navigationRef.current,
-        title: "Navigation",
-        content: "Guide users from the workspace navigation first.",
+        title: "Menu",
+        content: "Start from the compact navigation area.",
         placement: "right",
       },
       {
         id: "home-tour-search",
         target: () => searchRef.current,
-        title: "Quick search",
-        content: "Move the spotlight to the next target with layout motion.",
+        title: "Search",
+        content: "Move the spotlight to the quick action target.",
         placement: "bottom",
       },
       {
         id: "home-tour-projects",
         target: () => projectsRef.current,
-        title: "Project status",
-        content: "Finish the tour after highlighting the key work area.",
+        title: "Progress",
+        content: "Finish on the primary workspace panel.",
         placement: "top",
       },
     ],
@@ -560,50 +560,44 @@ function TourPreview() {
   );
 
   return (
-    <div className="w-full max-w-sm space-y-3">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <div className="text-sm font-semibold">Product workspace</div>
-          <div className="text-xs text-muted-foreground">Live Tour preview</div>
-        </div>
-        <Button
-          type="button"
-          size="sm"
-          className="h-8 gap-1.5"
-          onClick={() => setOpen(true)}
-        >
-          <SparklesIcon className="size-3.5" />
-          Start
-        </Button>
-      </div>
-
+    <div className="w-full max-w-[320px]">
       <div className="relative h-[220px] overflow-hidden rounded-lg border bg-background p-3">
-        <div className="mb-3 flex items-center gap-2">
-          <div className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-            <SparklesIcon className="size-4" />
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+              <SparklesIcon className="size-4" />
+            </div>
+            <div className="min-w-0">
+              <div className="truncate text-sm font-semibold">Release hub</div>
+              <div className="truncate text-[11px] leading-4 text-muted-foreground">
+                Interactive tour preview
+              </div>
+            </div>
           </div>
-          <div className="min-w-0">
-            <div className="text-sm font-medium">Release hub</div>
-            <div className="text-xs text-muted-foreground">3 guided steps</div>
-          </div>
-          <Badge variant="secondary" className="ml-auto hidden sm:inline-flex">
-            demo
-          </Badge>
+          <Button
+            type="button"
+            size="sm"
+            className="h-7 shrink-0 gap-1 px-2.5 text-xs"
+            onClick={() => setOpen(true)}
+          >
+            <SparklesIcon className="size-3.5" />
+            <span>Start</span>
+          </Button>
         </div>
 
-        <div className="grid grid-cols-[96px_1fr] gap-3">
+        <div className="mt-3 grid grid-cols-[76px_minmax(0,1fr)] gap-2">
           <div
             ref={navigationRef}
-            className="space-y-2 rounded-md border bg-muted/30 p-2"
+            className="min-w-0 space-y-1.5 rounded-md border bg-muted/30 p-1.5"
           >
-            {["Roadmap", "Tasks", "Launch"].map((item, index) => (
+            {["Map", "Tasks", "Ship"].map((item, index) => (
               <button
                 key={item}
                 type="button"
                 className={
                   index === 1
-                    ? "h-8 w-full rounded-md bg-primary px-2 text-left text-xs font-medium text-primary-foreground"
-                    : "h-8 w-full rounded-md bg-background px-2 text-left text-xs text-muted-foreground"
+                    ? "h-7 w-full truncate rounded-md bg-primary px-2 text-left text-xs font-medium text-primary-foreground"
+                    : "h-7 w-full truncate rounded-md bg-background px-2 text-left text-xs text-muted-foreground"
                 }
               >
                 {item}
@@ -614,31 +608,33 @@ function TourPreview() {
           <div className="min-w-0 space-y-3">
             <div
               ref={searchRef}
-              className="flex h-11 items-center gap-2 rounded-md border bg-muted/30 px-3 text-xs text-muted-foreground"
+              className="flex h-9 min-w-0 items-center gap-2 rounded-md border bg-muted/30 px-2.5 text-xs text-muted-foreground"
             >
-              <SparklesIcon className="size-3.5 text-primary" />
-              Search releases
-              <Badge variant="outline" className="ml-auto text-[10px]">
+              <SparklesIcon className="size-3.5 shrink-0 text-primary" />
+              <span className="truncate">Search</span>
+              <span className="ml-auto rounded bg-background px-1.5 py-0.5 text-[10px] leading-none">
                 K
-              </Badge>
+              </span>
             </div>
 
             <div
               ref={projectsRef}
-              className="rounded-md border bg-muted/30 p-3"
+              className="rounded-md border bg-muted/30 p-2"
             >
-              <div className="mb-3 flex items-center justify-between gap-2">
-                <div className="text-xs font-semibold">Project status</div>
-                <Badge variant="secondary" className="text-[10px]">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <div className="min-w-0 truncate text-xs font-semibold">
+                  Progress
+                </div>
+                <span className="shrink-0 rounded bg-background px-1.5 py-0.5 text-[10px] leading-none text-muted-foreground">
                   live
-                </Badge>
+                </span>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {["Design", "Build"].map((item, index) => (
-                  <div key={item} className="rounded bg-background px-2 py-1.5">
-                    <div className="mb-1 flex items-center justify-between text-[11px]">
-                      <span>{item}</span>
-                      <span className="text-muted-foreground">
+                  <div key={item} className="rounded bg-background px-2 py-1">
+                    <div className="mb-1 flex min-w-0 items-center justify-between gap-2 text-[11px]">
+                      <span className="min-w-0 truncate">{item}</span>
+                      <span className="shrink-0 text-muted-foreground">
                         {index === 0 ? "82%" : "64%"}
                       </span>
                     </div>
@@ -661,8 +657,8 @@ function TourPreview() {
           steps={steps}
           allowTargetInteraction
           maskClosable
-          popoverWidth={280}
-          viewportPadding={12}
+          popoverWidth={260}
+          viewportPadding={10}
         />
       </div>
     </div>
