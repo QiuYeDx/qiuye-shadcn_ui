@@ -5,6 +5,7 @@ import {
   BellIcon,
   CheckIcon,
   FolderKanbanIcon,
+  GripVerticalIcon,
   MenuIcon,
   MoonIcon,
   SparklesIcon,
@@ -113,29 +114,200 @@ function ScrollableDialogPreview() {
   );
 }
 
-function DotGlassPreview() {
+const dotGlassMarqueeTiles = [
+  {
+    width: "5.75rem",
+    background: "linear-gradient(135deg, #22d3ee 0%, #2563eb 100%)",
+  },
+  {
+    width: "7rem",
+    background: "linear-gradient(135deg, #fb7185 0%, #c026d3 100%)",
+  },
+  {
+    width: "4.75rem",
+    background: "linear-gradient(135deg, #fbbf24 0%, #f97316 100%)",
+  },
+  {
+    width: "6.5rem",
+    background: "linear-gradient(135deg, #34d399 0%, #0f766e 100%)",
+  },
+  {
+    width: "5.25rem",
+    background: "linear-gradient(135deg, #a78bfa 0%, #4f46e5 100%)",
+  },
+  {
+    width: "6rem",
+    background: "linear-gradient(135deg, #f472b6 0%, #be123c 100%)",
+  },
+];
+
+function clampPercent(value: number) {
+  return Math.min(100, Math.max(0, value));
+}
+
+function DotGlassMarqueeStrip({
+  duration,
+  reverse = false,
+}: {
+  duration: number;
+  reverse?: boolean;
+}) {
+  const tiles = reverse
+    ? [...dotGlassMarqueeTiles].reverse()
+    : dotGlassMarqueeTiles;
+  const longTileSet = Array.from({ length: 3 }).flatMap(() => tiles);
+
   return (
-    <div className="relative h-[210px] w-full overflow-hidden rounded-lg border bg-white text-zinc-950 dark:bg-zinc-950 dark:text-white">
-      <div className="absolute inset-0 p-5">
-        <div className="flex items-center justify-between">
-          <div className="text-sm font-semibold">Dot glass layer</div>
-          <div className="rounded-full bg-zinc-950 px-2 py-0.5 text-xs text-white dark:bg-white dark:text-zinc-950">
-            Live
+    <div aria-hidden="true" className="relative h-14 w-full overflow-hidden">
+      <div
+        className="dot-glass-home-marquee-track flex w-max"
+        style={{
+          animation: `dot-glass-home-marquee-track ${duration}s linear infinite`,
+          animationDirection: reverse ? "reverse" : "normal",
+        }}
+      >
+        {[0, 1].map((groupIndex) => (
+          <div key={groupIndex} className="flex shrink-0 gap-5 pr-5">
+            {longTileSet.map((tile, tileIndex) => (
+              <div
+                key={`${groupIndex}-${tileIndex}`}
+                className="h-14 rounded-md shadow-sm ring-1 ring-white/45 dark:ring-white/10"
+                style={{ width: tile.width, background: tile.background }}
+              />
+            ))}
           </div>
-        </div>
-        <div className="mt-5 grid grid-cols-3 gap-3">
-          <div className="h-16 rounded-lg bg-cyan-500/35" />
-          <div className="h-16 rounded-lg bg-fuchsia-500/30" />
-          <div className="h-16 rounded-lg bg-amber-500/30" />
-        </div>
-        <div className="mt-5 space-y-2">
-          <div className="h-2 w-4/5 rounded bg-zinc-950/15 dark:bg-white/20" />
-          <div className="h-2 w-2/3 rounded bg-zinc-950/10 dark:bg-white/15" />
-        </div>
+        ))}
       </div>
+    </div>
+  );
+}
+
+function DotGlassPreview() {
+  const [split, setSplit] = React.useState(50);
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const draggingRef = React.useRef(false);
+
+  const updateSplitFromClientX = React.useCallback((clientX: number) => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+    const ratio = rect.width > 0 ? (clientX - rect.left) / rect.width : 0.5;
+    setSplit(Math.round(clampPercent(ratio * 100)));
+  }, []);
+
+  const handlePointerDown = React.useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      draggingRef.current = true;
+      updateSplitFromClientX(event.clientX);
+
+      try {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      } catch {
+        // 嵌入式预览里指针捕获尽量启用即可。
+      }
+
+      event.preventDefault();
+    },
+    [updateSplitFromClientX]
+  );
+
+  const handlePointerMove = React.useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (!draggingRef.current) return;
+      updateSplitFromClientX(event.clientX);
+      event.preventDefault();
+    },
+    [updateSplitFromClientX]
+  );
+
+  const handlePointerEnd = React.useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      draggingRef.current = false;
+
+      try {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      } catch {
+        // 指针捕获可能已被浏览器释放。
+      }
+
+      event.preventDefault();
+    },
+    []
+  );
+
+  const handleLostPointerCapture = React.useCallback(() => {
+    draggingRef.current = false;
+  }, []);
+
+  const handleKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      const step = event.shiftKey ? 10 : 2;
+
+      if (event.key === "ArrowLeft") {
+        setSplit((value) => clampPercent(value - step));
+        event.preventDefault();
+      }
+
+      if (event.key === "ArrowRight") {
+        setSplit((value) => clampPercent(value + step));
+        event.preventDefault();
+      }
+
+      if (event.key === "Home") {
+        setSplit(0);
+        event.preventDefault();
+      }
+
+      if (event.key === "End") {
+        setSplit(100);
+        event.preventDefault();
+      }
+    },
+    []
+  );
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative h-[230px] w-full overflow-hidden rounded-lg border bg-background text-foreground"
+    >
+      <style>
+        {`
+          @keyframes dot-glass-home-marquee-track {
+            from { transform: translate3d(0, 0, 0); }
+            to { transform: translate3d(-50%, 0, 0); }
+          }
+
+          .dot-glass-home-marquee-track {
+            will-change: transform;
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .dot-glass-home-marquee-track {
+              animation: none !important;
+            }
+          }
+        `}
+      </style>
+
+      <div className="absolute inset-0 flex flex-col justify-center gap-5 overflow-hidden bg-muted/40">
+        <div className="w-full">
+          <DotGlassMarqueeStrip duration={26} />
+        </div>
+        <div className="w-full">
+          <DotGlassMarqueeStrip duration={32} reverse />
+        </div>
+        <div className="w-full">
+          <DotGlassMarqueeStrip duration={38} />
+        </div>
+        <div className="absolute inset-0 bg-background/10" />
+      </div>
+
       <DotGlass
         absolute
-        className="inset-y-0 left-0 w-[58%]"
+        className="pointer-events-none inset-y-0 left-0"
+        style={{ width: `${split}%` }}
         dotSize={3}
         dotGap={6}
         dotFade={0}
@@ -144,7 +316,28 @@ function DotGlassPreview() {
         glassAlpha={0}
         coverColor="var(--background)"
       />
-      <div className="absolute inset-y-0 left-[58%] w-px bg-border" />
+      <div
+        className="pointer-events-none absolute inset-y-0 z-20 w-px bg-foreground/35"
+        style={{ left: `${split}%` }}
+      />
+      <div
+        role="slider"
+        tabIndex={0}
+        aria-label="调整 Dot Glass 覆盖区域"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={split}
+        className="absolute top-1/2 z-30 flex h-16 w-8 -translate-x-1/2 -translate-y-1/2 cursor-col-resize items-center justify-center rounded-full border bg-background/90 text-foreground shadow-sm backdrop-blur transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        style={{ left: `${split}%`, touchAction: "none" }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerEnd}
+        onPointerCancel={handlePointerEnd}
+        onLostPointerCapture={handleLostPointerCapture}
+        onKeyDown={handleKeyDown}
+      >
+        <GripVerticalIcon className="size-4" />
+      </div>
     </div>
   );
 }

@@ -10,6 +10,33 @@ import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 
+const marqueeTiles = [
+  {
+    width: "5.75rem",
+    background: "linear-gradient(135deg, #22d3ee 0%, #2563eb 100%)",
+  },
+  {
+    width: "7rem",
+    background: "linear-gradient(135deg, #fb7185 0%, #c026d3 100%)",
+  },
+  {
+    width: "4.75rem",
+    background: "linear-gradient(135deg, #fbbf24 0%, #f97316 100%)",
+  },
+  {
+    width: "6.5rem",
+    background: "linear-gradient(135deg, #34d399 0%, #0f766e 100%)",
+  },
+  {
+    width: "5.25rem",
+    background: "linear-gradient(135deg, #a78bfa 0%, #4f46e5 100%)",
+  },
+  {
+    width: "6rem",
+    background: "linear-gradient(135deg, #f472b6 0%, #be123c 100%)",
+  },
+];
+
 export function DotGlassDemo() {
   // ====== DotGlass 参数（完整覆盖组件 props）======
   const [dotSize, setDotSize] = useState(3);
@@ -26,6 +53,7 @@ export function DotGlassDemo() {
   // ====== 对比滑块（左右拖拽，控制 DotGlass 覆盖宽度）======
   const lightContainerRef = useRef<HTMLDivElement | null>(null);
   const darkContainerRef = useRef<HTMLDivElement | null>(null);
+  const marqueeContainerRef = useRef<HTMLDivElement | null>(null);
   const dragRef = useRef<{ active: boolean; container: HTMLDivElement | null }>(
     {
       active: false,
@@ -500,9 +528,176 @@ export function DotGlassDemo() {
           </div>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader className="space-y-1">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <CardTitle>示例：动态色块跑马灯</CardTitle>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setSplit(50)}
+              className="cursor-pointer"
+            >
+              居中
+            </Button>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            底层使用水平等距的循环色块跑马灯，拖拽中线查看 DotGlass
+            覆盖区域内的点阵开孔毛玻璃效果。
+          </p>
+        </CardHeader>
+        <CardContent>
+          <MarqueeSceneCanvas
+            containerRef={marqueeContainerRef}
+            split={split}
+            dotGlassBaseProps={dotGlassBaseProps}
+            onPointerDownHandler={onHandlePointerDown(marqueeContainerRef)}
+            onPointerMoveHandler={onHandlePointerMove}
+            onPointerUpHandler={onHandlePointerUp}
+            onKeyDownHandler={onHandleKeyDown}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }
+
+function MarqueeStrip({
+  duration,
+  reverse = false,
+}: {
+  duration: number;
+  reverse?: boolean;
+}) {
+  const tiles = reverse ? [...marqueeTiles].reverse() : marqueeTiles;
+  const longTileSet = Array.from({ length: 3 }).flatMap(() => tiles);
+
+  return (
+    <div aria-hidden="true" className="relative h-14 w-full overflow-hidden">
+      <div
+        className="dot-glass-demo-marquee-track flex w-max"
+        style={{
+          animation: `dot-glass-demo-marquee-track ${duration}s linear infinite`,
+          animationDirection: reverse ? "reverse" : "normal",
+        }}
+      >
+        {[0, 1].map((groupIndex) => (
+          <div key={groupIndex} className="flex shrink-0 gap-5 pr-5">
+            {longTileSet.map((tile, tileIndex) => (
+              <div
+                key={`${groupIndex}-${tileIndex}`}
+                className="h-14 rounded-md shadow-sm ring-1 ring-white/45 dark:ring-white/10"
+                style={{ width: tile.width, background: tile.background }}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const MarqueeSceneCanvas = ({
+  containerRef,
+  split,
+  dotGlassBaseProps,
+  onPointerDownHandler,
+  onPointerMoveHandler,
+  onPointerUpHandler,
+  onKeyDownHandler,
+}: {
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  split: number;
+  dotGlassBaseProps: {
+    dotSize: number;
+    dotGap: number;
+    dotFade: number;
+    blur: number;
+    saturation: number;
+    glassAlpha: number;
+  };
+  onPointerDownHandler: (e: React.PointerEvent<HTMLDivElement>) => void;
+  onPointerMoveHandler: (e: React.PointerEvent<HTMLDivElement>) => void;
+  onPointerUpHandler: (e: React.PointerEvent<HTMLDivElement>) => void;
+  onKeyDownHandler: (e: React.KeyboardEvent<HTMLDivElement>) => void;
+}) => {
+  return (
+    <div
+      ref={containerRef}
+      className="relative h-[260px] w-full overflow-hidden rounded-xl border bg-background"
+    >
+      <style>
+        {`
+          @keyframes dot-glass-demo-marquee-track {
+            from { transform: translate3d(0, 0, 0); }
+            to { transform: translate3d(-50%, 0, 0); }
+          }
+
+          .dot-glass-demo-marquee-track {
+            will-change: transform;
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .dot-glass-demo-marquee-track {
+              animation: none !important;
+            }
+          }
+        `}
+      </style>
+
+      <div className="absolute inset-0 flex flex-col justify-center gap-5 overflow-hidden bg-muted/40">
+        <div className="w-full">
+          <MarqueeStrip duration={26} />
+        </div>
+        <div className="w-full">
+          <MarqueeStrip duration={32} reverse />
+        </div>
+        <div className="w-full">
+          <MarqueeStrip duration={38} />
+        </div>
+        <div className="absolute inset-0 bg-background/10" />
+      </div>
+
+      <DotGlass
+        absolute
+        className="pointer-events-none inset-y-0 left-0"
+        style={{ width: `${split}%` }}
+        coverColor="var(--background)"
+        {...dotGlassBaseProps}
+      />
+
+      <div
+        className="pointer-events-none absolute inset-y-0 z-20 w-px bg-foreground/35"
+        style={{ left: `${split}%` }}
+      />
+      <div
+        role="slider"
+        tabIndex={0}
+        aria-label="调整动态跑马灯示例的 DotGlass 覆盖区域"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={split}
+        className="absolute inset-y-0 z-30 w-10 -translate-x-1/2 cursor-col-resize touch-none select-none"
+        style={{ left: `${split}%` }}
+        onPointerDown={onPointerDownHandler}
+        onPointerMove={onPointerMoveHandler}
+        onPointerUp={onPointerUpHandler}
+        onPointerCancel={onPointerUpHandler}
+        onKeyDown={onKeyDownHandler}
+      >
+        <div className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 bg-foreground/45 shadow-sm" />
+        <div className="absolute left-1/2 top-1/2 grid size-14 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border bg-background/90 shadow-sm backdrop-blur">
+          <div className="grid grid-cols-2 gap-1">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="size-1 rounded-full bg-foreground" />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const SceneCanvas = ({
   variant,
