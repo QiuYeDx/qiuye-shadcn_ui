@@ -73,7 +73,7 @@ export function HomeCta() {
           </p>
         </motion.div>
         <motion.div
-          className="flex flex-col gap-3 sm:flex-row md:flex-col lg:flex-row"
+          className="flex flex-col gap-3 flex-row"
           variants={ctaContainerVariants}
         >
           <motion.div variants={ctaActionVariants}>
