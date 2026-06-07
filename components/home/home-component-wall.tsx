@@ -130,7 +130,7 @@ export function HomeComponentWall() {
       variants={wallSectionVariants}
       initial={initialState}
       whileInView="visible"
-      viewport={{ once: true, amount: 0.16 }}
+      viewport={{ once: true, amount: 0.01, margin: "0px 0px 18% 0px" }}
     >
       <div className="mx-auto max-w-screen-2xl">
         <motion.div className="mb-5" variants={wallHeaderVariants}>
