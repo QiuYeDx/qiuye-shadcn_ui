@@ -412,28 +412,42 @@ function DualStateTogglePreview() {
 }
 
 function CodeBlockPreview() {
-  const code = `import { DotGlass } from "@/components/qiuye-ui/dot-glass";
+  const code = `import { useState, useCallback } from "react";
 
-export function Preview() {
-  return <DotGlass className="rounded-lg p-4" />;
+interface UseCounterOptions {
+  min?: number;
+  max?: number;
+}
+
+export function useCounter(initial = 0, opts?: UseCounterOptions) {
+  const [count, setCount] = useState(initial);
+
+  const increment = useCallback(
+    () => setCount((c) => opts?.max != null ? Math.min(c + 1, opts.max) : c + 1),
+    [opts?.max]
+  );
+
+  const reset = useCallback(() => setCount(initial), [initial]);
+
+  return { count, increment, reset } as const;
 }`;
 
   return (
     <div className="w-full max-w-xl">
       <CodeBlockPanel
-        filename="preview.tsx"
+        filename="use-counter.ts"
         code={code}
         isDark
         colorTheme="github"
         className="shadow-none"
       >
         <CodeBlock
-          language="tsx"
+          language="typescript"
           isDark
           colorTheme="github"
           displayMode="scroll"
-          maxHeight={180}
-          showLineNumbers={false}
+          maxHeight={200}
+          highlightLines="3-6,11-14"
           noShadow
         >
           {code}
