@@ -1,12 +1,6 @@
 "use client";
 
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useId,
-  useCallback,
-} from "react";
+import React, { useState, useEffect, useRef, useId, useCallback } from "react";
 import {
   Code,
   Eye,
@@ -143,7 +137,10 @@ function getMermaidPalette(
   };
 }
 
-function getMermaidThemeVariables(palette: MermaidThemePalette, isDark: boolean) {
+function getMermaidThemeVariables(
+  palette: MermaidThemePalette,
+  isDark: boolean,
+) {
   const [pie1, pie2, pie3, pie4, pie5, pie6] = palette.pie;
 
   return {
@@ -491,14 +488,7 @@ export function MermaidBlock({
     return () => {
       cancelled = true;
     };
-  }, [
-    mounted,
-    code,
-    showPreview,
-    mermaidIdBase,
-    colorTheme,
-    isDark,
-  ]);
+  }, [mounted, code, showPreview, mermaidIdBase, colorTheme, isDark]);
 
   useEffect(() => {
     if (!isFullscreen) return;
@@ -820,7 +810,7 @@ export function MermaidBlock({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowPreview(false)}
-              className={`relative flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+              className={`relative flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
                 !showPreview
                   ? "text-primary"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
@@ -839,7 +829,7 @@ export function MermaidBlock({
             </button>
             <button
               onClick={() => setShowPreview(true)}
-              className={`relative flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+              className={`relative flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
                 showPreview
                   ? "text-primary"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
