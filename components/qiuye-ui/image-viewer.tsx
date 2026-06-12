@@ -34,6 +34,17 @@ const roundedClasses = {
 
 type RoundedSize = keyof typeof roundedClasses;
 
+interface ImageDimensions {
+  src: string;
+  width: number;
+  height: number;
+}
+
+interface ImageSize {
+  width: number;
+  height: number;
+}
+
 type BaseImageProps = Omit<
   React.ComponentPropsWithoutRef<"img">,
   | "src"
@@ -144,6 +155,24 @@ const formatSize = (value: number | string | undefined): string | undefined => {
   return typeof value === "number" ? `${value}px` : value;
 };
 
+const getLightboxImageSize = (
+  dimensions: ImageDimensions,
+  padding: number
+): ImageSize => {
+  const maxWidth = Math.max(1, window.innerWidth - padding * 2);
+  const maxHeight = Math.max(1, window.innerHeight - padding * 2);
+  const scale = Math.min(
+    1,
+    maxWidth / dimensions.width,
+    maxHeight / dimensions.height
+  );
+
+  return {
+    width: Math.round(dimensions.width * scale),
+    height: Math.round(dimensions.height * scale),
+  };
+};
+
 const getTouchDistance = (touches: React.TouchList) => {
   const dx = touches[0].clientX - touches[1].clientX;
   const dy = touches[0].clientY - touches[1].clientY;
@@ -207,6 +236,10 @@ export function ImageViewer({
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [imageDimensions, setImageDimensions] =
+    useState<ImageDimensions | null>(null);
+  const [lightboxImageSize, setLightboxImageSize] =
+    useState<ImageSize | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const lightboxGestureRef = useRef<HTMLDivElement | null>(null);
   // 灯箱图片的变换使用 MotionValue，避免高频触摸导致重渲染
@@ -250,11 +283,16 @@ export function ImageViewer({
   const resolvedSrc = typeof src === "string" ? src : blobUrl || undefined;
   const hasSource =
     typeof src === "string" ? src.trim().length > 0 : src instanceof Blob;
+  const currentImageDimensions =
+    imageDimensions?.src === resolvedSrc ? imageDimensions : null;
+  const paddingValue = Math.max(16, lightboxPadding);
 
   useEffect(() => {
     if (resolvedSrc) {
       setImageLoading(true);
       setImageError(false);
+      setImageDimensions(null);
+      setLightboxImageSize(null);
     }
   }, [resolvedSrc]);
 
@@ -265,24 +303,16 @@ export function ImageViewer({
     if (image.complete) {
       if (image.naturalWidth === 0) {
         setImageError(true);
+      } else {
+        setImageDimensions({
+          src: resolvedSrc,
+          width: image.naturalWidth,
+          height: image.naturalHeight,
+        });
       }
       setImageLoading(false);
     }
   }, [resolvedSrc]);
-
-  // 预加载图片，确保点击打开灯箱时图片已在浏览器缓存中
-  // 这可以避免首次打开灯箱时因图片加载延迟导致 layoutId 过渡动画异常
-  useEffect(() => {
-    if (!resolvedSrc || !enableLightbox) return;
-
-    const preloadImage = new Image();
-    preloadImage.src = resolvedSrc;
-
-    return () => {
-      // 组件卸载时清理预加载
-      preloadImage.src = "";
-    };
-  }, [resolvedSrc, enableLightbox]);
 
   // 组件卸载时清理复位动画与定时器
   useEffect(() => {
@@ -382,6 +412,22 @@ export function ImageViewer({
       closeLightbox();
     }
   }, [closeLightbox, enableLightbox, isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || !currentImageDimensions) return;
+
+    const updateLightboxImageSize = () => {
+      setLightboxImageSize(
+        getLightboxImageSize(currentImageDimensions, paddingValue)
+      );
+    };
+
+    updateLightboxImageSize();
+    window.addEventListener("resize", updateLightboxImageSize);
+    return () => {
+      window.removeEventListener("resize", updateLightboxImageSize);
+    };
+  }, [currentImageDimensions, isOpen, paddingValue]);
 
   // 打开时重置状态，防止复位动画残留
   useEffect(() => {
@@ -691,8 +737,8 @@ export function ImageViewer({
   const inlineRoundedClass = roundedClasses[rounded];
   const lightboxRoundedClass =
     roundedClasses[lightboxRounded ?? rounded] ?? roundedClasses.lg;
-  const canPreview = enableLightbox && !imageError;
-  const paddingValue = Math.max(16, lightboxPadding);
+  const canPreview =
+    enableLightbox && !imageError && currentImageDimensions !== null;
   const maxSizeStyle = {
     width: `calc(100vw - ${paddingValue * 2}px)`,
     height: `calc(100vh - ${paddingValue * 2}px)`,
@@ -742,7 +788,11 @@ export function ImageViewer({
               : undefined
           }
           onClick={() => {
-            if (canPreview) setIsOpen(true);
+            if (!canPreview || !currentImageDimensions) return;
+            setLightboxImageSize(
+              getLightboxImageSize(currentImageDimensions, paddingValue)
+            );
+            setIsOpen(true);
           }}
         >
           <AnimatePresence>
@@ -785,12 +835,18 @@ export function ImageViewer({
             }}
             loading={loading}
             onLoad={(event) => {
+              setImageDimensions({
+                src: resolvedSrc,
+                width: event.currentTarget.naturalWidth,
+                height: event.currentTarget.naturalHeight,
+              });
               setImageLoading(false);
               onLoad?.(event);
             }}
             onError={(event) => {
               setImageError(true);
               setImageLoading(false);
+              setImageDimensions(null);
               onError?.(event);
             }}
             {...props}
@@ -852,9 +908,11 @@ export function ImageViewer({
                       src={resolvedSrc}
                       alt={alt || ""}
                       title={title}
+                      width={lightboxImageSize?.width}
+                      height={lightboxImageSize?.height}
                       draggable={selectable}
                       className={cn(
-                        "h-auto w-auto max-h-full max-w-full object-contain shadow-2xl",
+                        "max-h-full max-w-full object-contain shadow-2xl",
                         !selectable && "select-none",
                         lightboxRoundedClass,
                         lightboxClassName
@@ -864,7 +922,7 @@ export function ImageViewer({
                           ? { WebkitTouchCallout: "none" }
                           : undefined
                       }
-                      // 灯箱图片使用 eager 加载，配合预加载确保过渡动画流畅
+                      // 预先计算宽高，让重新请求中的图片节点也能被 Motion 正确测量
                       loading="eager"
                     />
                   </motion.div>
