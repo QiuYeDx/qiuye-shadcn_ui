@@ -3,9 +3,12 @@
 import { useState, useSyncExternalStore, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { ArrowLeft, Copy, CheckCircle, Code } from "lucide-react";
+import { ArrowLeft, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CodeBlock as CodeBlockDisplay } from "@/components/qiuye-ui/code-block";
+import {
+  CodeBlock as CodeBlockDisplay,
+  CodeBlockPanel,
+} from "@/components/qiuye-ui/code-block";
 import {
   ResponsiveTabs,
   type TabItem,
@@ -66,7 +69,7 @@ function PackageManagerSelector() {
   const { packageManager, setPackageManager } = usePackageManager();
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex min-w-0 items-center gap-2">
       <span className="text-sm text-muted-foreground shrink-0">包管理器:</span>
       <ResponsiveTabs
         value={packageManager}
@@ -74,8 +77,9 @@ function PackageManagerSelector() {
         items={pmItems}
         layout="grid"
         gridColsClass="grid-cols-2"
-        listClassName="w-[140px]"
-        size="sm"
+        className="min-w-0 flex-1 w-auto!"
+        listClassName="w-full"
+        triggerClassName="text-sm h-7.5"
         scrollButtons={false}
         fadeMasks={false}
       />
@@ -108,8 +112,6 @@ interface CopyCommandButtonProps {
 }
 
 export function CopyCommandButton({ cliName }: CopyCommandButtonProps) {
-  const clipboard = useClipboard();
-  const [copiedCommand, setCopiedCommand] = useState(false);
   const { packageManager } = usePackageManager();
 
   const generateCommand = () => {
@@ -117,80 +119,45 @@ export function CopyCommandButton({ cliName }: CopyCommandButtonProps) {
     return `${prefix} shadcn@latest add @qiuye-ui/${cliName}`;
   };
 
-  const handleCopyCommand = () => {
-    const command = generateCommand();
-    clipboard.copy(command);
-    setCopiedCommand(true);
-    setTimeout(() => setCopiedCommand(false), 2000);
-    toast.success("复制成功！", {
-      description: `已复制命令: ${command}`,
-    });
-  };
-
   return (
     <div className="space-y-3">
       <PackageManagerSelector />
-
-      <div className="rounded-md bg-background/70 p-3 ring-1 ring-border/60">
-        <div className="flex min-w-0 items-center gap-2">
-          <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap text-xs font-mono sm:text-sm">
-            {generateCommand()}
-          </code>
-          <Button
-            onClick={handleCopyCommand}
-            size="sm"
-            variant="ghost"
-            className="h-6 w-6 shrink-0 p-0"
-          >
-            {copiedCommand ? (
-              <CheckCircle className="h-3 w-3 text-green-500" />
-            ) : (
-              <Copy className="h-3 w-3" />
-            )}
-          </Button>
-        </div>
-      </div>
+      <SidebarCodeBlock
+        code={generateCommand()}
+        language="shell"
+      />
     </div>
   );
 }
 
-// 导入代码复制按钮组件
-interface CopyCodeButtonProps {
-  componentName: string;
-  cliName: string;
+interface SidebarCodeBlockProps {
+  code: string;
+  language?: string;
 }
 
-export function CopyCodeButton({
-  componentName,
-  cliName,
-}: CopyCodeButtonProps) {
-  const clipboard = useClipboard();
-  const [copiedCode, setCopiedCode] = useState(false);
-
-  const handleCopyCode = () => {
-    const importCode = `import { ${componentName.replace(/\s+/g, "")} } from "@/components/qiuye-ui/${cliName}";`;
-    clipboard.copy(importCode);
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2000);
-    toast.success("复制成功！", {
-      description: "已复制导入代码",
-    });
-  };
+// 侧栏统一代码展示：由 CodeBlockPanel 提供复制交互，代码区域只负责滚动。
+export function SidebarCodeBlock({
+  code,
+  language = "tsx",
+}: SidebarCodeBlockProps) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   return (
-    <Button
-      onClick={handleCopyCode}
-      variant="outline"
-      className="w-full"
-      size="sm"
+    <CodeBlockPanel
+      code={code}
+      language={language}
+      isDark={isDark}
+      className="min-w-0 rounded-lg"
     >
-      {copiedCode ? (
-        <CheckCircle className="h-4 w-4" />
-      ) : (
-        <Code className="h-4 w-4" />
-      )}
-      {copiedCode ? "已复制" : "复制导入"}
-    </Button>
+      <CodeBlockDisplay
+        language={language}
+        isDark={isDark}
+        showLineNumbers={false}
+      >
+        {code}
+      </CodeBlockDisplay>
+    </CodeBlockPanel>
   );
 }
 

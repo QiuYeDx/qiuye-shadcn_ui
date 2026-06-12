@@ -20,7 +20,7 @@ import { ComponentId } from "@/lib/component-constants";
 import {
   BackButton,
   CopyCommandButton,
-  CopyCodeButton,
+  SidebarCodeBlock,
   DependenciesSection,
   ComponentDetailTabs,
   BasicUsageBlock,
@@ -224,14 +224,8 @@ export default async function ComponentDetailPage({
               {/* 导入代码 */}
               <section className="space-y-3">
                 <h2 className="text-sm font-semibold">导入代码</h2>
-                <div className="rounded-md bg-background/70 p-3 ring-1 ring-border/60">
-                  <code className="block text-xs lg:text-sm font-mono break-all">
-                    {importStatement}
-                  </code>
-                </div>
-                <CopyCodeButton
-                  componentName={component.name}
-                  cliName={component.cliName}
+                <SidebarCodeBlock
+                  code={importStatement}
                 />
               </section>
 
