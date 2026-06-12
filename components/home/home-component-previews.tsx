@@ -350,13 +350,13 @@ function DotGlassPreview() {
 
       <div className="absolute inset-0 flex flex-col justify-center gap-5 overflow-hidden bg-muted/40">
         <div className="w-full">
-          <DotGlassMarqueeStrip duration={26} />
+          <DotGlassMarqueeStrip duration={38} />
         </div>
         <div className="w-full">
           <DotGlassMarqueeStrip duration={32} reverse />
         </div>
         <div className="w-full">
-          <DotGlassMarqueeStrip duration={38} />
+          <DotGlassMarqueeStrip duration={26} />
         </div>
         <div className="absolute inset-0 bg-background/10" />
       </div>
