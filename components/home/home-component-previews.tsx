@@ -704,14 +704,14 @@ function TourPreview() {
           aria-hidden
           className="tour-preview-glow pointer-events-none absolute size-64 scale-75 rounded-full bg-background/70 opacity-0 blur-3xl transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
         />
-        <span className="tour-preview-cta relative flex items-center gap-2.5 rounded-full border border-foreground/10 bg-background/88 py-1.5 pr-3.5 pl-1.5 text-foreground opacity-0 shadow-[0_14px_36px_-18px_rgba(0,0,0,0.5),0_1px_0_rgba(255,255,255,0.7)_inset] backdrop-blur-xl transition-[opacity,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:shadow-[0_18px_42px_-18px_rgba(0,0,0,0.58),0_1px_0_rgba(255,255,255,0.7)_inset]">
-          <span className="flex size-8 items-center justify-center rounded-full bg-foreground text-background shadow-sm">
+        <span className="tour-preview-cta relative flex items-center gap-2.5 rounded-full border border-foreground/10 bg-background/88 py-1.5 pr-3.5 pl-1.5 text-foreground opacity-0 shadow-[0_14px_36px_-18px_rgba(0,0,0,0.5),0_1px_0_rgba(255,255,255,0.7)_inset] backdrop-blur-xl transition-[opacity,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:shadow-[0_18px_42px_-18px_rgba(0,0,0,0.58),0_1px_0_rgba(255,255,255,0.7)_inset] dark:border-white/80 dark:bg-white/95 dark:text-zinc-950 dark:shadow-[0_18px_48px_-18px_rgba(0,0,0,0.9),0_1px_0_rgba(255,255,255,0.95)_inset] dark:hover:shadow-[0_20px_52px_-18px_rgba(0,0,0,0.95),0_1px_0_rgba(255,255,255,0.95)_inset]">
+          <span className="flex size-8 items-center justify-center rounded-full bg-foreground text-background shadow-sm dark:bg-zinc-950 dark:text-white">
             <MousePointer2Icon className="size-3.5" />
           </span>
           <span className="text-sm font-medium tracking-[-0.01em]">
             体验 Tour 引导
           </span>
-          <ArrowUpRightIcon className="size-3.5 text-muted-foreground transition-transform duration-300 ease-out group-hover/tour-preview:translate-x-0.5 group-hover/tour-preview:-translate-y-0.5 group-focus-within/tour-preview:translate-x-0.5 group-focus-within/tour-preview:-translate-y-0.5 motion-reduce:transition-none" />
+          <ArrowUpRightIcon className="size-3.5 text-muted-foreground transition-transform duration-300 ease-out group-hover/tour-preview:translate-x-0.5 group-hover/tour-preview:-translate-y-0.5 group-focus-within/tour-preview:translate-x-0.5 group-focus-within/tour-preview:-translate-y-0.5 motion-reduce:transition-none dark:text-zinc-500" />
         </span>
       </button>
 
