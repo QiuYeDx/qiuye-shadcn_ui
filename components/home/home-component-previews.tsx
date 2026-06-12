@@ -14,6 +14,7 @@ import {
   SunIcon,
   XIcon,
 } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 
 import {
   DialogDescription,
@@ -599,6 +600,8 @@ function ColorPickerPreview() {
 function TourPreview() {
   const [open, setOpen] = React.useState(false);
   const [currentStep, setCurrentStep] = React.useState(0);
+  const [ctaVisible, setCtaVisible] = React.useState(false);
+  const prefersReducedMotion = useReducedMotion();
   const toolbarRef = React.useRef<HTMLDivElement>(null);
   const sidebarRef = React.useRef<HTMLDivElement>(null);
   const panelRef = React.useRef<HTMLDivElement>(null);
@@ -634,8 +637,19 @@ function TourPreview() {
   );
 
   const startTour = () => {
+    setCtaVisible(false);
     setCurrentStep(0);
     setOpen(true);
+  };
+
+  const showCta = () => {
+    if (open) return;
+    setCtaVisible(true);
+  };
+
+  const hideCta = () => {
+    if (open) return;
+    setCtaVisible(false);
   };
 
   return (
@@ -686,14 +700,16 @@ function TourPreview() {
       <button
         type="button"
         aria-label="体验 Tour 引导"
+        onPointerEnter={showCta}
+        onPointerLeave={hideCta}
+        onFocus={showCta}
+        onBlur={hideCta}
         onClick={startTour}
         className={cn(
           "absolute inset-0 z-10 isolate flex items-center justify-center overflow-hidden bg-background/0 px-6 text-center",
           "transition-[background-color,backdrop-filter] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
           "hover:bg-background/20 hover:backdrop-blur-[0.75px] hover:duration-300 focus-visible:bg-background/20 focus-visible:backdrop-blur-[0.75px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/45 focus-visible:ring-inset",
-          "[&:focus-visible_.tour-preview-cta]:opacity-100 [&:focus-visible_.tour-preview-cta]:duration-300",
           "[&:focus-visible_.tour-preview-glow]:scale-100 [&:focus-visible_.tour-preview-glow]:opacity-100 [&:focus-visible_.tour-preview-glow]:duration-500",
-          "[&:hover_.tour-preview-cta]:opacity-100 [&:hover_.tour-preview-cta]:duration-300",
           "[&:hover_.tour-preview-glow]:scale-100 [&:hover_.tour-preview-glow]:opacity-100 [&:hover_.tour-preview-glow]:duration-500",
           open
             ? "pointer-events-none"
@@ -704,7 +720,19 @@ function TourPreview() {
           aria-hidden
           className="tour-preview-glow pointer-events-none absolute size-64 scale-75 rounded-full bg-background/70 opacity-0 blur-3xl transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
         />
-        <span className="tour-preview-cta relative flex items-center gap-2.5 rounded-full border border-foreground/10 bg-background/88 py-1.5 pr-3.5 pl-1.5 text-foreground opacity-0 shadow-[0_14px_36px_-18px_rgba(0,0,0,0.5),0_1px_0_rgba(255,255,255,0.7)_inset] backdrop-blur-xl transition-[opacity,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:shadow-[0_18px_42px_-18px_rgba(0,0,0,0.58),0_1px_0_rgba(255,255,255,0.7)_inset] dark:border-white/80 dark:bg-white/95 dark:text-zinc-950 dark:shadow-[0_18px_48px_-18px_rgba(0,0,0,0.9),0_1px_0_rgba(255,255,255,0.95)_inset] dark:hover:shadow-[0_20px_52px_-18px_rgba(0,0,0,0.95),0_1px_0_rgba(255,255,255,0.95)_inset]">
+        <motion.span
+          className="tour-preview-cta relative flex items-center gap-2.5 rounded-full border border-foreground/10 bg-background/88 py-1.5 pr-3.5 pl-1.5 text-foreground shadow-[0_14px_36px_-18px_rgba(0,0,0,0.5),0_1px_0_rgba(255,255,255,0.7)_inset] backdrop-blur-xl transition-shadow duration-500 ease-out hover:shadow-[0_18px_42px_-18px_rgba(0,0,0,0.58),0_1px_0_rgba(255,255,255,0.7)_inset] dark:border-white/80 dark:bg-white/95 dark:text-zinc-950 dark:shadow-[0_18px_48px_-18px_rgba(0,0,0,0.9),0_1px_0_rgba(255,255,255,0.95)_inset] dark:hover:shadow-[0_20px_52px_-18px_rgba(0,0,0,0.95),0_1px_0_rgba(255,255,255,0.95)_inset]"
+          initial={false}
+          animate={{
+            opacity: ctaVisible ? 1 : 0,
+            y: prefersReducedMotion ? 0 : ctaVisible ? 0 : 16,
+            scale: ctaVisible ? 1 : 0.975,
+          }}
+          transition={{
+            duration: prefersReducedMotion ? 0 : ctaVisible ? 0.28 : 0.36,
+            ease: [0.25, 0.1, 0.25, 1],
+          }}
+        >
           <span className="flex size-8 items-center justify-center rounded-full bg-foreground text-background shadow-sm dark:bg-zinc-950 dark:text-white">
             <MousePointer2Icon className="size-3.5" />
           </span>
@@ -712,7 +740,7 @@ function TourPreview() {
             体验 Tour 引导
           </span>
           <ArrowUpRightIcon className="size-3.5 text-muted-foreground transition-transform duration-300 ease-out group-hover/tour-preview:translate-x-0.5 group-hover/tour-preview:-translate-y-0.5 group-focus-within/tour-preview:translate-x-0.5 group-focus-within/tour-preview:-translate-y-0.5 motion-reduce:transition-none dark:text-zinc-500" />
-        </span>
+        </motion.span>
       </button>
 
       <Tour
