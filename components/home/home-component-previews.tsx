@@ -2,13 +2,13 @@
 
 import * as React from "react";
 import {
+  BellOffIcon,
   BellIcon,
   CheckIcon,
   FolderKanbanIcon,
   GripVerticalIcon,
   MenuIcon,
   MoonIcon,
-  SparklesIcon,
   SunIcon,
   XIcon,
 } from "lucide-react";
@@ -32,6 +32,7 @@ import { Typewriter } from "@/components/qiuye-ui/typewriter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ComponentId } from "@/lib/component-constants";
+import { cn } from "@/lib/utils";
 
 function ResponsiveTabsPreview() {
   const [value, setValue] = React.useState("overview");
@@ -69,45 +70,97 @@ function ResponsiveTabsPreview() {
 
 function ScrollableDialogPreview() {
   const [open, setOpen] = React.useState(false);
+  const reviewItems = [
+    ["图标语义", "切换前后状态保持同一对象"],
+    ["滚动内容", "长内容分组清晰，遮罩提示保留"],
+    ["底部操作", "取消与确认按钮固定居中"],
+  ];
 
   return (
     <div className="flex w-full max-w-sm flex-col items-center gap-4">
       <div className="w-full rounded-lg border bg-background p-4 shadow-sm">
         <div className="mb-3 flex items-center justify-between">
-          <div>
-            <div className="text-sm font-medium">Release notes</div>
-            <div className="text-xs text-muted-foreground">
-              Fixed header and footer
+          <div className="flex items-center gap-3">
+            <div className="flex size-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
+              <CheckIcon className="size-4" />
+            </div>
+            <div>
+              <div className="text-sm font-medium">发布确认</div>
+              <div className="text-xs text-muted-foreground">
+                固定头部、滚动正文、居中操作
+              </div>
             </div>
           </div>
-          <Badge variant="secondary">Dialog</Badge>
+          <Badge variant="secondary">Review</Badge>
         </div>
-        <div className="space-y-2">
-          <div className="h-2 rounded bg-muted" />
-          <div className="h-2 w-4/5 rounded bg-muted" />
-          <div className="h-2 w-2/3 rounded bg-muted" />
+        <div className="space-y-2 text-xs">
+          {reviewItems.map(([label, detail]) => (
+            <div
+              key={label}
+              className="flex items-center justify-between gap-3 rounded-md bg-muted/50 px-3 py-2"
+            >
+              <span className="font-medium">{label}</span>
+              <span className="truncate text-muted-foreground">{detail}</span>
+            </div>
+          ))}
         </div>
       </div>
       <Button size="sm" onClick={() => setOpen(true)}>
-        打开预览
+        查看确认单
       </Button>
-      <ScrollableDialog open={open} onOpenChange={setOpen}>
+      <ScrollableDialog
+        open={open}
+        onOpenChange={setOpen}
+        maxWidth="sm:max-w-lg"
+      >
         <ScrollableDialogHeader>
-          <DialogTitle>Scrollable Dialog</DialogTitle>
-          <DialogDescription>头部和底部保持固定。</DialogDescription>
+          <DialogTitle>组件发布确认</DialogTitle>
+          <DialogDescription>
+            滚动查看变更、风险和后续动作，底部操作始终可见。
+          </DialogDescription>
         </ScrollableDialogHeader>
         <ScrollableDialogContent>
-          <div className="space-y-3">
-            {Array.from({ length: 8 }).map((_, index) => (
-              <div key={index} className="rounded-md border p-3 text-sm">
-                Content row {index + 1}
+          <div className="space-y-4 text-sm">
+            <div className="rounded-lg border bg-muted/30 p-4">
+              <div className="mb-2 text-sm font-semibold">本次调整</div>
+              <p className="text-muted-foreground">
+                优化首页示例的状态语义与对话框内容结构，让预览更接近真实发布检查流。
+              </p>
+            </div>
+            {reviewItems.map(([label, detail], index) => (
+              <div key={label} className="rounded-lg border bg-background p-4">
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                    {index + 1}
+                  </span>
+                  <span className="font-medium">{label}</span>
+                </div>
+                <p className="text-muted-foreground">{detail}</p>
               </div>
             ))}
+            <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+              <div className="mb-1 font-medium text-primary">发布建议</div>
+              <p className="text-muted-foreground">
+                保留固定 footer，用户滚动到底部前也能随时取消或确认。
+              </p>
+            </div>
           </div>
         </ScrollableDialogContent>
-        <ScrollableDialogFooter>
-          <Button size="sm" onClick={() => setOpen(false)}>
-            完成
+        <ScrollableDialogFooter className="flex flex-col-reverse items-center justify-center gap-2 sm:flex-row">
+          <Button
+            size="sm"
+            variant="outline"
+            className="w-full sm:w-auto"
+            onClick={() => setOpen(false)}
+          >
+            稍后处理
+          </Button>
+          <Button
+            size="sm"
+            className="w-full sm:w-auto"
+            onClick={() => setOpen(false)}
+          >
+            确认发布
           </Button>
         </ScrollableDialogFooter>
       </ScrollableDialog>
@@ -372,7 +425,7 @@ function ImageViewerPreview() {
 function DualStateTogglePreview() {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [theme, setTheme] = React.useState(false);
-  const [done, setDone] = React.useState(true);
+  const [notificationsMuted, setNotificationsMuted] = React.useState(false);
 
   return (
     <div className="flex items-center justify-center gap-3 rounded-full border bg-muted/30 p-3">
@@ -398,14 +451,15 @@ function DualStateTogglePreview() {
         variant="outline"
       />
       <DualStateToggle
-        active={done}
-        onToggle={setDone}
-        activeIcon={<CheckIcon />}
+        active={notificationsMuted}
+        onToggle={setNotificationsMuted}
+        activeIcon={<BellOffIcon />}
         inactiveIcon={<BellIcon />}
-        activeLabel="完成"
-        inactiveLabel="提醒"
+        activeLabel="通知关闭"
+        inactiveLabel="通知开启"
         effect="scale"
         variant="ghost"
+        shape="circle"
       />
     </div>
   );
@@ -542,139 +596,120 @@ function ColorPickerPreview() {
 
 function TourPreview() {
   const [open, setOpen] = React.useState(false);
-  const navigationRef = React.useRef<HTMLDivElement>(null);
-  const searchRef = React.useRef<HTMLDivElement>(null);
-  const projectsRef = React.useRef<HTMLDivElement>(null);
+  const [currentStep, setCurrentStep] = React.useState(0);
+  const toolbarRef = React.useRef<HTMLDivElement>(null);
+  const sidebarRef = React.useRef<HTMLDivElement>(null);
+  const panelRef = React.useRef<HTMLDivElement>(null);
 
   const steps = React.useMemo<TourStep[]>(
     () => [
       {
-        id: "home-tour-navigation",
-        target: () => navigationRef.current,
-        title: "Menu",
-        content: "Start from the compact navigation area.",
-        placement: "right",
-      },
-      {
-        id: "home-tour-search",
-        target: () => searchRef.current,
-        title: "Search",
-        content: "Move the spotlight to the quick action target.",
+        id: "home-tour-toolbar",
+        target: () => toolbarRef.current,
+        title: "顶部工具栏",
+        content: "Tour 会聚焦到指定目标，并把说明贴近目标展示。",
         placement: "bottom",
+        align: "center",
       },
       {
-        id: "home-tour-projects",
-        target: () => projectsRef.current,
-        title: "Progress",
-        content: "Finish on the primary workspace panel.",
+        id: "home-tour-sidebar",
+        target: () => sidebarRef.current,
+        title: "侧边区域",
+        content: "步骤可以绑定页面上的任意元素。",
+        placement: "bottom",
+        align: "start",
+      },
+      {
+        id: "home-tour-panel",
+        target: () => panelRef.current,
+        title: "主要内容",
+        content: "最后一步收束到关键内容区，完成一次引导流程。",
         placement: "top",
+        align: "center",
       },
     ],
     [],
   );
 
+  const startTour = () => {
+    setCurrentStep(0);
+    setOpen(true);
+  };
+
   return (
-    <div className="w-full max-w-[320px]">
-      <div className="relative h-[220px] overflow-hidden rounded-lg border bg-background p-3">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-2">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-              <SparklesIcon className="size-4" />
-            </div>
-            <div className="min-w-0">
-              <div className="truncate text-sm font-semibold">Release hub</div>
-              <div className="truncate text-[11px] leading-4 text-muted-foreground">
-                Interactive tour preview
-              </div>
-            </div>
-          </div>
-          <Button
-            type="button"
-            size="sm"
-            className="h-7 shrink-0 gap-1 px-2.5 text-xs"
-            onClick={() => setOpen(true)}
-          >
-            <SparklesIcon className="size-3.5" />
-            <span>Start</span>
-          </Button>
-        </div>
-
-        <div className="mt-3 grid grid-cols-[76px_minmax(0,1fr)] gap-2">
+    <div className="relative -m-4 flex h-[calc(100%+2rem)] min-h-[260px] w-[calc(100%+2rem)] items-center justify-center overflow-hidden p-5 sm:p-6">
+      <div className="relative z-0 h-full min-h-[210px] w-full max-w-2xl overflow-hidden rounded-lg border bg-background p-3 sm:p-4">
+        <div className="flex h-full min-h-0 flex-col gap-3">
           <div
-            ref={navigationRef}
-            className="min-w-0 space-y-1.5 rounded-md border bg-muted/30 p-1.5"
+            ref={toolbarRef}
+            className="flex h-10 shrink-0 items-center gap-2 rounded-md border bg-muted/35 px-3 sm:h-12 sm:px-4"
           >
-            {["Map", "Tasks", "Ship"].map((item, index) => (
-              <button
-                key={item}
-                type="button"
-                className={
-                  index === 1
-                    ? "h-7 w-full truncate rounded-md bg-primary px-2 text-left text-xs font-medium text-primary-foreground"
-                    : "h-7 w-full truncate rounded-md bg-background px-2 text-left text-xs text-muted-foreground"
-                }
-              >
-                {item}
-              </button>
-            ))}
+            <div className="size-5 shrink-0 rounded-full bg-muted-foreground/25 sm:size-6" />
+            <div className="h-2.5 w-24 max-w-[44%] rounded-full bg-muted-foreground/20 sm:w-40" />
+            <div className="ml-auto flex shrink-0 gap-1.5 sm:gap-2">
+              <div className="size-5 rounded bg-muted-foreground/15 sm:size-7" />
+              <div className="size-5 rounded bg-muted-foreground/15 sm:size-7" />
+            </div>
           </div>
 
-          <div className="min-w-0 space-y-3">
+          <div className="grid min-h-0 flex-1 grid-cols-[76px_minmax(0,1fr)] gap-3 sm:grid-cols-[112px_minmax(0,1fr)] sm:gap-4">
             <div
-              ref={searchRef}
-              className="flex h-9 min-w-0 items-center gap-2 rounded-md border bg-muted/30 px-2.5 text-xs text-muted-foreground"
+              ref={sidebarRef}
+              className="space-y-2 rounded-md border bg-muted/25 p-2 sm:p-3"
             >
-              <SparklesIcon className="size-3.5 shrink-0 text-primary" />
-              <span className="truncate">Search</span>
-              <span className="ml-auto rounded bg-background px-1.5 py-0.5 text-[10px] leading-none">
-                K
-              </span>
+              <div className="h-6 rounded bg-muted-foreground/20 sm:h-8" />
+              <div className="h-6 rounded bg-muted-foreground/12 sm:h-8" />
+              <div className="h-6 rounded bg-muted-foreground/12 sm:h-8" />
             </div>
 
             <div
-              ref={projectsRef}
-              className="rounded-md border bg-muted/30 p-2"
+              ref={panelRef}
+              className="flex min-h-0 flex-col justify-between rounded-md border bg-muted/20 p-3 sm:p-4"
             >
-              <div className="mb-2 flex items-center justify-between gap-2">
-                <div className="min-w-0 truncate text-xs font-semibold">
-                  Progress
-                </div>
-                <span className="shrink-0 rounded bg-background px-1.5 py-0.5 text-[10px] leading-none text-muted-foreground">
-                  live
-                </span>
+              <div className="space-y-2">
+                <div className="h-3 w-28 max-w-[48%] rounded-full bg-muted-foreground/20 sm:w-44" />
+                <div className="h-2.5 rounded-full bg-muted-foreground/14" />
+                <div className="h-2.5 w-5/6 rounded-full bg-muted-foreground/14" />
               </div>
-              <div className="space-y-1.5">
-                {["Design", "Build"].map((item, index) => (
-                  <div key={item} className="rounded bg-background px-2 py-1">
-                    <div className="mb-1 flex min-w-0 items-center justify-between gap-2 text-[11px]">
-                      <span className="min-w-0 truncate">{item}</span>
-                      <span className="shrink-0 text-muted-foreground">
-                        {index === 0 ? "82%" : "64%"}
-                      </span>
-                    </div>
-                    <div className="h-1.5 rounded-full bg-muted">
-                      <div
-                        className="h-full rounded-full bg-primary"
-                        style={{ width: index === 0 ? "82%" : "64%" }}
-                      />
-                    </div>
-                  </div>
-                ))}
+              <div className="mt-2 grid grid-cols-3 gap-2 sm:gap-3">
+                <div className="h-10 rounded bg-muted-foreground/12 sm:h-14" />
+                <div className="h-10 rounded bg-muted-foreground/12 sm:h-14" />
+                <div className="h-10 rounded bg-muted-foreground/12 sm:h-14" />
               </div>
             </div>
           </div>
         </div>
-
-        <Tour
-          open={open}
-          onOpenChange={setOpen}
-          steps={steps}
-          allowTargetInteraction
-          maskClosable
-          popoverWidth={260}
-          viewportPadding={10}
-        />
       </div>
+
+      <button
+        type="button"
+        onClick={startTour}
+        className={cn(
+          "absolute inset-0 z-10 flex items-center justify-center bg-muted/0 px-6 text-center transition-colors",
+          "hover:bg-muted/70 hover:backdrop-blur-[1px] focus-visible:bg-muted/70 focus-visible:backdrop-blur-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/45 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          "[&:focus-visible>span]:opacity-100 [&:hover>span]:opacity-100",
+          open
+            ? "pointer-events-none"
+            : "cursor-pointer",
+        )}
+      >
+        <span className="rounded-md px-3 py-2 text-sm font-medium text-foreground opacity-0 transition-opacity">
+          点击查看 Tour 引导
+        </span>
+      </button>
+
+      <Tour
+        open={open}
+        onOpenChange={setOpen}
+        currentStep={currentStep}
+        onStepChange={setCurrentStep}
+        steps={steps}
+        popoverWidth={260}
+        viewportPadding={12}
+        scrollIntoView={false}
+        maskClosable
+        allowTargetInteraction
+      />
     </div>
   );
 }

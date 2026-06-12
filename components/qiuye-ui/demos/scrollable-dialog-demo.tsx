@@ -24,26 +24,50 @@ import { ViewSourceButton } from "@/components/view-source-button";
 
 // 源码数据
 const sourceCodes = {
-  basic: `<ScrollableDialog open={basicOpen} onOpenChange={setBasicOpen}>
+  basic: `<ScrollableDialog
+  open={basicOpen}
+  onOpenChange={setBasicOpen}
+  maxWidth="sm:max-w-lg"
+>
   <ScrollableDialogHeader>
-    <DialogTitle>基础对话框标题</DialogTitle>
-    <DialogDescription>这是一个可滚动的对话框示例</DialogDescription>
+    <DialogTitle>组件发布确认</DialogTitle>
+    <DialogDescription>
+      确认本次示例优化的范围、风险和后续动作
+    </DialogDescription>
   </ScrollableDialogHeader>
 
   <ScrollableDialogContent>
-    <div className="space-y-4">
-      <p>这是对话框的内容区域，当内容超过设定高度时会出现滚动条。</p>
-      <p>您可以在这里放置任何内容，包括表单、列表、卡片等。</p>
-      <div className="p-4 bg-muted rounded-md">
-        <p className="font-semibold">提示</p>
-        <p className="text-sm text-muted-foreground">
-          头部和底部会固定在顶部和底部，只有中间内容区域可滚动。
+    <div className="space-y-4 text-sm">
+      <div className="rounded-lg border bg-muted/30 p-4">
+        <p className="font-semibold">发布摘要</p>
+        <p className="mt-1 text-muted-foreground">
+          本次更新让首页示例更贴近真实使用场景，并保持固定 footer 可随时操作。
+        </p>
+      </div>
+      <div className="grid gap-3">
+        <div className="rounded-md border bg-background p-3">
+          <p className="font-medium">Dual State Toggle</p>
+          <p className="mt-1 text-muted-foreground">
+            使用通知开/关、明暗模式、菜单展开/收起这类语义成对的图标。
+          </p>
+        </div>
+        <div className="rounded-md border bg-background p-3">
+          <p className="font-medium">Scrollable Dialog</p>
+          <p className="mt-1 text-muted-foreground">
+            内容按摘要、检查项和建议分组，滚动区域不再只是占位文本。
+          </p>
+        </div>
+      </div>
+      <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+        <p className="font-medium text-primary">交互重点</p>
+        <p className="mt-1 text-muted-foreground">
+          头部说明和底部按钮固定，中间内容独立滚动，适合承载长表单或确认清单。
         </p>
       </div>
     </div>
   </ScrollableDialogContent>
 
-  <ScrollableDialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+  <ScrollableDialogFooter className="flex flex-col-reverse items-center justify-center gap-2 sm:flex-row">
     <Button variant="outline" onClick={() => setBasicOpen(false)}>
       取消
     </Button>
@@ -51,27 +75,46 @@ const sourceCodes = {
   </ScrollableDialogFooter>
 </ScrollableDialog>`,
 
-  longContent: `<ScrollableDialog open={longContentOpen} onOpenChange={setLongContentOpen}>
+  longContent: `<ScrollableDialog
+  open={longContentOpen}
+  onOpenChange={setLongContentOpen}
+  maxWidth="sm:max-w-xl"
+>
   <ScrollableDialogHeader>
-    <DialogTitle>长内容对话框</DialogTitle>
+    <DialogTitle>发布评审记录</DialogTitle>
     <DialogDescription>
-      滚动查看下方的大量内容，注意头部和底部始终可见
+      滚动查看完整检查项，头部和底部始终可见
     </DialogDescription>
   </ScrollableDialogHeader>
 
   <ScrollableDialogContent>
-    <div className="space-y-4">
-      <h3 className="font-semibold text-lg">第一部分</h3>
-      <p>这是一个包含大量内容的对话框示例。当内容超过最大高度时，内容区域会自动出现滚动条。</p>
-      
-      <h3 className="font-semibold text-lg">第二部分</h3>
-      <p>内容区域可以包含任何组件...</p>
-      
-      {/* 更多内容 */}
+    <div className="space-y-5 text-sm">
+      <section className="rounded-lg border p-4">
+        <h3 className="font-semibold">变更摘要</h3>
+        <p className="mt-2 text-muted-foreground">
+          本次发布包含首页预览、详情页示例和源码展示的同步优化。
+        </p>
+      </section>
+
+      <section className="rounded-lg border p-4">
+        <h3 className="font-semibold">质量检查</h3>
+        <ul className="mt-3 space-y-2 text-muted-foreground">
+          <li>图标切换前后语义成对</li>
+          <li>长内容分区清晰，可扫读</li>
+          <li>footer 按钮固定并居中</li>
+        </ul>
+      </section>
+
+      <section className="rounded-lg border p-4">
+        <h3 className="font-semibold">后续动作</h3>
+        <p className="mt-2 text-muted-foreground">
+          确认后执行 registry 更新和页面构建验证。
+        </p>
+      </section>
     </div>
   </ScrollableDialogContent>
 
-  <ScrollableDialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+  <ScrollableDialogFooter className="flex flex-col-reverse items-center justify-center gap-2 sm:flex-row">
     <Button variant="outline" onClick={() => setLongContentOpen(false)}>
       取消
     </Button>
@@ -98,7 +141,7 @@ const sourceCodes = {
     </div>
   </ScrollableDialogContent>
 
-  <ScrollableDialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+  <ScrollableDialogFooter className="flex flex-col-reverse items-center justify-center gap-2 sm:flex-row">
     <Button variant="outline" onClick={() => setCustomHeightOpen(false)}>
       取消
     </Button>
@@ -131,7 +174,7 @@ const sourceCodes = {
     </form>
   </ScrollableDialogContent>
 
-  <ScrollableDialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+  <ScrollableDialogFooter className="flex flex-col-reverse items-center justify-center gap-2 sm:flex-row">
     <Button variant="outline" onClick={() => setFormOpen(false)}>
       取消
     </Button>
@@ -179,7 +222,7 @@ const sourceCodes = {
     </div>
   </ScrollableDialogContent>
 
-  <ScrollableDialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+  <ScrollableDialogFooter className="flex flex-col-reverse items-center justify-center gap-2 sm:flex-row">
     <Button onClick={() => setNoFadeOpen(false)}>知道了</Button>
   </ScrollableDialogFooter>
 </ScrollableDialog>`,
@@ -214,26 +257,51 @@ export function ScrollableDialogDemo() {
           <Button onClick={() => setBasicOpen(true)} className="cursor-pointer">
             打开基础对话框
           </Button>
-          <ScrollableDialog open={basicOpen} onOpenChange={setBasicOpen}>
+          <ScrollableDialog
+            open={basicOpen}
+            onOpenChange={setBasicOpen}
+            maxWidth="sm:max-w-lg"
+          >
             <ScrollableDialogHeader>
-              <DialogTitle>基础对话框标题</DialogTitle>
-              <DialogDescription>这是一个可滚动的对话框示例</DialogDescription>
+              <DialogTitle>组件发布确认</DialogTitle>
+              <DialogDescription>
+                确认本次示例优化的范围、风险和后续动作
+              </DialogDescription>
             </ScrollableDialogHeader>
 
             <ScrollableDialogContent>
-              <div className="space-y-4">
-                <p>这是对话框的内容区域，当内容超过设定高度时会出现滚动条。</p>
-                <p>您可以在这里放置任何内容，包括表单、列表、卡片等。</p>
-                <div className="p-4 bg-muted rounded-md">
-                  <p className="font-semibold">提示</p>
-                  <p className="text-sm text-muted-foreground">
-                    头部和底部会固定在顶部和底部，只有中间内容区域可滚动。
+              <div className="space-y-4 text-sm">
+                <div className="rounded-lg border bg-muted/30 p-4">
+                  <p className="font-semibold">发布摘要</p>
+                  <p className="mt-1 text-muted-foreground">
+                    本次更新让首页示例更贴近真实使用场景，并保持固定
+                    footer 可随时操作。
+                  </p>
+                </div>
+                <div className="grid gap-3">
+                  <div className="rounded-md border bg-background p-3">
+                    <p className="font-medium">Dual State Toggle</p>
+                    <p className="mt-1 text-muted-foreground">
+                      使用通知开/关、明暗模式、菜单展开/收起这类语义成对的图标。
+                    </p>
+                  </div>
+                  <div className="rounded-md border bg-background p-3">
+                    <p className="font-medium">Scrollable Dialog</p>
+                    <p className="mt-1 text-muted-foreground">
+                      内容按摘要、检查项和建议分组，滚动区域不再只是占位文本。
+                    </p>
+                  </div>
+                </div>
+                <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+                  <p className="font-medium text-primary">交互重点</p>
+                  <p className="mt-1 text-muted-foreground">
+                    头部说明和底部按钮固定，中间内容独立滚动，适合承载长表单或确认清单。
                   </p>
                 </div>
               </div>
             </ScrollableDialogContent>
 
-            <ScrollableDialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <ScrollableDialogFooter className="flex flex-col-reverse items-center justify-center gap-2 sm:flex-row">
               <Button
                 variant="outline"
                 onClick={() => setBasicOpen(false)}
@@ -277,77 +345,71 @@ export function ScrollableDialogDemo() {
           <ScrollableDialog
             open={longContentOpen}
             onOpenChange={setLongContentOpen}
+            maxWidth="sm:max-w-xl"
           >
             <ScrollableDialogHeader>
-              <DialogTitle>长内容对话框</DialogTitle>
+              <DialogTitle>发布评审记录</DialogTitle>
               <DialogDescription>
-                滚动查看下方的大量内容，注意头部和底部始终可见
+                滚动查看完整检查项，头部和底部始终可见
               </DialogDescription>
             </ScrollableDialogHeader>
 
             <ScrollableDialogContent>
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">第一部分</h3>
-                <p>
-                  这是一个包含大量内容的对话框示例。当内容超过最大高度时，内容区域会自动出现滚动条。
-                </p>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                </p>
-
-                <h3 className="font-semibold text-lg">第二部分</h3>
-                <p>
-                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                  laboris nisi ut aliquip ex ea commodo consequat.
-                </p>
-                <div className="p-4 bg-muted rounded-md space-y-2">
-                  <p className="font-semibold">特性列表：</p>
-                  <ul className="list-disc list-inside space-y-1 text-sm">
-                    <li>固定的头部区域</li>
-                    <li>可滚动的内容区域</li>
-                    <li>固定的底部操作区域</li>
-                    <li>响应式设计</li>
-                    <li>可自定义最大高度</li>
-                  </ul>
-                </div>
-
-                <h3 className="font-semibold text-lg">第三部分</h3>
-                <p>
-                  Duis aute irure dolor in reprehenderit in voluptate velit esse
-                  cillum dolore eu fugiat nulla pariatur.
-                </p>
-                <p>
-                  Excepteur sint occaecat cupidatat non proident, sunt in culpa
-                  qui officia deserunt mollit anim id est laborum.
-                </p>
-
-                <h3 className="font-semibold text-lg">第四部分</h3>
-                <p>
-                  Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                  accusantium doloremque laudantium.
-                </p>
-                <p>
-                  Totam rem aperiam, eaque ipsa quae ab illo inventore veritatis
-                  et quasi architecto beatae vitae dicta sunt explicabo.
-                </p>
-
-                <h3 className="font-semibold text-lg">第五部分</h3>
-                <p>
-                  Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut
-                  odit aut fugit, sed quia consequuntur magni dolores eos qui
-                  ratione voluptatem sequi nesciunt.
-                </p>
-                <div className="p-4 bg-primary/10 rounded-md">
-                  <p className="font-semibold">注意事项</p>
-                  <p className="text-sm text-muted-foreground">
-                    请注意，即使内容很长，头部的标题和底部的操作按钮始终保持可见，方便用户操作。
+              <div className="space-y-5 text-sm">
+                <section className="rounded-lg border p-4">
+                  <h3 className="font-semibold">变更摘要</h3>
+                  <p className="mt-2 text-muted-foreground">
+                    本次发布包含首页预览、详情页示例和源码展示的同步优化。
                   </p>
-                </div>
+                  <div className="mt-3 grid gap-2">
+                    <div className="rounded-md bg-muted/50 px-3 py-2">
+                      Dual State Toggle：使用关联明确的状态图标。
+                    </div>
+                    <div className="rounded-md bg-muted/50 px-3 py-2">
+                      Scrollable Dialog：将占位内容替换为发布确认场景。
+                    </div>
+                    <div className="rounded-md bg-muted/50 px-3 py-2">
+                      Footer：取消与确认按钮在固定操作栏中居中排列。
+                    </div>
+                  </div>
+                </section>
+
+                <section className="rounded-lg border p-4">
+                  <h3 className="font-semibold">质量检查</h3>
+                  <ul className="mt-3 space-y-2 text-muted-foreground">
+                    <li>图标切换前后语义成对，不再跨概念跳变。</li>
+                    <li>长内容分区清晰，用户滚动时可以快速扫读重点。</li>
+                    <li>固定头部说明当前任务，固定底部保留主要操作。</li>
+                    <li>源码预览与页面实际示例保持一致。</li>
+                  </ul>
+                </section>
+
+                <section className="rounded-lg border p-4">
+                  <h3 className="font-semibold">风险与回滚</h3>
+                  <p className="mt-2 text-muted-foreground">
+                    本次只调整示例内容和布局，不改动 ScrollableDialog
+                    的组件 API。若视觉密度不合适，可以单独回退 demo 文件。
+                  </p>
+                </section>
+
+                <section className="rounded-lg border p-4">
+                  <h3 className="font-semibold">发布窗口</h3>
+                  <p className="mt-2 text-muted-foreground">
+                    验证首页、组件详情页和 registry 输出后即可发布。长内容区域会继续滚动，footer
+                    操作栏保持可见。
+                  </p>
+                </section>
+
+                <section className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+                  <h3 className="font-semibold text-primary">后续动作</h3>
+                  <p className="mt-2 text-muted-foreground">
+                    确认后执行 registry 更新和页面构建验证，确保示例、文档和安装产物一致。
+                  </p>
+                </section>
               </div>
             </ScrollableDialogContent>
 
-            <ScrollableDialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <ScrollableDialogFooter className="flex flex-col-reverse items-center justify-center gap-2 sm:flex-row">
               <Button
                 variant="outline"
                 onClick={() => setLongContentOpen(false)}
@@ -423,7 +485,7 @@ export function ScrollableDialogDemo() {
               </div>
             </ScrollableDialogContent>
 
-            <ScrollableDialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <ScrollableDialogFooter className="flex flex-col-reverse items-center justify-center gap-2 sm:flex-row">
               <Button
                 variant="outline"
                 onClick={() => setCustomHeightOpen(false)}
@@ -519,14 +581,13 @@ export function ScrollableDialogDemo() {
 
                 <div className="p-4 bg-muted rounded-md">
                   <p className="text-sm text-muted-foreground">
-                    💡
                     提示：当表单内容较多时，中间区域会自动滚动，确保所有字段都能被访问。
                   </p>
                 </div>
               </form>
             </ScrollableDialogContent>
 
-            <ScrollableDialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <ScrollableDialogFooter className="flex flex-col-reverse items-center justify-center gap-2 sm:flex-row">
               <Button
                 variant="outline"
                 onClick={() => setFormOpen(false)}
@@ -625,7 +686,7 @@ export function ScrollableDialogDemo() {
 
                 <div className="p-4 bg-primary/10 rounded-md">
                   <p className="text-sm">
-                    ℹ️ 点击对话框外部或按 ESC 键即可关闭
+                    点击对话框外部或按 ESC 键即可关闭。
                   </p>
                 </div>
               </div>
@@ -723,13 +784,13 @@ export function ScrollableDialogDemo() {
 
                 <div className="p-4 bg-primary/10 rounded-md">
                   <p className="text-sm">
-                    💡 这个示例禁用了渐变遮罩，所以你看不到上下的渐变效果。
+                    这个示例禁用了渐变遮罩，所以你看不到上下的渐变效果。
                   </p>
                 </div>
               </div>
             </ScrollableDialogContent>
 
-            <ScrollableDialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <ScrollableDialogFooter className="flex flex-col-reverse items-center justify-center gap-2 sm:flex-row">
               <Button
                 onClick={() => setNoFadeOpen(false)}
                 className="cursor-pointer"

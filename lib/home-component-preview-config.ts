@@ -20,13 +20,12 @@ export const homePreviewConfigs: HomePreviewConfig[] = [
     featured: true,
   },
   {
-    id: ComponentId.MARKDOWN_RENDERER,
+    id: ComponentId.IMAGE_VIEWER,
     size: "tall",
-    featured: true,
   },
   {
     id: ComponentId.TOUR,
-    size: "square",
+    size: "wide",
     featured: true,
   },
   {
@@ -42,15 +41,16 @@ export const homePreviewConfigs: HomePreviewConfig[] = [
     size: "compact",
   },
   {
+    id: ComponentId.TYPEWRITER,
+    size: "compact",
+  },
+  {
     id: ComponentId.SCROLLABLE_DIALOG,
     size: "square",
   },
   {
-    id: ComponentId.IMAGE_VIEWER,
-    size: "tall",
-  },
-  {
-    id: ComponentId.TYPEWRITER,
-    size: "compact",
+    id: ComponentId.MARKDOWN_RENDERER,
+    size: "square",
+    featured: true,
   },
 ];
