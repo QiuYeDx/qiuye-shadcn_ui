@@ -2,12 +2,14 @@
 
 import * as React from "react";
 import {
+  ArrowUpRightIcon,
   BellOffIcon,
   BellIcon,
   CheckIcon,
   FolderKanbanIcon,
   GripVerticalIcon,
   MenuIcon,
+  MousePointer2Icon,
   MoonIcon,
   SunIcon,
   XIcon,
@@ -637,8 +639,8 @@ function TourPreview() {
   };
 
   return (
-    <div className="relative -m-4 flex h-[calc(100%+2rem)] min-h-[260px] w-[calc(100%+2rem)] items-center justify-center overflow-hidden p-5 sm:p-6">
-      <div className="relative z-0 h-full min-h-[210px] w-full max-w-2xl overflow-hidden rounded-lg border bg-background p-3 sm:p-4">
+    <div className="group/tour-preview relative -m-4 flex h-[calc(100%+2rem)] min-h-[260px] w-[calc(100%+2rem)] items-center justify-center overflow-hidden p-5 sm:p-6">
+      <div className="relative z-0 h-full min-h-[210px] w-full max-w-2xl overflow-hidden rounded-lg border bg-background p-3 transition-[filter,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none group-hover/tour-preview:saturate-[0.88] group-hover/tour-preview:opacity-90 group-hover/tour-preview:duration-300 sm:p-4">
         <div className="flex h-full min-h-0 flex-col gap-3">
           <div
             ref={toolbarRef}
@@ -683,18 +685,33 @@ function TourPreview() {
 
       <button
         type="button"
+        aria-label="体验 Tour 引导"
         onClick={startTour}
         className={cn(
-          "absolute inset-0 z-10 flex items-center justify-center bg-muted/0 px-6 text-center transition-colors",
-          "hover:bg-muted/70 hover:backdrop-blur-[1px] focus-visible:bg-muted/70 focus-visible:backdrop-blur-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/45 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-          "[&:focus-visible>span]:opacity-100 [&:hover>span]:opacity-100",
+          "absolute inset-0 z-10 isolate flex items-center justify-center overflow-hidden bg-background/0 px-6 text-center",
+          "transition-[background-color,backdrop-filter] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+          "hover:bg-background/20 hover:backdrop-blur-[0.75px] hover:duration-300 focus-visible:bg-background/20 focus-visible:backdrop-blur-[0.75px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/45 focus-visible:ring-inset",
+          "[&:focus-visible_.tour-preview-cta]:opacity-100 [&:focus-visible_.tour-preview-cta]:duration-300",
+          "[&:focus-visible_.tour-preview-glow]:scale-100 [&:focus-visible_.tour-preview-glow]:opacity-100 [&:focus-visible_.tour-preview-glow]:duration-500",
+          "[&:hover_.tour-preview-cta]:opacity-100 [&:hover_.tour-preview-cta]:duration-300",
+          "[&:hover_.tour-preview-glow]:scale-100 [&:hover_.tour-preview-glow]:opacity-100 [&:hover_.tour-preview-glow]:duration-500",
           open
             ? "pointer-events-none"
             : "cursor-pointer",
         )}
       >
-        <span className="rounded-md px-3 py-2 text-sm font-medium text-foreground opacity-0 transition-opacity">
-          点击查看 Tour 引导
+        <span
+          aria-hidden
+          className="tour-preview-glow pointer-events-none absolute size-64 scale-75 rounded-full bg-background/70 opacity-0 blur-3xl transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
+        />
+        <span className="tour-preview-cta relative flex items-center gap-2.5 rounded-full border border-foreground/10 bg-background/88 py-1.5 pr-3.5 pl-1.5 text-foreground opacity-0 shadow-[0_14px_36px_-18px_rgba(0,0,0,0.5),0_1px_0_rgba(255,255,255,0.7)_inset] backdrop-blur-xl transition-[opacity,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:shadow-[0_18px_42px_-18px_rgba(0,0,0,0.58),0_1px_0_rgba(255,255,255,0.7)_inset]">
+          <span className="flex size-8 items-center justify-center rounded-full bg-foreground text-background shadow-sm">
+            <MousePointer2Icon className="size-3.5" />
+          </span>
+          <span className="text-sm font-medium tracking-[-0.01em]">
+            体验 Tour 引导
+          </span>
+          <ArrowUpRightIcon className="size-3.5 text-muted-foreground transition-transform duration-300 ease-out group-hover/tour-preview:translate-x-0.5 group-hover/tour-preview:-translate-y-0.5 group-focus-within/tour-preview:translate-x-0.5 group-focus-within/tour-preview:-translate-y-0.5 motion-reduce:transition-none" />
         </span>
       </button>
 
