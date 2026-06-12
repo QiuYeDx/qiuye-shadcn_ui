@@ -257,7 +257,7 @@ export function CodeBlockPanel({
       <div className="min-w-0 rounded-xl p-1 text-sm">
         {/* ---- 头部：文件名 + 复制按钮 ---- */}
         {hasHeader && (
-          <div className="flex min-w-0 items-center justify-between gap-2 px-3 pt-0.5 pb-1">
+          <div className="flex min-w-0 items-center justify-between gap-2 pl-3 pr-[2px] pt-0.5 pb-[5px]">
             {displayLabel ? (
               <span className="cbp-filename min-w-0 truncate text-xs/5 font-medium select-none">
                 {displayLabel}

@@ -593,7 +593,7 @@ function CodeBlockStyles() {
          ============================================ */
 
       .qiuye-code-block pre {
-        margin: 2rem 0;
+        margin: 0;
         padding: 0;
         border-radius: 8px;
         overflow: hidden;
@@ -745,7 +745,7 @@ function CodeBlockStyles() {
       /* 容器 - 接管 pre 的外层样式 */
       .qiuye-code-block .collapsible-code-block {
         position: relative;
-        margin: 2rem 0;
+        margin: 0;
         border-radius: 8px;
         box-shadow: 0 4px 12px var(--cb-shadow-lg);
         overflow: hidden;
@@ -894,7 +894,7 @@ function CodeBlockStyles() {
       /* 容器 - 接管 pre 的外层样式（与 collapsible-code-block 类似） */
       .qiuye-code-block .scrollable-code-block {
         position: relative;
-        margin: 2rem 0;
+        margin: 0;
         border-radius: 8px;
         box-shadow: 0 4px 12px var(--cb-shadow-lg);
         overflow: hidden;
