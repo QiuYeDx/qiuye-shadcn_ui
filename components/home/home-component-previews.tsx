@@ -35,6 +35,7 @@ import { Typewriter } from "@/components/qiuye-ui/typewriter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ComponentId } from "@/lib/component-constants";
+import { useHoverSupport } from "@/hooks/use-hover-support";
 import { cn } from "@/lib/utils";
 
 function ResponsiveTabsPreview() {
@@ -602,6 +603,7 @@ function TourPreview() {
   const [currentStep, setCurrentStep] = React.useState(0);
   const [ctaVisible, setCtaVisible] = React.useState(false);
   const prefersReducedMotion = useReducedMotion();
+  const canHover = useHoverSupport();
   const toolbarRef = React.useRef<HTMLDivElement>(null);
   const sidebarRef = React.useRef<HTMLDivElement>(null);
   const panelRef = React.useRef<HTMLDivElement>(null);
@@ -636,6 +638,25 @@ function TourPreview() {
     [],
   );
 
+  const isFirstEffect = React.useRef(true);
+
+  React.useEffect(() => {
+    if (isFirstEffect.current) {
+      isFirstEffect.current = false;
+      // canHover 的 SSR 默认值为 false，首次 effect 时尚未结算，
+      // 用同步 matchMedia 判断避免桌面端闪现
+      if (!window.matchMedia("(hover: hover)").matches && !open) {
+        setCtaVisible(true);
+      }
+      return;
+    }
+    if (!canHover && !open) {
+      setCtaVisible(true);
+    } else if (canHover && !open) {
+      setCtaVisible(false);
+    }
+  }, [canHover, open]);
+
   const startTour = () => {
     setCtaVisible(false);
     setCurrentStep(0);
@@ -648,13 +669,16 @@ function TourPreview() {
   };
 
   const hideCta = () => {
-    if (open) return;
+    if (open || !canHover) return;
     setCtaVisible(false);
   };
 
   return (
     <div className="group/tour-preview relative -m-4 flex h-[calc(100%+2rem)] min-h-[260px] w-[calc(100%+2rem)] items-center justify-center overflow-hidden p-5 sm:p-6">
-      <div className="relative z-0 h-full min-h-[210px] w-full max-w-2xl overflow-hidden rounded-lg border bg-background p-3 transition-[filter,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none group-hover/tour-preview:saturate-[0.88] group-hover/tour-preview:opacity-90 group-hover/tour-preview:duration-300 sm:p-4">
+      <div className={cn(
+        "relative z-0 h-full min-h-[210px] w-full max-w-2xl overflow-hidden rounded-lg border bg-background p-3 transition-[filter,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none group-hover/tour-preview:saturate-[0.88] group-hover/tour-preview:opacity-90 group-hover/tour-preview:duration-300 sm:p-4",
+        !canHover && !open && "saturate-[0.92] opacity-[0.94]",
+      )}>
         <div className="flex h-full min-h-0 flex-col gap-3">
           <div
             ref={toolbarRef}
