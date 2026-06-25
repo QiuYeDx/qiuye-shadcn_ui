@@ -160,7 +160,7 @@ pnpm dlx shadcn@latest --help
 
 ### Registry 文件
 
-- `public/registry/registry.json`：组件索引。
+- `public/registry/registry.json`：组件索引，由 `pnpm update-registry` 生成，请勿手动编辑。
 - `public/registry/[component].json`：单个组件 registry item，包含依赖、registry 依赖和 `files[].content`。
 - `scripts/update-registry.mjs`：读取组件源码并自动回填 registry JSON 的 `files[].content`。
 
@@ -201,7 +201,7 @@ npx -y --package @qiuye-ui/mcp@latest qiuye-ui-mcp --check
 
 ### 支持能力
 
-- `qiuye_ui_list_registry_items`：列出所有可用组件。
+- `qiuye_ui_list_registry_items`：列出 registry 索引中的组件。
 - `qiuye_ui_search_registry_items`：按关键词搜索组件。
 - `qiuye_ui_get_registry_item`：读取指定组件 registry JSON。
 - `qiuye_ui_get_registry_file_content`：读取组件源码内容。
@@ -375,7 +375,7 @@ export { MyComponent };
 
 #### 2. 创建 Demo
 
-在 `components/qiuye-ui/demos/` 下创建 Demo，并在 `app/components/[id]/page.tsx` 中接入完整 Demo 和简单预览 Demo。
+在 `components/qiuye-ui/demos/` 下创建完整 Demo，并在 `app/components/[id]/simple-demos.tsx` 中补充轻量预览组件。随后在 `app/components/[id]/page.tsx` 中接入完整 Demo 和简单预览 Demo 的映射。
 
 ```tsx
 import { MyComponent } from "../my-component";
@@ -391,6 +391,7 @@ export function MyComponentDemo() {
 
 - `lib/component-constants.ts`：新增 `ComponentId` 和基础用法示例。
 - `lib/registry.ts`：新增组件名称、描述、分类、依赖、文件路径、Props API、版本、标签和 `cliName`。
+- `app/cli/page.tsx`：在“可用组件列表”中加入新组件 ID。
 
 #### 4. 创建 registry JSON
 
@@ -421,7 +422,7 @@ export function MyComponentDemo() {
 
 #### 5. 更新 registry 索引和源码内容
 
-确认 `public/registry/registry.json` 已包含新组件索引，然后运行：
+确认 `public/registry/[component].json` 已创建后运行脚本，`public/registry/registry.json` 会自动更新：
 
 ```bash
 pnpm update-registry:dry
@@ -452,6 +453,7 @@ pnpm dlx shadcn@latest add http://localhost:3000/registry/my-component.json
 - Demo 应覆盖基础用法和关键交互状态。
 - 保持浅色 / 深色主题兼容。
 - 组件说明、Props API、依赖和 registry 必须同步更新。
+- 如果希望 MCP Server 在远端索引缺失时也能兜底列出新组件，同步更新 `packages/qiuye-ui-cli/bin/qiuye-ui-mcp.mjs` 的 `DEFAULT_COMPONENT_NAMES`。
 
 ## 🤝 贡献
 
