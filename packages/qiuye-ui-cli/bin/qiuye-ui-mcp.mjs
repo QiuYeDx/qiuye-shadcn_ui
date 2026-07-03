@@ -17,6 +17,7 @@ const DEFAULT_COMPONENT_NAMES = [
   "dot-glass",
   "image-viewer",
   "dual-state-toggle",
+  "theme-transition-toggle",
   "code-block",
   "typewriter",
   "markdown-renderer",

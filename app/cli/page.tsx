@@ -609,6 +609,7 @@ export default function App() {
                                 ComponentId.DOT_GLASS,
                                 ComponentId.IMAGE_VIEWER,
                                 ComponentId.DUAL_STATE_TOGGLE,
+                                ComponentId.THEME_TRANSITION_TOGGLE,
                                 ComponentId.CODE_BLOCK,
                                 ComponentId.TYPEWRITER,
                                 ComponentId.MARKDOWN_RENDERER,
