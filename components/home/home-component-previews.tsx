@@ -5,7 +5,6 @@ import {
   ArrowUpRightIcon,
   BellOffIcon,
   BellIcon,
-  CheckIcon,
   FolderKanbanIcon,
   GripVerticalIcon,
   MenuIcon,
@@ -76,97 +75,239 @@ function ResponsiveTabsPreview() {
 
 function ScrollableDialogPreview() {
   const [open, setOpen] = React.useState(false);
-  const reviewItems = [
-    ["图标语义", "切换前后状态保持同一对象"],
-    ["滚动内容", "长内容分组清晰，遮罩提示保留"],
-    ["底部操作", "取消与确认按钮固定居中"],
+  const [ctaVisible, setCtaVisible] = React.useState(false);
+  const prefersReducedMotion = useReducedMotion();
+  const canHover = useHoverSupport();
+  const skeletonSections = [
+    ["w-7/12", "w-full", "w-10/12"],
+    ["w-5/12", "w-11/12", "w-8/12"],
+    ["w-6/12", "w-full", "w-9/12"],
+    ["w-4/12", "w-10/12", "w-7/12"],
+    ["w-6/12", "w-full", "w-8/12"],
+    ["w-5/12", "w-11/12", "w-9/12"],
   ];
 
+  const isFirstEffect = React.useRef(true);
+
+  React.useEffect(() => {
+    if (isFirstEffect.current) {
+      isFirstEffect.current = false;
+      if (!window.matchMedia("(hover: hover)").matches && !open) {
+        setCtaVisible(true);
+      }
+      return;
+    }
+
+    if (!canHover && !open) {
+      setCtaVisible(true);
+    } else if (canHover && !open) {
+      setCtaVisible(false);
+    }
+  }, [canHover, open]);
+
+  const showCta = () => {
+    if (open) return;
+    setCtaVisible(true);
+  };
+
+  const hideCta = () => {
+    if (open || !canHover) return;
+    setCtaVisible(false);
+  };
+
+  const openDialog = () => {
+    setCtaVisible(false);
+    setOpen(true);
+  };
+
   return (
-    <div className="flex w-full max-w-sm flex-col items-center gap-4">
-      <div className="w-full rounded-lg border bg-background p-4 shadow-sm">
-        <div className="mb-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <CheckIcon className="size-4" />
+    <div className="group/scroll-dialog-preview relative -m-4 flex h-[calc(100%+2rem)] min-h-[260px] w-[calc(100%+2rem)] items-center justify-center overflow-hidden p-5 sm:p-6">
+      <div
+        className={cn(
+          "relative z-0 flex h-full min-h-[210px] w-full max-w-lg items-center justify-center overflow-hidden rounded-lg border bg-background p-4 transition-[filter,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none group-hover/scroll-dialog-preview:saturate-[0.9] group-hover/scroll-dialog-preview:opacity-90 group-hover/scroll-dialog-preview:duration-300 sm:p-5",
+          !canHover && !open && "saturate-[0.94] opacity-[0.96]",
+        )}
+      >
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 flex flex-col gap-3 p-4 opacity-55 sm:p-5"
+        >
+          <div className="flex h-10 shrink-0 items-center gap-2 rounded-md border bg-muted/35 px-3">
+            <div className="size-5 rounded-full bg-muted-foreground/18" />
+            <div className="h-2.5 w-28 rounded-full bg-muted-foreground/14" />
+            <div className="ml-auto flex gap-1.5">
+              <div className="size-5 rounded bg-muted-foreground/12" />
+              <div className="size-5 rounded bg-muted-foreground/12" />
             </div>
-            <div>
-              <div className="text-sm font-medium">发布确认</div>
-              <div className="text-xs text-muted-foreground">
-                固定头部、滚动正文、居中操作
+          </div>
+          <div className="grid min-h-0 flex-1 grid-cols-[72px_minmax(0,1fr)] gap-3 sm:grid-cols-[104px_minmax(0,1fr)]">
+            <div className="space-y-2 rounded-md border bg-muted/20 p-2">
+              <div className="h-6 rounded bg-muted-foreground/14" />
+              <div className="h-6 rounded bg-muted-foreground/10" />
+              <div className="h-6 rounded bg-muted-foreground/10" />
+            </div>
+            <div className="rounded-md border bg-muted/15 p-3">
+              <div className="space-y-2">
+                <div className="h-3 w-32 max-w-[48%] rounded-full bg-muted-foreground/16" />
+                <div className="h-2.5 rounded-full bg-muted-foreground/10" />
+                <div className="h-2.5 w-5/6 rounded-full bg-muted-foreground/10" />
               </div>
             </div>
           </div>
-          <Badge variant="secondary">Review</Badge>
         </div>
-        <div className="space-y-2 text-xs">
-          {reviewItems.map(([label, detail]) => (
-            <div
-              key={label}
-              className="flex items-center justify-between gap-3 rounded-md bg-muted/50 px-3 py-2"
-            >
-              <span className="font-medium">{label}</span>
-              <span className="truncate text-muted-foreground">{detail}</span>
+
+        <div
+          aria-hidden="true"
+          className="relative w-full max-w-[340px] overflow-hidden rounded-lg border bg-background shadow-[0_22px_70px_-34px_rgba(0,0,0,0.45)] dark:shadow-[0_24px_76px_-32px_rgba(0,0,0,0.85)]"
+        >
+          <div className="border-b px-4 py-3">
+            <div className="h-3 w-28 rounded-full bg-foreground/18" />
+            <div className="mt-2 h-2 w-40 rounded-full bg-muted-foreground/14" />
+          </div>
+          <div className="relative max-h-[166px] overflow-hidden px-4 py-3">
+            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-8 bg-gradient-to-b from-background to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-10 bg-gradient-to-t from-background to-transparent" />
+            <div className="space-y-3">
+              {skeletonSections.slice(0, 4).map((section, index) => (
+                <div key={index} className="rounded-md border bg-muted/20 p-3">
+                  <div
+                    className={cn(
+                      "h-2.5 rounded-full bg-foreground/18",
+                      section[0],
+                    )}
+                  />
+                  <div className="mt-2 space-y-1.5">
+                    <div
+                      className={cn(
+                        "h-2 rounded-full bg-muted-foreground/12",
+                        section[1],
+                      )}
+                    />
+                    <div
+                      className={cn(
+                        "h-2 rounded-full bg-muted-foreground/10",
+                        section[2],
+                      )}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+          <div className="flex justify-end gap-2 border-t px-4 py-3">
+            <div className="h-8 w-16 rounded-md border bg-background" />
+            <div className="h-8 w-20 rounded-md bg-foreground/90" />
+          </div>
         </div>
       </div>
-      <Button size="sm" onClick={() => setOpen(true)}>
-        查看确认单
-      </Button>
+
+      <button
+        type="button"
+        aria-label="打开 Scrollable Dialog"
+        onPointerEnter={showCta}
+        onPointerLeave={hideCta}
+        onFocus={showCta}
+        onBlur={hideCta}
+        onClick={openDialog}
+        className={cn(
+          "absolute inset-0 z-10 isolate flex items-center justify-center overflow-hidden bg-background/0 px-6 text-center",
+          "transition-[background-color,backdrop-filter] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+          "hover:bg-background/20 hover:backdrop-blur-[0.75px] hover:duration-300 focus-visible:bg-background/20 focus-visible:backdrop-blur-[0.75px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/45 focus-visible:ring-inset",
+          "[&:focus-visible_.scroll-dialog-preview-glow]:scale-100 [&:focus-visible_.scroll-dialog-preview-glow]:opacity-100 [&:focus-visible_.scroll-dialog-preview-glow]:duration-500",
+          "[&:hover_.scroll-dialog-preview-glow]:scale-100 [&:hover_.scroll-dialog-preview-glow]:opacity-100 [&:hover_.scroll-dialog-preview-glow]:duration-500",
+          open ? "pointer-events-none" : "cursor-pointer",
+        )}
+      >
+        <span
+          aria-hidden
+          className="scroll-dialog-preview-glow pointer-events-none absolute size-64 scale-75 rounded-full bg-background/70 opacity-0 blur-3xl transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
+        />
+        <motion.span
+          className="group/scroll-dialog-cta relative flex items-center gap-2.5 rounded-full border border-foreground/10 bg-background/88 py-1.5 pr-3.5 pl-1.5 text-foreground shadow-[0_14px_36px_-18px_rgba(0,0,0,0.5),0_1px_0_rgba(255,255,255,0.7)_inset] backdrop-blur-xl transition-shadow duration-500 ease-out hover:shadow-[0_18px_42px_-18px_rgba(0,0,0,0.58),0_1px_0_rgba(255,255,255,0.7)_inset] dark:border-white/80 dark:bg-white/95 dark:text-zinc-950 dark:shadow-[0_18px_48px_-18px_rgba(0,0,0,0.9),0_1px_0_rgba(255,255,255,0.95)_inset] dark:hover:shadow-[0_20px_52px_-18px_rgba(0,0,0,0.95),0_1px_0_rgba(255,255,255,0.95)_inset]"
+          initial={false}
+          animate={{
+            opacity: ctaVisible ? 1 : 0,
+            y: prefersReducedMotion ? 0 : ctaVisible ? 0 : 16,
+            scale: ctaVisible ? 1 : 0.975,
+          }}
+          transition={{
+            duration: prefersReducedMotion ? 0 : ctaVisible ? 0.28 : 0.36,
+            ease: [0.25, 0.1, 0.25, 1],
+          }}
+        >
+          <span className="flex size-8 items-center justify-center rounded-full bg-foreground text-background shadow-sm dark:bg-zinc-950 dark:text-white">
+            <MousePointer2Icon className="size-3.5" />
+          </span>
+          <span className="text-sm font-medium">打开 Dialog</span>
+          <ArrowUpRightIcon className="size-3.5 text-muted-foreground transition-transform duration-300 ease-out group-hover/scroll-dialog-cta:translate-x-0.5 group-hover/scroll-dialog-cta:-translate-y-0.5 motion-reduce:transition-none dark:text-zinc-500" />
+        </motion.span>
+      </button>
+
       <ScrollableDialog
         open={open}
         onOpenChange={setOpen}
-        maxWidth="sm:max-w-lg"
+        maxWidth="sm:max-w-xl"
       >
-        <ScrollableDialogHeader>
-          <DialogTitle>组件发布确认</DialogTitle>
+        <ScrollableDialogHeader className="px-5 py-4 pr-12 text-left">
+          <DialogTitle>Dialog Preview</DialogTitle>
           <DialogDescription>
-            滚动查看变更、风险和后续动作，底部操作始终可见。
+            固定头部、可滚动内容与常驻底部操作。
           </DialogDescription>
         </ScrollableDialogHeader>
         <ScrollableDialogContent>
-          <div className="space-y-4 text-sm">
-            <div className="rounded-lg border bg-muted/30 p-4">
-              <div className="mb-2 text-sm font-semibold">本次调整</div>
-              <p className="text-muted-foreground">
-                优化首页示例的状态语义与对话框内容结构，让预览更接近真实发布检查流。
-              </p>
-            </div>
-            {reviewItems.map(([label, detail], index) => (
-              <div key={label} className="rounded-lg border bg-background p-4">
-                <div className="mb-2 flex items-center gap-2">
-                  <span className="flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                    {index + 1}
-                  </span>
-                  <span className="font-medium">{label}</span>
+          <div aria-hidden="true" className="space-y-3">
+            {skeletonSections.map((section, index) => (
+              <div key={index} className="rounded-lg border bg-muted/20 p-4">
+                <div className="flex items-center gap-3">
+                  <div className="size-9 rounded-md bg-foreground/10" />
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <div
+                      className={cn(
+                        "h-2.5 rounded-full bg-foreground/18",
+                        section[0],
+                      )}
+                    />
+                    <div className="h-2 w-full rounded-full bg-muted-foreground/12" />
+                  </div>
                 </div>
-                <p className="text-muted-foreground">{detail}</p>
+                <div className="mt-4 space-y-2">
+                  <div
+                    className={cn(
+                      "h-2 rounded-full bg-muted-foreground/12",
+                      section[1],
+                    )}
+                  />
+                  <div
+                    className={cn(
+                      "h-2 rounded-full bg-muted-foreground/10",
+                      section[2],
+                    )}
+                  />
+                </div>
               </div>
             ))}
-            <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
-              <div className="mb-1 font-medium text-primary">发布建议</div>
-              <p className="text-muted-foreground">
-                保留固定 footer，用户滚动到底部前也能随时取消或确认。
-              </p>
+            <div className="grid grid-cols-3 gap-2 rounded-lg border bg-background p-3">
+              <div className="h-12 rounded-md bg-muted-foreground/10" />
+              <div className="h-12 rounded-md bg-muted-foreground/10" />
+              <div className="h-12 rounded-md bg-muted-foreground/10" />
             </div>
           </div>
         </ScrollableDialogContent>
-        <ScrollableDialogFooter className="flex flex-col-reverse items-center justify-center gap-2 sm:flex-row">
+        <ScrollableDialogFooter className="flex flex-col-reverse items-center justify-end gap-2 sm:flex-row">
           <Button
             size="sm"
             variant="outline"
             className="w-full sm:w-auto"
             onClick={() => setOpen(false)}
           >
-            稍后处理
+            关闭
           </Button>
           <Button
             size="sm"
             className="w-full sm:w-auto"
             onClick={() => setOpen(false)}
           >
-            确认发布
+            完成
           </Button>
         </ScrollableDialogFooter>
       </ScrollableDialog>
