@@ -4,10 +4,11 @@ import * as React from "react";
 import { flushSync } from "react-dom";
 import { MoonIcon, SunIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import {
+  DualStateToggle,
+  type DualStateToggleProps,
+} from "@/components/qiuye-ui/dual-state-toggle";
 import { cn } from "@/lib/utils";
-
-type ButtonProps = React.ComponentProps<typeof Button>;
 
 type ViewTransitionLike = {
   ready: Promise<void>;
@@ -21,13 +22,25 @@ type DocumentWithViewTransition = Document & {
 };
 
 type ThemeTransitionLayer = "new" | "old";
+type PolygonTransitionShape = "star" | "diamond" | "hexagon";
 
 const ELLIPSE_Y_RATIO = 0.72;
+const STAR_INNER_RADIUS_RATIO = 0.46;
+const POLYGON_COVER_MULTIPLIERS: Record<PolygonTransitionShape, number> = {
+  star: 2.6,
+  diamond: 1.5,
+  hexagon: 1.25,
+};
 const DEFAULT_TRANSITION_DURATION = 580;
 const DEFAULT_TRANSITION_EASING = "cubic-bezier(0.17,0.84,0.44,1)";
 
 /** 主题切换时的几何揭幕形状 */
-export type ThemeTransitionShape = "circle" | "ellipse";
+export type ThemeTransitionShape =
+  | "circle"
+  | "ellipse"
+  | "star"
+  | "diamond"
+  | "hexagon";
 
 /** 主题切换动画的方向 */
 export type ThemeTransitionDirection = "auto" | "enter" | "exit";
@@ -50,7 +63,7 @@ export interface ThemeTransitionOptions {
   /** 触发主题切换的 DOM 更新函数 */
   updateTheme: () => void;
   /**
-   * 用于计算圆形/椭圆揭幕中心点的来源
+   * 用于计算几何揭幕中心点的来源
    * @default "center"
    */
   origin?: ThemeTransitionOrigin | null;
@@ -73,6 +86,11 @@ export interface ThemeTransitionOptions {
   timing?: ThemeTransitionTiming;
   /**
    * 揭幕形状
+   * - `"circle"`：圆形揭幕
+   * - `"ellipse"`：椭圆揭幕
+   * - `"star"`：五角星揭幕
+   * - `"diamond"`：菱形揭幕
+   * - `"hexagon"`：六边形揭幕
    * @default "circle"
    */
   shape?: ThemeTransitionShape;
@@ -125,7 +143,16 @@ export interface UseThemeTransitionOptions
 
 /** ThemeTransitionToggle 组件的属性 */
 export interface ThemeTransitionToggleProps
-  extends Omit<ButtonProps, "children" | "onToggle">,
+  extends Omit<
+      DualStateToggleProps,
+      | "active"
+      | "onToggle"
+      | "activeIcon"
+      | "inactiveIcon"
+      | "activeLabel"
+      | "inactiveLabel"
+      | "shape"
+    >,
     Omit<ThemeTransitionOptions, "updateTheme" | "origin"> {
   /** 当前是否处于深色主题 */
   isDark: boolean;
@@ -151,6 +178,11 @@ export interface ThemeTransitionToggleProps
    * @default "切换到浅色主题"
    */
   darkLabel?: string;
+  /**
+   * 按钮形状快捷设置，独立于揭幕 shape
+   * @default "square"
+   */
+  buttonShape?: DualStateToggleProps["shape"];
   /** 点击切换前触发 */
   onToggleStart?: (nextDark: boolean) => void;
 }
@@ -287,6 +319,46 @@ function getEllipseCoverRadii(x: number, y: number, extraRadius: number) {
   };
 }
 
+function isPolygonShape(shape: ThemeTransitionShape): shape is PolygonTransitionShape {
+  return shape === "star" || shape === "diamond" || shape === "hexagon";
+}
+
+function getPolygonPoints(shape: PolygonTransitionShape) {
+  if (shape === "diamond") {
+    return [
+      [0, -1],
+      [1, 0],
+      [0, 1],
+      [-1, 0],
+    ];
+  }
+
+  if (shape === "hexagon") {
+    return Array.from({ length: 6 }, (_, index) => {
+      const angle = -Math.PI / 2 + index * (Math.PI / 3);
+      return [Math.cos(angle), Math.sin(angle)];
+    });
+  }
+
+  return Array.from({ length: 10 }, (_, index) => {
+    const angle = -Math.PI / 2 + index * (Math.PI / 5);
+    const radius = index % 2 === 0 ? 1 : STAR_INNER_RADIUS_RATIO;
+    return [Math.cos(angle) * radius, Math.sin(angle) * radius];
+  });
+}
+
+function getPolygonCoverRadii(
+  shape: PolygonTransitionShape,
+  radius: number,
+) {
+  const coverRadius = radius * POLYGON_COVER_MULTIPLIERS[shape];
+
+  return {
+    radiusX: coverRadius,
+    radiusY: coverRadius,
+  };
+}
+
 function getClipPathValue({
   x,
   y,
@@ -300,9 +372,21 @@ function getClipPathValue({
   radiusY: number;
   shape: ThemeTransitionShape;
 }) {
-  return shape === "ellipse"
-    ? `ellipse(${radiusX}px ${radiusY}px at ${x}px ${y}px)`
-    : `circle(${radiusX}px at ${x}px ${y}px)`;
+  if (shape === "ellipse") {
+    return `ellipse(${radiusX}px ${radiusY}px at ${x}px ${y}px)`;
+  }
+
+  if (isPolygonShape(shape)) {
+    const points = getPolygonPoints(shape)
+      .map(([pointX, pointY]) => {
+        return `${x + pointX * radiusX}px ${y + pointY * radiusY}px`;
+      })
+      .join(", ");
+
+    return `polygon(${points})`;
+  }
+
+  return `circle(${radiusX}px at ${x}px ${y}px)`;
 }
 
 function waitForNextPaint() {
@@ -459,6 +543,8 @@ export async function runThemeViewTransition({
   const { radiusX, radiusY } =
     shape === "ellipse"
       ? getEllipseCoverRadii(x, y, extraRadius)
+      : isPolygonShape(shape)
+        ? getPolygonCoverRadii(shape, circleRadius)
       : { radiusX: circleRadius, radiusY: circleRadius };
   const layer = getTransitionLayer(direction, isDark);
   const keyframes = getClipPathKeyframes({
@@ -597,7 +683,8 @@ export function useThemeTransition({
  * ThemeTransitionToggle — View Transition 深浅模式切换按钮
  *
  * 提供可直接安装使用的主题按钮：
- * - 用浏览器 View Transition API 做全屏圆形/椭圆揭幕
+ * - 用浏览器 View Transition API 做全屏圆形、椭圆或多边形揭幕
+ * - 复用 DualStateToggle，默认带图标旋转与点击缩放反馈
  * - 默认从按钮中心扩散，支持鼠标点击位置、坐标或居中降级
  * - 暴露 `runThemeViewTransition` 与 `useThemeTransition` 复用能力
  * - 不支持 API 或用户开启减少动态效果时自动切换为无动画更新
@@ -638,6 +725,9 @@ export const ThemeTransitionToggle = React.forwardRef<
     onToggleStart,
     variant = "outline",
     size = "icon",
+    buttonShape = "square",
+    effect = "rotate",
+    transitionDuration = 0.35,
     disabled,
     className,
     onClick,
@@ -711,44 +801,29 @@ export const ThemeTransitionToggle = React.forwardRef<
   );
 
   return (
-    <Button
+    <DualStateToggle
       ref={setRefs}
-      type={type}
+      active={isDark}
+      onToggle={() => undefined}
+      activeIcon={darkIcon}
+      inactiveIcon={lightIcon}
+      activeLabel={darkLabel}
+      inactiveLabel={lightLabel}
       variant={variant}
       size={size}
+      shape={buttonShape}
+      effect={effect}
+      transitionDuration={transitionDuration}
+      type={type}
       disabled={disabled || isTransitioning}
       aria-label={isDark ? darkLabel : lightLabel}
       aria-pressed={isDark}
       className={cn(
-        "relative cursor-pointer overflow-hidden rounded-full transition-transform duration-150 active:scale-[0.97]",
+        "overflow-hidden",
         className,
       )}
       {...buttonProps}
       onClick={handleClick}
-    >
-      <span
-        aria-hidden="true"
-        className={cn(
-          "absolute inset-0 flex items-center justify-center transition-all duration-300",
-          isDark
-            ? "rotate-0 scale-100 opacity-100"
-            : "-rotate-90 scale-75 opacity-0",
-        )}
-      >
-        {darkIcon}
-      </span>
-      <span
-        aria-hidden="true"
-        className={cn(
-          "absolute inset-0 flex items-center justify-center transition-all duration-300",
-          isDark
-            ? "rotate-90 scale-75 opacity-0"
-            : "rotate-0 scale-100 opacity-100",
-        )}
-      >
-        {lightIcon}
-      </span>
-      <span className="sr-only">{isDark ? darkLabel : lightLabel}</span>
-    </Button>
+    />
   );
 });

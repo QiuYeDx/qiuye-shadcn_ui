@@ -711,9 +711,9 @@ export const componentRegistry: ComponentRegistry = {
   [ComponentId.THEME_TRANSITION_TOGGLE]: {
     name: "Theme Transition Toggle",
     description:
-      "基于浏览器 View Transition API 的深浅模式切换组件：从触发点播放圆形/椭圆揭幕动画，封装按钮、Hook 与纯函数三种复用方式，并在不支持 API 或减少动态效果偏好下自动降级。",
+      "基于浏览器 View Transition API 的深浅模式切换组件：从触发点播放圆形、椭圆或多边形揭幕动画，封装按钮、Hook 与纯函数三种复用方式，并在不支持 API 或减少动态效果偏好下自动降级。",
     category: "交互",
-    dependencies: ["lucide-react", "next-themes"],
+    dependencies: ["lucide-react", "motion", "next-themes"],
     files: {
       component: "components/qiuye-ui/theme-transition-toggle.tsx",
       demo: "components/qiuye-ui/demos/theme-transition-toggle-demo.tsx",
@@ -759,8 +759,8 @@ export const componentRegistry: ComponentRegistry = {
           },
           {
             name: "shape",
-            type: '"circle" | "ellipse"',
-            description: "揭幕形状：圆形或椭圆",
+            type: '"circle" | "ellipse" | "star" | "diamond" | "hexagon"',
+            description: "揭幕形状：圆形、椭圆、五角星、菱形或六边形",
             required: false,
             default: '"circle"',
           },
@@ -828,6 +828,27 @@ export const componentRegistry: ComponentRegistry = {
             description: "深色主题下的无障碍标签",
             required: false,
             default: '"切换到浅色主题"',
+          },
+          {
+            name: "buttonShape",
+            type: '"square" | "circle"',
+            description: "触发器按钮形状，独立于揭幕 shape",
+            required: false,
+            default: '"square"',
+          },
+          {
+            name: "effect",
+            type: '"fade" | "rotate" | "slide-up" | "slide-down" | "scale" | ToggleEffectConfig',
+            description: "图标切换过渡效果，继承 DualStateToggle",
+            required: false,
+            default: '"rotate"',
+          },
+          {
+            name: "transitionDuration",
+            type: "number",
+            description: "图标切换动画时长，单位秒",
+            required: false,
+            default: "0.35",
           },
           {
             name: "onToggleStart",
@@ -931,8 +952,8 @@ export const componentRegistry: ComponentRegistry = {
           },
           {
             name: "shape",
-            type: '"circle" | "ellipse"',
-            description: "揭幕形状",
+            type: '"circle" | "ellipse" | "star" | "diamond" | "hexagon"',
+            description: "揭幕形状：圆形、椭圆、五角星、菱形或六边形",
             required: false,
             default: '"circle"',
           },
@@ -997,6 +1018,13 @@ export const componentRegistry: ComponentRegistry = {
               "动画时间预设：保留 spring / smooth 两种兼容写法；当前均使用连续起止两帧，实际节奏由 duration/easing 控制",
             required: false,
             default: '"spring"',
+          },
+          {
+            name: "shape",
+            type: '"circle" | "ellipse" | "star" | "diamond" | "hexagon"',
+            description: "揭幕形状：圆形、椭圆、五角星、菱形或六边形",
+            required: false,
+            default: '"circle"',
           },
         ],
       },

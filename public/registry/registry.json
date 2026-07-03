@@ -274,9 +274,11 @@
       "author": "QiuYeDx <me@qiuyedx.com>",
       "dependencies": [
         "lucide-react",
+        "motion",
         "next-themes"
       ],
       "registryDependencies": [
+        "@qiuye-ui/dual-state-toggle",
         "button"
       ],
       "files": [

@@ -3,15 +3,20 @@
 import * as React from "react";
 import { useTheme } from "next-themes";
 import {
+  DiamondIcon,
+  HexagonIcon,
   LaptopIcon,
   MoonIcon,
   MousePointer2Icon,
+  ShapesIcon,
   SparklesIcon,
+  StarIcon,
   SunIcon,
 } from "lucide-react";
 
 import {
   ThemeTransitionToggle,
+  type ThemeTransitionShape,
   useThemeTransition,
 } from "@/components/qiuye-ui/theme-transition-toggle";
 import { Badge } from "@/components/ui/badge";
@@ -43,9 +48,12 @@ function BasicDemo() {
   );
 }`,
   hook: `import { useTheme } from "next-themes";
-import { useThemeTransition } from "@/components/qiuye-ui/theme-transition-toggle";
+import {
+  ThemeTransitionToggle,
+  useThemeTransition,
+} from "@/components/qiuye-ui/theme-transition-toggle";
 
-function HookDemo() {
+function GeometryDemo() {
   const { resolvedTheme, setTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
   const { run, isTransitioning } = useThemeTransition({
@@ -63,6 +71,12 @@ function HookDemo() {
     >
       Toggle with custom trigger
     </button>
+
+    <ThemeTransitionToggle
+      isDark={isDark}
+      shape="star"
+      onToggle={(nextDark) => setTheme(nextDark ? "dark" : "light")}
+    />
   );
 }`,
   customOrigin: `import { useRef } from "react";
@@ -92,6 +106,28 @@ function CustomOriginDemo() {
   );
 }`,
 };
+
+const geometryExamples: Array<{
+  shape: ThemeTransitionShape;
+  label: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+}> = [
+  {
+    shape: "star",
+    label: "五角星",
+    icon: StarIcon,
+  },
+  {
+    shape: "diamond",
+    label: "菱形",
+    icon: DiamondIcon,
+  },
+  {
+    shape: "hexagon",
+    label: "六边形",
+    icon: HexagonIcon,
+  },
+];
 
 function useResolvedDark() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -206,15 +242,18 @@ export function ThemeTransitionToggleDemo() {
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1.5">
-              <CardTitle>Hook 复用到自定义触发器</CardTitle>
+              <CardTitle>几何揭幕形状</CardTitle>
               <CardDescription>
-                使用 useThemeTransition 接入自己的按钮、菜单项或工具栏
+                使用 useThemeTransition 接入自定义触发器，也可以直接切换星形、菱形和六边形遮罩
               </CardDescription>
             </div>
-            <ViewSourceButton code={sourceCodes.hook} title="Hook 用法 - 源码" />
+            <ViewSourceButton
+              code={sourceCodes.hook}
+              title="几何形状 - 源码"
+            />
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="grid gap-4 rounded-lg border bg-muted/20 p-4 sm:grid-cols-[1fr_auto] sm:items-center">
             <div>
               <div className="mb-1 text-sm font-medium">
@@ -234,6 +273,37 @@ export function ThemeTransitionToggleDemo() {
               <MousePointer2Icon className="size-4" />
               {isTransitioning ? "切换中..." : "从点击处切换"}
             </Button>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            {geometryExamples.map(({ shape, label, icon: Icon }) => (
+              <div
+                key={shape}
+                className="flex items-center justify-between gap-3 rounded-lg border bg-muted/20 p-3"
+              >
+                <div className="flex min-w-0 items-center gap-2">
+                  <div className="flex size-8 shrink-0 items-center justify-center rounded-md border bg-background">
+                    <Icon className="size-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium">{label}</div>
+                    <code className="block truncate text-xs text-muted-foreground">
+                      {`shape="${shape}"`}
+                    </code>
+                  </div>
+                </div>
+                <ThemeTransitionToggle
+                  isDark={isDark}
+                  onToggle={(nextDark) => setTheme(nextDark ? "dark" : "light")}
+                  shape={shape}
+                  variant="secondary"
+                  lightIcon={<ShapesIcon className="size-4" />}
+                  darkIcon={<ShapesIcon className="size-4" />}
+                  lightLabel={`${label}揭幕切换到深色主题`}
+                  darkLabel={`${label}揭幕切换到浅色主题`}
+                />
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
