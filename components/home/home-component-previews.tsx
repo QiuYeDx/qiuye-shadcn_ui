@@ -622,35 +622,30 @@ function ThemeTransitionTogglePreview() {
   const isDark = mounted && resolvedTheme === "dark";
 
   return (
-    <div className="relative flex w-full max-w-xs flex-col items-center gap-4 overflow-hidden rounded-lg border bg-background p-5">
+    <div className="relative flex h-full min-h-[138px] w-full items-center justify-center overflow-hidden">
       <div
         aria-hidden
-        className="absolute inset-0 opacity-80"
-        style={{
-          background:
-            "radial-gradient(circle at 30% 20%, hsl(var(--primary) / 0.18), transparent 32%), linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--background)) 72%)",
-        }}
+        className={cn(
+          "absolute size-24 rounded-full blur-2xl transition-colors duration-500",
+          isDark ? "bg-white/12" : "bg-foreground/7"
+        )}
       />
-      <div className="relative flex items-center gap-3">
+      <div
+        aria-hidden
+        className="absolute h-px w-28 bg-gradient-to-r from-transparent via-border to-transparent"
+      />
+
+      <div className="relative flex items-center justify-center rounded-full bg-background/70 p-2.5 shadow-sm ring-1 ring-border/70 backdrop-blur-md">
         <ThemeTransitionToggle
           isDark={isDark}
           onToggle={(nextDark) => setTheme(nextDark ? "dark" : "light")}
           variant="secondary"
         />
-        <div className="text-left">
-          <div className="text-sm font-semibold">Theme reveal</div>
-          <div className="text-xs text-muted-foreground">
-            {isDark ? "dark -> light" : "light -> dark"}
-          </div>
-        </div>
       </div>
-      <div className="relative grid w-full grid-cols-3 gap-2">
-        {["root", "clip", "fallback"].map((item) => (
-          <div key={item} className="rounded-md border bg-background/75 p-2 text-center text-[11px]">
-            {item}
-          </div>
-        ))}
-      </div>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-8 bottom-4 h-8 bg-gradient-to-t from-background to-transparent"
+      />
     </div>
   );
 }
