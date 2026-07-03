@@ -34,7 +34,6 @@ import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
 import { Tour, type TourStep } from "@/components/qiuye-ui/tour";
 import { Typewriter } from "@/components/qiuye-ui/typewriter";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ComponentId } from "@/lib/component-constants";
 import { useHoverSupport } from "@/hooks/use-hover-support";
 import { cn } from "@/lib/utils";
@@ -717,38 +716,109 @@ function TypewriterPreview() {
 }
 
 function MarkdownRendererPreview() {
+  const paragraphLines = ["w-full", "w-11/12", "w-8/12"];
+  const tableRows = ["w-7/12", "w-5/12", "w-6/12"];
+  const codeLines = ["w-8/12", "w-11/12", "w-6/12"];
+
   return (
-    <div className="w-full max-w-sm rounded-lg border bg-background p-4 text-left shadow-sm">
-      <div className="mb-3 flex items-center justify-between">
-        <div className="text-sm font-semibold">MarkdownRenderer</div>
-        <Badge variant="secondary">GFM</Badge>
-      </div>
-      <div className="space-y-3 text-sm">
-        <div>
-          <div className="text-lg font-semibold">Release checklist</div>
-          <p className="mt-1 text-muted-foreground">
-            Tables, code blocks, widgets and safe links.
-          </p>
-        </div>
-        <div className="rounded-md border">
-          <div className="grid grid-cols-3 border-b bg-muted/40 px-3 py-2 text-xs font-medium">
-            <span>Item</span>
-            <span>Status</span>
-            <span>Owner</span>
+    <div
+      aria-hidden="true"
+      className="relative -m-4 flex h-[calc(100%+2rem)] min-h-[260px] w-[calc(100%+2rem)] items-center justify-center overflow-hidden p-5 sm:p-6"
+    >
+      <div className="absolute inset-0 grid grid-cols-[0.85fr_1fr] gap-3 p-4 opacity-45 sm:p-5">
+        <div className="space-y-3 rounded-lg border bg-muted/25 p-3">
+          <div className="h-3 w-20 rounded-full bg-muted-foreground/14" />
+          <div className="space-y-2">
+            <div className="h-8 rounded-md bg-muted-foreground/10" />
+            <div className="h-8 rounded-md bg-muted-foreground/8" />
+            <div className="h-8 rounded-md bg-muted-foreground/8" />
           </div>
-          {["Docs", "CLI", "Preview"].map((item) => (
-            <div
-              key={item}
-              className="grid grid-cols-3 border-b px-3 py-2 text-xs last:border-b-0"
-            >
-              <span>{item}</span>
-              <span>Done</span>
-              <span>QiuYe</span>
-            </div>
-          ))}
         </div>
-        <div className="rounded-md bg-zinc-950 p-3 font-mono text-xs text-zinc-100">
-          pnpm dlx shadcn@latest add @qiuye-ui/markdown-renderer
+        <div className="space-y-3 rounded-lg border bg-muted/20 p-3">
+          <div className="h-20 rounded-md bg-muted-foreground/10" />
+          <div className="grid grid-cols-2 gap-2">
+            <div className="h-12 rounded-md bg-muted-foreground/8" />
+            <div className="h-12 rounded-md bg-muted-foreground/8" />
+          </div>
+        </div>
+      </div>
+
+      <div className="relative w-full max-w-[360px] overflow-hidden rounded-lg border bg-background shadow-[0_24px_80px_-34px_rgba(0,0,0,0.5)] dark:shadow-[0_26px_86px_-34px_rgba(0,0,0,0.9)]">
+        <div className="flex h-10 items-center gap-2 border-b bg-muted/25 px-4">
+          <div className="size-2 rounded-full bg-muted-foreground/28" />
+          <div className="size-2 rounded-full bg-muted-foreground/18" />
+          <div className="size-2 rounded-full bg-muted-foreground/18" />
+          <div className="ml-auto h-2 w-14 rounded-full bg-muted-foreground/14" />
+        </div>
+
+        <div className="relative max-h-[260px] overflow-hidden p-4">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-14 bg-gradient-to-t from-background to-transparent" />
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="h-4 w-7/12 rounded-full bg-foreground/20" />
+              <div className="h-2.5 w-9/12 rounded-full bg-muted-foreground/14" />
+            </div>
+
+            <div className="space-y-2">
+              {paragraphLines.map((width, index) => (
+                <div
+                  key={index}
+                  className={cn(
+                    "h-2 rounded-full bg-muted-foreground/12",
+                    width,
+                  )}
+                />
+              ))}
+            </div>
+
+            <div className="rounded-md border bg-muted/15">
+              <div className="grid grid-cols-3 gap-2 border-b bg-muted/30 px-3 py-2">
+                <div className="h-2 rounded-full bg-muted-foreground/18" />
+                <div className="h-2 rounded-full bg-muted-foreground/18" />
+                <div className="h-2 rounded-full bg-muted-foreground/18" />
+              </div>
+              {tableRows.map((width, index) => (
+                <div
+                  key={index}
+                  className="grid grid-cols-3 gap-2 border-b px-3 py-2 last:border-b-0"
+                >
+                  <div
+                    className={cn(
+                      "h-2 rounded-full bg-muted-foreground/12",
+                      width,
+                    )}
+                  />
+                  <div className="h-2 rounded-full bg-muted-foreground/10" />
+                  <div className="h-2 rounded-full bg-muted-foreground/10" />
+                </div>
+              ))}
+            </div>
+
+            <div className="rounded-md border bg-zinc-950 p-3 dark:bg-black">
+              <div className="mb-3 flex gap-1.5">
+                <div className="size-2 rounded-full bg-zinc-500/60" />
+                <div className="size-2 rounded-full bg-zinc-600/60" />
+              </div>
+              <div className="space-y-2">
+                {codeLines.map((width, index) => (
+                  <div
+                    key={index}
+                    className={cn("h-2 rounded-full bg-zinc-300/20", width)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-md border bg-muted/20 p-3">
+              <div className="size-9 rounded-md bg-foreground/10" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="h-2.5 w-5/12 rounded-full bg-foreground/16" />
+                <div className="h-2 w-full rounded-full bg-muted-foreground/12" />
+              </div>
+              <div className="size-7 rounded-full border bg-background" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
