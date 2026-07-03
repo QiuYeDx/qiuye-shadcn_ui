@@ -622,29 +622,13 @@ function ThemeTransitionTogglePreview() {
   const isDark = mounted && resolvedTheme === "dark";
 
   return (
-    <div className="relative flex h-full min-h-[138px] w-full items-center justify-center overflow-hidden">
-      <div
-        aria-hidden
-        className={cn(
-          "absolute size-24 rounded-full blur-2xl transition-colors duration-500",
-          isDark ? "bg-white/12" : "bg-foreground/7"
-        )}
-      />
-      <div
-        aria-hidden
-        className="absolute h-px w-28 bg-gradient-to-r from-transparent via-border to-transparent"
-      />
-
-      <div className="relative flex items-center justify-center rounded-full bg-background/70 p-2.5 shadow-sm ring-1 ring-border/70 backdrop-blur-md">
-        <ThemeTransitionToggle
-          isDark={isDark}
-          onToggle={(nextDark) => setTheme(nextDark ? "dark" : "light")}
-          variant="secondary"
-        />
-      </div>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-8 bottom-4 h-8 bg-gradient-to-t from-background to-transparent"
+    <div className="flex h-full w-full items-center justify-center">
+      <ThemeTransitionToggle
+        isDark={isDark}
+        onToggle={(nextDark) => setTheme(nextDark ? "dark" : "light")}
+        variant="ghost"
+        buttonShape="circle"
+        className="size-11 rounded-full border border-border/70 bg-background text-foreground shadow-none hover:bg-muted/70 dark:bg-background dark:hover:bg-muted/40"
       />
     </div>
   );
