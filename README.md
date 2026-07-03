@@ -118,6 +118,7 @@ export default function App() {
 | Dot Glass | `dot-glass` | 特效 | 点阵开孔毛玻璃效果，只在点阵孔洞中露出背景模糊，适合 Header / Navbar 等视觉场景。 |
 | Image Viewer | `image-viewer` | 媒体 | 带灯箱预览的图片查看器，支持点击放大、滚轮 / 触控缩放、拖拽平移和加载过渡。 |
 | Dual State Toggle | `dual-state-toggle` | 交互 | 双状态图标按钮，内置点击缩放、图标切换动画和多种过渡效果。 |
+| Theme Transition Toggle | `theme-transition-toggle` | 交互 | 基于浏览器 View Transition API 的深浅模式切换按钮，支持从触发点圆形 / 椭圆揭幕并自动降级。 |
 | Code Block | `code-block` | 展示 | 基于 `prism-react-renderer` 的代码块，支持主题、折叠、滚动、Diff 高亮、行高亮、行号固定和复制按钮。 |
 | Typewriter | `typewriter` | 特效 | 平滑打字机效果，支持多文案轮播、单次打字、自定义光标与弹簧宽度跟随。 |
 | Markdown Renderer | `markdown-renderer` | 展示 | 通用 Markdown 渲染器，支持 Blog / Chat 预设、GFM、代码高亮、Mermaid、图片预览和可扩展 Widget。 |

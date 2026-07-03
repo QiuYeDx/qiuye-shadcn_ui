@@ -68,7 +68,7 @@ export function SiteHeader() {
         </Link>
 
         <div className="ml-auto flex items-center gap-1.5 md:hidden">
-          <ThemeToggle />
+          <ThemeToggle className="rounded-md" />
           <SiteMobileNav
             open={mobileNavOpen}
             onOpenChange={setMobileNavOpen}
@@ -112,7 +112,7 @@ export function SiteHeader() {
               <GithubIcon className="size-4" />
             </Link>
           </Button>
-          <ThemeToggle />
+          <ThemeToggle className="rounded-md" />
           <Button asChild size="sm">
             <Link href="/cli">Install</Link>
           </Button>

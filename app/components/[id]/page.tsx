@@ -39,6 +39,7 @@ import { ScrollableDialogDemo } from "@/components/qiuye-ui/demos/scrollable-dia
 import { DotGlassDemo } from "@/components/qiuye-ui/demos/dot-glass-demo";
 import { ImageViewerDemo } from "@/components/qiuye-ui/demos/image-viewer-demo";
 import { DualStateToggleDemo } from "@/components/qiuye-ui/demos/dual-state-toggle-demo";
+import { ThemeTransitionToggleDemo } from "@/components/qiuye-ui/demos/theme-transition-toggle-demo";
 import { CodeBlockDemo } from "@/components/qiuye-ui/demos/code-block-demo";
 import { TypewriterDemo } from "@/components/qiuye-ui/demos/typewriter-demo";
 import { MarkdownRendererDemo } from "@/components/qiuye-ui/demos/markdown-renderer-demo";
@@ -52,6 +53,7 @@ const demoComponents = {
   [ComponentId.DOT_GLASS]: DotGlassDemo,
   [ComponentId.IMAGE_VIEWER]: ImageViewerDemo,
   [ComponentId.DUAL_STATE_TOGGLE]: DualStateToggleDemo,
+  [ComponentId.THEME_TRANSITION_TOGGLE]: ThemeTransitionToggleDemo,
   [ComponentId.CODE_BLOCK]: CodeBlockDemo,
   [ComponentId.TYPEWRITER]: TypewriterDemo,
   [ComponentId.MARKDOWN_RENDERER]: MarkdownRendererDemo,
@@ -66,6 +68,7 @@ import {
   DotGlassSimpleDemo,
   ImageViewerSimpleDemo,
   DualStateToggleSimpleDemo,
+  ThemeTransitionToggleSimpleDemo,
   CodeBlockSimpleDemo,
   TypewriterSimpleDemo,
   MarkdownRendererSimpleDemo,
@@ -80,6 +83,7 @@ const simpleDemoComponents = {
   [ComponentId.DOT_GLASS]: DotGlassSimpleDemo,
   [ComponentId.IMAGE_VIEWER]: ImageViewerSimpleDemo,
   [ComponentId.DUAL_STATE_TOGGLE]: DualStateToggleSimpleDemo,
+  [ComponentId.THEME_TRANSITION_TOGGLE]: ThemeTransitionToggleSimpleDemo,
   [ComponentId.CODE_BLOCK]: CodeBlockSimpleDemo,
   [ComponentId.TYPEWRITER]: TypewriterSimpleDemo,
   [ComponentId.MARKDOWN_RENDERER]: MarkdownRendererSimpleDemo,

@@ -11,6 +11,7 @@ export enum ComponentId {
   DOT_GLASS = "dot-glass",
   IMAGE_VIEWER = "image-viewer",
   DUAL_STATE_TOGGLE = "dual-state-toggle",
+  THEME_TRANSITION_TOGGLE = "theme-transition-toggle",
   CODE_BLOCK = "code-block",
   TYPEWRITER = "typewriter",
   MARKDOWN_RENDERER = "markdown-renderer",
@@ -120,6 +121,19 @@ return (
     activeLabel="关闭"
     inactiveLabel="打开"
     effect="rotate"
+  />
+);`,
+  },
+  [ComponentId.THEME_TRANSITION_TOGGLE]: {
+    import: `import { ThemeTransitionToggle } from "@/components/qiuye-ui/theme-transition-toggle";
+import { useTheme } from "next-themes";`,
+    usage: `const { resolvedTheme, setTheme } = useTheme();
+const isDark = resolvedTheme === "dark";
+
+return (
+  <ThemeTransitionToggle
+    isDark={isDark}
+    onToggle={(nextDark) => setTheme(nextDark ? "dark" : "light")}
   />
 );`,
   },

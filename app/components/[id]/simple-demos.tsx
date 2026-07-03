@@ -13,6 +13,7 @@ import {
 import { DotGlass } from "@/components/qiuye-ui/dot-glass";
 import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
 import { DualStateToggle } from "@/components/qiuye-ui/dual-state-toggle";
+import { ThemeTransitionToggle } from "@/components/qiuye-ui/theme-transition-toggle";
 import { CodeBlock, CodeBlockPanel } from "@/components/qiuye-ui/code-block";
 import { Typewriter } from "@/components/qiuye-ui/typewriter";
 import { MarkdownRenderer } from "@/components/qiuye-ui/markdown-renderer";
@@ -20,6 +21,7 @@ import { ColorPicker } from "@/components/qiuye-ui/color-picker";
 import { Tour, type TourStep } from "@/components/qiuye-ui/tour";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useTheme } from "next-themes";
 import {
   FolderKanban,
   Menu,
@@ -215,6 +217,33 @@ export function DualStateToggleSimpleDemo() {
         effect="scale"
         variant="ghost"
       />
+    </div>
+  );
+}
+
+// ThemeTransitionToggle 简单演示
+export function ThemeTransitionToggleSimpleDemo() {
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && resolvedTheme === "dark";
+
+  return (
+    <div className="flex items-center justify-center gap-4 rounded-lg border bg-background p-5">
+      <ThemeTransitionToggle
+        isDark={isDark}
+        onToggle={(nextDark) => setTheme(nextDark ? "dark" : "light")}
+      />
+      <div className="text-sm">
+        <div className="font-medium">View Transition</div>
+        <div className="text-muted-foreground">
+          {isDark ? "深色模式" : "浅色模式"}
+        </div>
+      </div>
     </div>
   );
 }

@@ -15,6 +15,7 @@ import {
   XIcon,
 } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
+import { useTheme } from "next-themes";
 
 import {
   DialogDescription,
@@ -28,6 +29,7 @@ import { CodeBlock, CodeBlockPanel } from "@/components/qiuye-ui/code-block";
 import { ColorPicker } from "@/components/qiuye-ui/color-picker";
 import { DotGlass } from "@/components/qiuye-ui/dot-glass";
 import { DualStateToggle } from "@/components/qiuye-ui/dual-state-toggle";
+import { ThemeTransitionToggle } from "@/components/qiuye-ui/theme-transition-toggle";
 import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
 import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
 import { Tour, type TourStep } from "@/components/qiuye-ui/tour";
@@ -469,6 +471,50 @@ function DualStateTogglePreview() {
   );
 }
 
+function ThemeTransitionTogglePreview() {
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && resolvedTheme === "dark";
+
+  return (
+    <div className="relative flex w-full max-w-xs flex-col items-center gap-4 overflow-hidden rounded-lg border bg-background p-5">
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-80"
+        style={{
+          background:
+            "radial-gradient(circle at 30% 20%, hsl(var(--primary) / 0.18), transparent 32%), linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--background)) 72%)",
+        }}
+      />
+      <div className="relative flex items-center gap-3">
+        <ThemeTransitionToggle
+          isDark={isDark}
+          onToggle={(nextDark) => setTheme(nextDark ? "dark" : "light")}
+          variant="secondary"
+        />
+        <div className="text-left">
+          <div className="text-sm font-semibold">Theme reveal</div>
+          <div className="text-xs text-muted-foreground">
+            {isDark ? "dark -> light" : "light -> dark"}
+          </div>
+        </div>
+      </div>
+      <div className="relative grid w-full grid-cols-3 gap-2">
+        {["root", "clip", "fallback"].map((item) => (
+          <div key={item} className="rounded-md border bg-background/75 p-2 text-center text-[11px]">
+            {item}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function CodeBlockPreview() {
   const code = `import { useState, useCallback } from "react";
 
@@ -789,6 +835,7 @@ export const homePreviewComponents = {
   [ComponentId.DOT_GLASS]: DotGlassPreview,
   [ComponentId.IMAGE_VIEWER]: ImageViewerPreview,
   [ComponentId.DUAL_STATE_TOGGLE]: DualStateTogglePreview,
+  [ComponentId.THEME_TRANSITION_TOGGLE]: ThemeTransitionTogglePreview,
   [ComponentId.CODE_BLOCK]: CodeBlockPreview,
   [ComponentId.TYPEWRITER]: TypewriterPreview,
   [ComponentId.MARKDOWN_RENDERER]: MarkdownRendererPreview,

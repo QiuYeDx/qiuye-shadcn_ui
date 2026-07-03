@@ -41,6 +41,10 @@ export const homePreviewConfigs: HomePreviewConfig[] = [
     size: "compact",
   },
   {
+    id: ComponentId.THEME_TRANSITION_TOGGLE,
+    size: "compact",
+  },
+  {
     id: ComponentId.TYPEWRITER,
     size: "compact",
   },

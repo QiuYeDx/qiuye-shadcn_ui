@@ -708,6 +708,344 @@ export const componentRegistry: ComponentRegistry = {
     basicUsage: basicUsageExamples[ComponentId.DUAL_STATE_TOGGLE],
   },
 
+  [ComponentId.THEME_TRANSITION_TOGGLE]: {
+    name: "Theme Transition Toggle",
+    description:
+      "基于浏览器 View Transition API 的深浅模式切换组件：从触发点播放圆形、椭圆或多边形揭幕动画，封装按钮、Hook 与纯函数三种复用方式，并在不支持 API 或减少动态效果偏好下自动降级。",
+    category: "交互",
+    dependencies: ["lucide-react", "motion", "next-themes"],
+    files: {
+      component: "components/qiuye-ui/theme-transition-toggle.tsx",
+      demo: "components/qiuye-ui/demos/theme-transition-toggle-demo.tsx",
+    },
+    propsInfo: [
+      {
+        componentName: "ThemeTransitionToggle",
+        props: [
+          {
+            name: "isDark",
+            type: "boolean",
+            description: "当前是否处于深色主题",
+            required: true,
+          },
+          {
+            name: "onToggle",
+            type: "(nextDark: boolean) => void",
+            description:
+              "主题切换回调，会在 View Transition 的 update 阶段调用",
+            required: true,
+          },
+          {
+            name: "duration",
+            type: "number",
+            description: "全屏揭幕动画时长，单位毫秒",
+            required: false,
+            default: "580",
+          },
+          {
+            name: "easing",
+            type: "string",
+            description: "CSS easing 曲线，可与 duration 一起自定义动画节奏",
+            required: false,
+            default: '"cubic-bezier(0.17,0.84,0.44,1)"',
+          },
+          {
+            name: "timing",
+            type: '"spring" | "smooth"',
+            description:
+              "动画时间预设：保留 spring / smooth 两种兼容写法；当前均使用连续起止两帧，实际节奏由 duration/easing 控制",
+            required: false,
+            default: '"spring"',
+          },
+          {
+            name: "shape",
+            type: '"circle" | "ellipse" | "star" | "diamond" | "hexagon"',
+            description: "揭幕形状：圆形、椭圆、五角星、菱形或六边形",
+            required: false,
+            default: '"circle"',
+          },
+          {
+            name: "direction",
+            type: '"auto" | "enter" | "exit"',
+            description:
+              "揭幕方向：auto 根据当前主题决定扩散/收束，enter 始终扩散，exit 始终收束",
+            required: false,
+            default: '"auto"',
+          },
+          {
+            name: "targetDark",
+            type: "boolean",
+            description:
+              "切换后的目标主题是否为深色；按钮会自动推导，传入后可在 update 阶段同步 html class",
+            required: false,
+          },
+          {
+            name: "themeClassName",
+            type: "string | null",
+            description:
+              "深色主题挂载在 documentElement 上的 className，设为 null 可关闭同步",
+            required: false,
+            default: '"dark"',
+          },
+          {
+            name: "extraRadius",
+            type: "number",
+            description: "额外覆盖半径，避免视口边角露白",
+            required: false,
+            default: "48",
+          },
+          {
+            name: "respectReducedMotion",
+            type: "boolean",
+            description: "是否尊重系统减少动态效果偏好",
+            required: false,
+            default: "true",
+          },
+          {
+            name: "lightIcon",
+            type: "React.ReactNode",
+            description: "浅色主题下显示的图标",
+            required: false,
+            default: "<SunIcon />",
+          },
+          {
+            name: "darkIcon",
+            type: "React.ReactNode",
+            description: "深色主题下显示的图标",
+            required: false,
+            default: "<MoonIcon />",
+          },
+          {
+            name: "lightLabel",
+            type: "string",
+            description: "浅色主题下的无障碍标签",
+            required: false,
+            default: '"切换到深色主题"',
+          },
+          {
+            name: "darkLabel",
+            type: "string",
+            description: "深色主题下的无障碍标签",
+            required: false,
+            default: '"切换到浅色主题"',
+          },
+          {
+            name: "buttonShape",
+            type: '"square" | "circle"',
+            description: "触发器按钮形状，独立于揭幕 shape",
+            required: false,
+            default: '"square"',
+          },
+          {
+            name: "effect",
+            type: '"fade" | "rotate" | "slide-up" | "slide-down" | "scale" | ToggleEffectConfig',
+            description: "图标切换过渡效果，继承 DualStateToggle",
+            required: false,
+            default: '"rotate"',
+          },
+          {
+            name: "transitionDuration",
+            type: "number",
+            description: "图标切换动画时长，单位秒",
+            required: false,
+            default: "0.35",
+          },
+          {
+            name: "onToggleStart",
+            type: "(nextDark: boolean) => void",
+            description: "点击切换前触发",
+            required: false,
+          },
+          {
+            name: "onFallback",
+            type: "() => void",
+            description: "View Transition 不可用或被降级时触发",
+            required: false,
+          },
+          {
+            name: "onFinish",
+            type: "() => void",
+            description: "动画完成后的回调",
+            required: false,
+          },
+          {
+            name: "variant",
+            type: "ButtonProps['variant']",
+            description: "按钮变体，继承 shadcn/ui Button 的 variant",
+            required: false,
+            default: '"outline"',
+          },
+          {
+            name: "size",
+            type: "ButtonProps['size']",
+            description: "按钮尺寸，继承 shadcn/ui Button 的 size",
+            required: false,
+            default: '"icon"',
+          },
+          {
+            name: "className",
+            type: "string",
+            description: "额外的 CSS 类名",
+            required: false,
+          },
+        ],
+      },
+      {
+        componentName: "runThemeViewTransition",
+        props: [
+          {
+            name: "updateTheme",
+            type: "() => void",
+            description: "触发主题切换的 DOM 更新函数",
+            required: true,
+          },
+          {
+            name: "origin",
+            type: 'HTMLElement | RefObject | MouseEvent | { x: number; y: number } | "center"',
+            description: "用于计算揭幕中心点的来源",
+            required: false,
+            default: '"center"',
+          },
+          {
+            name: "isDark",
+            type: "boolean",
+            description: "切换前是否为深色主题，用于 auto 方向判断",
+            required: false,
+            default: "false",
+          },
+          {
+            name: "targetDark",
+            type: "boolean",
+            description:
+              "切换后的目标主题是否为深色，用于同步 html class 并稳定 View Transition 尾帧",
+            required: false,
+          },
+          {
+            name: "themeClassName",
+            type: "string | null",
+            description:
+              "深色主题挂载在 documentElement 上的 className，设为 null 可关闭同步",
+            required: false,
+            default: '"dark"',
+          },
+          {
+            name: "duration",
+            type: "number",
+            description: "动画时长，单位毫秒",
+            required: false,
+            default: "580",
+          },
+          {
+            name: "easing",
+            type: "string",
+            description: "CSS easing 曲线，可与 duration 一起自定义动画节奏",
+            required: false,
+            default: '"cubic-bezier(0.17,0.84,0.44,1)"',
+          },
+          {
+            name: "timing",
+            type: '"spring" | "smooth"',
+            description:
+              "动画时间预设：保留 spring / smooth 两种兼容写法；当前均使用连续起止两帧，实际节奏由 duration/easing 控制",
+            required: false,
+            default: '"spring"',
+          },
+          {
+            name: "shape",
+            type: '"circle" | "ellipse" | "star" | "diamond" | "hexagon"',
+            description: "揭幕形状：圆形、椭圆、五角星、菱形或六边形",
+            required: false,
+            default: '"circle"',
+          },
+        ],
+      },
+      {
+        componentName: "useThemeTransition",
+        props: [
+          {
+            name: "updateTheme",
+            type: "() => void",
+            description: "触发主题切换的 DOM 更新函数",
+            required: true,
+          },
+          {
+            name: "origin",
+            type: "ThemeTransitionOrigin",
+            description: "默认动画原点，调用 run 时传入的 origin 会覆盖它",
+            required: false,
+            default: '"center"',
+          },
+          {
+            name: "isDark",
+            type: "boolean",
+            description: "切换前是否为深色主题，用于 auto 方向判断",
+            required: false,
+            default: "false",
+          },
+          {
+            name: "targetDark",
+            type: "boolean",
+            description:
+              "切换后的目标主题是否为深色；默认按 !isDark 推导",
+            required: false,
+          },
+          {
+            name: "themeClassName",
+            type: "string | null",
+            description:
+              "深色主题挂载在 documentElement 上的 className，设为 null 可关闭同步",
+            required: false,
+            default: '"dark"',
+          },
+          {
+            name: "duration",
+            type: "number",
+            description: "动画时长，单位毫秒",
+            required: false,
+            default: "580",
+          },
+          {
+            name: "easing",
+            type: "string",
+            description: "CSS easing 曲线，可与 duration 一起自定义动画节奏",
+            required: false,
+            default: '"cubic-bezier(0.17,0.84,0.44,1)"',
+          },
+          {
+            name: "timing",
+            type: '"spring" | "smooth"',
+            description:
+              "动画时间预设：保留 spring / smooth 两种兼容写法；当前均使用连续起止两帧，实际节奏由 duration/easing 控制",
+            required: false,
+            default: '"spring"',
+          },
+          {
+            name: "shape",
+            type: '"circle" | "ellipse" | "star" | "diamond" | "hexagon"',
+            description: "揭幕形状：圆形、椭圆、五角星、菱形或六边形",
+            required: false,
+            default: '"circle"',
+          },
+        ],
+      },
+    ],
+    version: "1.0.0",
+    author: "QiuYeDx",
+    tags: [
+      "theme",
+      "dark-mode",
+      "view-transition",
+      "transition-api",
+      "toggle",
+      "animation",
+      "clip-path",
+      "next-themes",
+      "shadcn",
+    ],
+    cliName: "theme-transition-toggle",
+    basicUsage: basicUsageExamples[ComponentId.THEME_TRANSITION_TOGGLE],
+  },
+
   [ComponentId.CODE_BLOCK]: {
     name: "Code Block",
     description:
