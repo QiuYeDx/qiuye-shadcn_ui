@@ -9,12 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
 import {
   ResponsiveTabs,
   type TabItem,
@@ -287,7 +287,11 @@ function ComponentCard({
   };
 
   return (
-    <Card className="h-full hover:shadow-lg transition-all duration-300">
+    <SmoothCorners
+      radius={18}
+      smoothing={0.68}
+      className="h-full rounded-lg border bg-card text-card-foreground shadow-sm transition-all duration-300 hover:shadow-lg"
+    >
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -354,6 +358,6 @@ function ComponentCard({
           <span>by {component.author}</span>
         </div>
       </CardContent>
-    </Card>
+    </SmoothCorners>
   );
 }

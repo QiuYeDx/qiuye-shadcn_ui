@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Copy, CheckCircle, Terminal, Package } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
@@ -14,20 +14,36 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  ResponsiveTabs,
-  type TabItem,
-} from "@/components/qiuye-ui/responsive-tabs";
+  CodeBlock as CodeBlockDisplay,
+  CodeBlockPanel,
+} from "@/components/qiuye-ui/code-block";
+import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
+import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
 import { Separator } from "@/components/ui/separator";
 import { useClipboard } from "use-clipboard-copy";
 import { toast } from "sonner";
 import { ComponentId } from "@/lib/component-constants";
 
+function CliDocCard({ children }: { children: ReactNode }) {
+  return (
+    <SmoothCorners
+      radius={18}
+      smoothing={0.66}
+      className="rounded-lg border bg-card text-card-foreground shadow-sm"
+    >
+      {children}
+    </SmoothCorners>
+  );
+}
+
 export default function CLIPage() {
+  const { resolvedTheme } = useTheme();
   const clipboard = useClipboard();
   const [copiedStates, setCopiedStates] = useState<{ [key: string]: boolean }>(
     {}
   );
   const [packageManager, setPackageManager] = useState<"npm" | "pnpm">("pnpm");
+  const isDark = resolvedTheme === "dark";
 
   const getCommandPrefix = () => {
     return packageManager === "npm" ? "npx" : "pnpm dlx";
@@ -67,20 +83,28 @@ export default function CLIPage() {
   const CodeBlock = ({
     code,
     language = "bash",
-    copyKey,
+    showCopyButton = true,
   }: {
     code: string;
     language?: string;
     copyKey: string;
+    showCopyButton?: boolean;
   }) => (
-    <div className="relative">
-      <pre className="bg-muted/50 rounded-md p-4 pr-12 overflow-x-auto whitespace-pre-wrap break-words">
-        <code className={`text-sm font-mono language-${language}`}>{code}</code>
-      </pre>
-      <div className="absolute top-2 right-2">
-        <CopyButton text={code} copyKey={copyKey} />
-      </div>
-    </div>
+    <CodeBlockPanel
+      code={code}
+      language={language}
+      showCopyButton={showCopyButton}
+      isDark={isDark}
+      className="min-w-0"
+    >
+      <CodeBlockDisplay
+        language={language}
+        isDark={isDark}
+        showLineNumbers={false}
+      >
+        {code}
+      </CodeBlockDisplay>
+    </CodeBlockPanel>
   );
 
   // --- Tabs 受控 + 方向判定 ---
@@ -239,7 +263,7 @@ export default function CLIPage() {
                 >
                   {tab === "installation" && (
                     <div className="space-y-6">
-                      <Card>
+                      <CliDocCard>
                         <CardHeader>
                           <CardTitle>使用 Shadcn/ui CLI</CardTitle>
                           <CardDescription>
@@ -349,13 +373,13 @@ export default function CLIPage() {
                             </p>
                           </div>
                         </CardContent>
-                      </Card>
+                      </CliDocCard>
                     </div>
                   )}
 
                   {tab === "usage" && (
                     <div className="space-y-6">
-                      <Card>
+                      <CliDocCard>
                         <CardHeader>
                           <CardTitle>基本使用</CardTitle>
                           <CardDescription>
@@ -474,9 +498,9 @@ export default function App() {
                             </div>
                           </div>
                         </CardContent>
-                      </Card>
+                      </CliDocCard>
 
-                      <Card>
+                      <CliDocCard>
                         <CardHeader>
                           <CardTitle>项目配置</CardTitle>
                           <CardDescription>
@@ -517,13 +541,13 @@ export default function App() {
                             />
                           </div>
                         </CardContent>
-                      </Card>
+                      </CliDocCard>
                     </div>
                   )}
 
                   {tab === "commands" && (
                     <div className="space-y-6">
-                      <Card>
+                      <CliDocCard>
                         <CardHeader>
                           <CardTitle>常用命令</CardTitle>
                           <CardDescription>
@@ -588,9 +612,11 @@ export default function App() {
                                     copyKey={`cmd-${index}`}
                                   />
                                 </div>
-                                <div className="bg-muted/30 rounded p-2 text-xs font-mono">
-                                  $ {item.example}
-                                </div>
+                                <CodeBlock
+                                  code={`$ ${item.example}`}
+                                  copyKey={`cmd-example-${index}`}
+                                  showCopyButton={false}
+                                />
                               </div>
                             ))}
                           </div>
@@ -635,13 +661,13 @@ export default function App() {
                             </div>
                           </div>
                         </CardContent>
-                      </Card>
+                      </CliDocCard>
                     </div>
                   )}
 
                   {tab === "api" && (
                     <div className="space-y-6">
-                      <Card>
+                      <CliDocCard>
                         <CardHeader>
                           <CardTitle>注册表结构</CardTitle>
                           <CardDescription>
@@ -755,7 +781,7 @@ export default function App() {
                             />
                           </div>
                         </CardContent>
-                      </Card>
+                      </CliDocCard>
                     </div>
                   )}
                 </motion.div>

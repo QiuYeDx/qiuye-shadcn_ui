@@ -2,6 +2,7 @@ import Link from "next/link";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
 import { TabsContent } from "@/components/qiuye-ui/responsive-tabs";
 import {
   Table,
@@ -114,7 +115,11 @@ function DemoPreview({
           查看 {component.name} 组件的基本效果
         </p>
       </div>
-      <div className="rounded-lg bg-muted/30 p-4 sm:p-5">
+      <SmoothCorners
+        radius={20}
+        smoothing={0.7}
+        className="rounded-lg bg-muted/30 p-4 sm:p-5"
+      >
         {SimpleDemoComponent ? (
           <SimpleDemoComponent />
         ) : (
@@ -122,7 +127,7 @@ function DemoPreview({
             演示组件正在开发中...
           </div>
         )}
-      </div>
+      </SmoothCorners>
     </section>
   );
 }
@@ -220,7 +225,11 @@ export default async function ComponentDetailPage({
 
           {/* 侧栏：sticky，避免出现右侧空白 */}
           <aside className="min-w-0 lg:col-span-4 xl:col-span-3">
-            <div className="space-y-5 rounded-lg border bg-muted/20 p-4 sm:p-5 lg:sticky lg:top-24">
+            <SmoothCorners
+              radius={18}
+              smoothing={0.68}
+              className="space-y-5 rounded-lg border bg-muted/20 p-4 sm:p-5 lg:sticky lg:top-24"
+            >
               {/* 安装命令 */}
               <section className="space-y-3">
                 <h2 className="text-sm font-semibold">安装命令</h2>
@@ -257,7 +266,7 @@ export default async function ComponentDetailPage({
                   </div>
                 </div>
               </section>
-            </div>
+            </SmoothCorners>
           </aside>
         </div>
       </div>
