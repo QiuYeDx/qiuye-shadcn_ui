@@ -1001,13 +1001,24 @@ function SmoothCornersPreview() {
   return (
     <div className="flex w-full max-w-xs items-end justify-center gap-3">
       {[
-        { label: "0", smoothing: 0, height: "h-24", color: "bg-muted" },
-        { label: "0.6", smoothing: 0.6, height: "h-32", color: "bg-primary" },
+        {
+          label: "0",
+          smoothing: 0,
+          height: "h-24",
+          className:
+            "border border-sky-500/35 bg-sky-50 text-sky-950 shadow-[inset_0_0_0_1px_rgba(14,165,233,0.12)] dark:border-sky-400/35 dark:bg-sky-950/35 dark:text-sky-50",
+        },
+        {
+          label: "0.6",
+          smoothing: 0.6,
+          height: "h-32",
+          className: "bg-primary text-primary-foreground",
+        },
         {
           label: "0.95",
           smoothing: 0.95,
           height: "h-28",
-          color: "bg-foreground",
+          className: "bg-foreground text-background",
         },
       ].map((item) => (
         <SmoothCorners
@@ -1017,12 +1028,7 @@ function SmoothCornersPreview() {
           className={cn(
             "flex w-20 flex-col justify-between p-3 text-xs shadow-sm",
             item.height,
-            item.color,
-            item.color === "bg-muted"
-              ? "text-foreground"
-              : item.color === "bg-primary"
-                ? "text-primary-foreground"
-                : "text-background"
+            item.className
           )}
         >
           <span className="font-medium">s</span>

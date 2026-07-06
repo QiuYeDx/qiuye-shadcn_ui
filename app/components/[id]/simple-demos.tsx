@@ -335,7 +335,12 @@ export function SmoothCornersSimpleDemo() {
   return (
     <div className="grid gap-3 sm:grid-cols-3">
       {[
-        { label: "0", smoothing: 0, className: "bg-muted text-foreground" },
+        {
+          label: "0",
+          smoothing: 0,
+          className:
+            "border border-sky-500/35 bg-sky-50 text-sky-950 shadow-[inset_0_0_0_1px_rgba(14,165,233,0.12)] dark:border-sky-400/35 dark:bg-sky-950/35 dark:text-sky-50",
+        },
         {
           label: "0.6",
           smoothing: 0.6,
