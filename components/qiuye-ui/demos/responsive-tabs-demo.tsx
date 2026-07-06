@@ -40,6 +40,7 @@ import {
 import { ViewSourceButton } from "@/components/view-source-button";
 
 type LayoutMode = "responsive" | "scroll" | "grid";
+type TabSize = "default" | "sm";
 
 /* ── 源码片段（供 ViewSourceButton 展示） ──────────────── */
 
@@ -285,6 +286,7 @@ export function ResponsiveTabsDemo() {
 
   /* ── 8. Playground ── */
   const [playLayout, setPlayLayout] = useState<LayoutMode>("responsive");
+  const [playSize, setPlaySize] = useState<TabSize>("default");
   const [playScrollStep, setPlayScrollStep] = useState(200);
   const [playFadeMasks, setPlayFadeMasks] = useState(true);
   const [playFadeMaskWidth, setPlayFadeMaskWidth] = useState(64);
@@ -702,7 +704,7 @@ export function ResponsiveTabsDemo() {
         <CardContent className="space-y-5">
           {/* 控制面板 */}
           <div className="rounded-lg border bg-muted/30 p-4">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {/* 布局模式 */}
               <div className="space-y-2">
                 <Label className="text-xs text-muted-foreground">
@@ -718,6 +720,24 @@ export function ResponsiveTabsDemo() {
                       className="cursor-pointer flex-1 text-xs"
                     >
                       {m}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 尺寸 */}
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">size</Label>
+                <div className="flex gap-1.5">
+                  {(["default", "sm"] as const).map((s) => (
+                    <Button
+                      key={s}
+                      size="sm"
+                      variant={playSize === s ? "default" : "outline"}
+                      onClick={() => setPlaySize(s)}
+                      className="cursor-pointer flex-1 text-xs"
+                    >
+                      {s}
                     </Button>
                   ))}
                 </div>
@@ -817,19 +837,20 @@ export function ResponsiveTabsDemo() {
             onValueChange={setPlayTab}
             items={playItems}
             layout={playLayout}
+            size={playSize}
             scrollStep={playScrollStep}
             fadeMasks={playFadeMasks}
             fadeMaskWidth={playFadeMaskWidth}
             animatedHighlight={playAnimatedHL}
             gridColsClass="sm:grid-cols-6 xl:grid-cols-8"
-            triggerClassName="text-xs"
+            triggerClassName={playSize === "sm" ? "text-xs" : undefined}
           >
             {playItems.map((item) => (
               <TabsContent key={item.value} value={item.value}>
                 <ContentPanel
                   title={item.label}
                   badge={item.badge}
-                  description={`layout: ${playLayout} · animatedHighlight: ${playAnimatedHL ? "on" : "off"} · fadeMasks: ${playFadeMasks ? "on" : "off"} · scrollStep: ${playScrollStep}px · fadeMaskWidth: ${playFadeMaskWidth}px`}
+                  description={`layout: ${playLayout} · size: ${playSize} · animatedHighlight: ${playAnimatedHL ? "on" : "off"} · fadeMasks: ${playFadeMasks ? "on" : "off"} · scrollStep: ${playScrollStep}px · fadeMaskWidth: ${playFadeMaskWidth}px`}
                 />
               </TabsContent>
             ))}

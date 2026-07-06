@@ -296,19 +296,34 @@ const ResponsiveTabs = React.forwardRef<
     // 类名计算
     // 外层相对定位容器，仅用于放置按钮/遮罩层（不承担滚动）
     const outerRelativeClass = "relative w-full overflow-x-hidden";
+    const sizeClasses = isSm
+      ? {
+          listRadius: "rounded-lg",
+          triggerRadius: "rounded-md",
+          gutter: "p-0.5",
+          gap: "gap-0.5",
+        }
+      : {
+          listRadius: "rounded-xl",
+          triggerRadius: "rounded-lg",
+          gutter: "p-1",
+          gap: "gap-1",
+        };
 
     // TabsList：固定背景层（圆角灰底通常在这里），不滚动，负责 padding（edge gutter）
     const listClass = cn(
       // grid/responsive 的列定义（只在需要 grid 时作用）
       (isGridAll || isResponsive) && gridColsClass,
-      "h-auto w-full overflow-hidden", // 关键：overflow-hidden，固定背景
+      "h-auto w-full overflow-hidden p-0", // 关键：overflow-hidden，固定背景
+      sizeClasses.listRadius,
       // 当大屏 grid 时让内部布局切换到 grid（见 rowClass）
       listClassName
     );
 
     // scroller：真正滚动的层
     const scrollerClass = cn(
-      "w-full p-0.5",
+      "w-full",
+      sizeClasses.gutter,
       isGridAll
         ? "overflow-visible"
         : isScrollAll
@@ -324,15 +339,20 @@ const ResponsiveTabs = React.forwardRef<
     // row：承载触发器的行；滚动场景下 inline-flex + w-max，grid 场景下切为 grid
     const rowClass = cn(
       isGridAll
-        ? "grid w-full gap-0"
+        ? cn("grid w-full", sizeClasses.gap)
         : isScrollAll
-          ? "inline-flex w-max whitespace-nowrap gap-1"
-          : "inline-flex w-max whitespace-nowrap gap-1 sm:grid sm:w-full sm:gap-0",
+          ? cn("inline-flex w-max whitespace-nowrap", sizeClasses.gap)
+          : cn(
+              "inline-flex w-max whitespace-nowrap sm:grid sm:w-full",
+              sizeClasses.gap,
+              isSm ? "sm:gap-0.5" : "sm:gap-1"
+            ),
       (isGridAll || isResponsive) && gridColsClass
     );
 
     const triggerClass = cn(
       isSm ? "px-2 py-1 text-xs" : "px-3 py-2",
+      sizeClasses.triggerRadius,
       !isGridAll && "shrink-0 min-w-fit",
       isGridAll && "shrink min-w-0 flex items-center justify-center",
       isResponsive &&
@@ -432,7 +452,10 @@ const ResponsiveTabs = React.forwardRef<
                     {animatedHighlight && value === item.value && (
                       <motion.span
                         layoutId={`${instanceId}-tab-highlight`}
-                        className="absolute inset-0 rounded-md bg-background shadow-sm dark:border dark:border-input dark:bg-input/30"
+                        className={cn(
+                          "absolute inset-0 bg-background shadow-sm dark:border dark:border-input dark:bg-input/30",
+                          sizeClasses.triggerRadius
+                        )}
                         transition={{
                           type: "spring",
                           bounce: 0.15,
@@ -474,7 +497,10 @@ const ResponsiveTabs = React.forwardRef<
               {fadeMasks && (isScrollAll || isResponsive) && showLeftFade && (
                 <motion.div
                   aria-hidden="true"
-                  className="rounded-lg pointer-events-none absolute left-0 top-0 bottom-0 z-[5] bg-gradient-to-r from-muted to-transparent"
+                  className={cn(
+                    "pointer-events-none absolute left-0 top-0 bottom-0 z-[5] bg-gradient-to-r from-muted to-transparent",
+                    sizeClasses.listRadius
+                  )}
                   style={{ width: `${fadeMaskWidth}px` }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -487,7 +513,10 @@ const ResponsiveTabs = React.forwardRef<
               {fadeMasks && (isScrollAll || isResponsive) && showRightFade && (
                 <motion.div
                   aria-hidden="true"
-                  className="rounded-lg pointer-events-none absolute right-0 top-0 bottom-0 z-[5] bg-gradient-to-l from-muted to-transparent"
+                  className={cn(
+                    "pointer-events-none absolute right-0 top-0 bottom-0 z-[5] bg-gradient-to-l from-muted to-transparent",
+                    sizeClasses.listRadius
+                  )}
                   style={{ width: `${fadeMaskWidth}px` }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
