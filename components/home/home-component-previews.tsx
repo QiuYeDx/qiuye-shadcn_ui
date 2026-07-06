@@ -548,10 +548,23 @@ const imageViewerPreviewSrc =
 function ImageViewerPreview() {
   return (
     <div className="relative flex h-full min-h-[320px] w-full items-center justify-center overflow-visible py-3">
-      <div
+      {/* 原生 img 用于避开 iOS Safari 对 CSS background-image + filter 的首屏合成裁边。 */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         aria-hidden="true"
-        className="pointer-events-none absolute h-[82%] max-h-[360px] w-[72%] max-w-[260px] rounded-2xl bg-cover bg-center opacity-20 blur-xl saturate-125 dark:opacity-25"
-        style={{ backgroundImage: `url(${imageViewerPreviewSrc})` }}
+        src={imageViewerPreviewSrc}
+        alt=""
+        loading="eager"
+        decoding="async"
+        draggable={false}
+        className="pointer-events-none absolute h-[82%] max-h-[360px] w-[72%] max-w-[260px] rounded-2xl object-cover object-center opacity-20 blur-xl saturate-125 dark:opacity-25"
+        style={{
+          backfaceVisibility: "hidden",
+          transform: "translate3d(0, 0, 0)",
+          WebkitBackfaceVisibility: "hidden",
+          WebkitTransform: "translate3d(0, 0, 0)",
+          willChange: "filter, transform",
+        }}
       />
       <ImageViewer
         src={imageViewerPreviewSrc}

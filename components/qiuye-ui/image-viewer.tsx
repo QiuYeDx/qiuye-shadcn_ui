@@ -829,7 +829,7 @@ export function ImageViewer({
               maxHeight: formatSize(maxHeight),
               maxWidth: formatSize(maxWidth),
               opacity: imageLoading ? 0 : 1,
-              filter: imageLoading ? "blur(6px)" : "blur(0px)",
+              filter: imageLoading ? "blur(6px)" : "none",
               transition: "opacity 0.5s ease-out, filter 0.5s ease-out",
               ...(!selectable && { WebkitTouchCallout: "none" }),
             }}
