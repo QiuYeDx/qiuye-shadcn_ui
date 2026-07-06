@@ -31,6 +31,7 @@ import { DualStateToggle } from "@/components/qiuye-ui/dual-state-toggle";
 import { ThemeTransitionToggle } from "@/components/qiuye-ui/theme-transition-toggle";
 import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
 import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
+import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
 import { Tour, type TourStep } from "@/components/qiuye-ui/tour";
 import { Typewriter } from "@/components/qiuye-ui/typewriter";
 import { Button } from "@/components/ui/button";
@@ -996,6 +997,42 @@ function TourPreview() {
   );
 }
 
+function SmoothCornersPreview() {
+  return (
+    <div className="flex w-full max-w-xs items-end justify-center gap-3">
+      {[
+        { label: "0", smoothing: 0, height: "h-24", color: "bg-muted" },
+        { label: "0.6", smoothing: 0.6, height: "h-32", color: "bg-primary" },
+        {
+          label: "0.95",
+          smoothing: 0.95,
+          height: "h-28",
+          color: "bg-foreground",
+        },
+      ].map((item) => (
+        <SmoothCorners
+          key={item.label}
+          radius={24}
+          smoothing={item.smoothing}
+          className={cn(
+            "flex w-20 flex-col justify-between p-3 text-xs shadow-sm",
+            item.height,
+            item.color,
+            item.color === "bg-muted"
+              ? "text-foreground"
+              : item.color === "bg-primary"
+                ? "text-primary-foreground"
+                : "text-background"
+          )}
+        >
+          <span className="font-medium">s</span>
+          <span className="font-mono">{item.label}</span>
+        </SmoothCorners>
+      ))}
+    </div>
+  );
+}
+
 export const homePreviewComponents = {
   [ComponentId.RESPONSIVE_TABS]: ResponsiveTabsPreview,
   [ComponentId.SCROLLABLE_DIALOG]: ScrollableDialogPreview,
@@ -1007,5 +1044,6 @@ export const homePreviewComponents = {
   [ComponentId.TYPEWRITER]: TypewriterPreview,
   [ComponentId.MARKDOWN_RENDERER]: MarkdownRendererPreview,
   [ComponentId.COLOR_PICKER]: ColorPickerPreview,
+  [ComponentId.SMOOTH_CORNERS]: SmoothCornersPreview,
   [ComponentId.TOUR]: TourPreview,
 } satisfies Record<ComponentId, React.ComponentType>;

@@ -1641,6 +1641,88 @@ export const componentRegistry: ComponentRegistry = {
     cliName: "color-picker",
     basicUsage: basicUsageExamples[ComponentId.COLOR_PICKER],
   },
+  [ComponentId.SMOOTH_CORNERS]: {
+    name: "Smooth Corners",
+    description:
+      "Figma/iOS 风格平滑圆角组件：基于 CSS corner-shape 的渐进增强方案，将 radius + smoothing 转换为补偿半径和 superellipse，并在不支持的浏览器中自动回退到标准 border-radius。",
+    category: "特效",
+    dependencies: ["@qiuyedx/smooth-corners", "@radix-ui/react-slot"],
+    files: {
+      component: "components/qiuye-ui/smooth-corners.tsx",
+      demo: "components/qiuye-ui/demos/smooth-corners-demo.tsx",
+    },
+    props: [
+      {
+        name: "radius",
+        type: "number",
+        description: "原始圆角半径，单位 px",
+        required: false,
+        default: "16",
+      },
+      {
+        name: "smoothing",
+        type: "number",
+        description: "平滑强度，范围 0..1；0 表示标准圆弧，1 表示最大平滑",
+        required: false,
+        default: "0.6",
+      },
+      {
+        name: "observeSize",
+        type: "boolean",
+        description:
+          "是否根据元素实际尺寸自动压缩 smoothing，适合大圆角或尺寸动态变化场景",
+        required: false,
+        default: "false",
+      },
+      {
+        name: "asChild",
+        type: "boolean",
+        description:
+          "是否把效果应用到唯一子元素本身，而不是额外包一层 div",
+        required: false,
+        default: "false",
+      },
+      {
+        name: "disabled",
+        type: "boolean",
+        description: "是否禁用平滑圆角效果",
+        required: false,
+        default: "false",
+      },
+      {
+        name: "className",
+        type: "string",
+        description: "根元素额外类名",
+        required: false,
+      },
+      {
+        name: "style",
+        type: "React.CSSProperties",
+        description: "根元素样式，会与组件生成的 CSS 自定义属性合并",
+        required: false,
+      },
+      {
+        name: "children",
+        type: "React.ReactNode",
+        description: "被包装的内容",
+        required: false,
+      },
+    ],
+    version: "1.0.0",
+    author: "QiuYeDx",
+    tags: [
+      "smooth-corners",
+      "corner-shape",
+      "superellipse",
+      "squircle",
+      "figma",
+      "ios",
+      "radius",
+      "progressive-enhancement",
+    ],
+    cliName: "smooth-corners",
+    basicUsage: basicUsageExamples[ComponentId.SMOOTH_CORNERS],
+  },
   [ComponentId.TOUR]: {
     name: "Tour",
     description:

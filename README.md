@@ -123,6 +123,7 @@ export default function App() {
 | Typewriter | `typewriter` | 特效 | 平滑打字机效果，支持多文案轮播、单次打字、自定义光标与弹簧宽度跟随。 |
 | Markdown Renderer | `markdown-renderer` | 展示 | 通用 Markdown 渲染器，支持 Blog / Chat 预设、GFM、代码高亮、Mermaid、图片预览和可扩展 Widget。 |
 | Color Picker | `color-picker` | 表单 | HSV 取色器，支持 Alpha、触屏拖拽、十六进制输入、预设色卡、最近颜色和 Popover / Inline 模式。 |
+| Smooth Corners | `smooth-corners` | 特效 | Figma / iOS 风格平滑圆角组件，基于 `corner-shape` 渐进增强并自动回退到标准 `border-radius`。 |
 | Tour | `tour` | 导航 | 产品引导组件，支持目标元素高亮、遮罩聚焦、步骤 Popover、进度、跳过和自动滚动定位。 |
 
 安装任意组件：

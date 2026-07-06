@@ -18,6 +18,7 @@ import { CodeBlock, CodeBlockPanel } from "@/components/qiuye-ui/code-block";
 import { Typewriter } from "@/components/qiuye-ui/typewriter";
 import { MarkdownRenderer } from "@/components/qiuye-ui/markdown-renderer";
 import { ColorPicker } from "@/components/qiuye-ui/color-picker";
+import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
 import { Tour, type TourStep } from "@/components/qiuye-ui/tour";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -32,6 +33,7 @@ import {
   VolumeOff,
   X,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // ResponsiveTabs 简单演示
 export function ResponsiveTabsSimpleDemo() {
@@ -324,6 +326,40 @@ export function ColorPickerSimpleDemo() {
     <div className="flex items-center gap-4">
       <ColorPicker value={color} onChange={setColor} />
       <span className="text-sm font-mono text-muted-foreground">{color}</span>
+    </div>
+  );
+}
+
+// SmoothCorners 简单演示
+export function SmoothCornersSimpleDemo() {
+  return (
+    <div className="grid gap-3 sm:grid-cols-3">
+      {[
+        { label: "0", smoothing: 0, className: "bg-muted text-foreground" },
+        {
+          label: "0.6",
+          smoothing: 0.6,
+          className: "bg-primary text-primary-foreground",
+        },
+        {
+          label: "0.95",
+          smoothing: 0.95,
+          className: "bg-foreground text-background",
+        },
+      ].map((item) => (
+        <SmoothCorners
+          key={item.label}
+          radius={28}
+          smoothing={item.smoothing}
+          className={cn(
+            "flex aspect-[4/3] min-h-24 flex-col justify-between p-4 shadow-sm",
+            item.className
+          )}
+        >
+          <span className="text-sm font-medium">smoothing</span>
+          <span className="font-mono text-lg">{item.label}</span>
+        </SmoothCorners>
+      ))}
     </div>
   );
 }

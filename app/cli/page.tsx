@@ -614,6 +614,7 @@ export default function App() {
                                 ComponentId.TYPEWRITER,
                                 ComponentId.MARKDOWN_RENDERER,
                                 ComponentId.COLOR_PICKER,
+                                ComponentId.SMOOTH_CORNERS,
                                 ComponentId.TOUR,
                               ].map((component) => (
                                 <div

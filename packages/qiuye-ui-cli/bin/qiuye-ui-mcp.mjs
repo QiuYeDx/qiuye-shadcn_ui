@@ -21,6 +21,9 @@ const DEFAULT_COMPONENT_NAMES = [
   "code-block",
   "typewriter",
   "markdown-renderer",
+  "color-picker",
+  "smooth-corners",
+  "tour",
 ];
 
 function parseArgs(argv) {

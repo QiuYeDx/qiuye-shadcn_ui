@@ -37,6 +37,10 @@ export const homePreviewConfigs: HomePreviewConfig[] = [
     size: "compact",
   },
   {
+    id: ComponentId.SMOOTH_CORNERS,
+    size: "compact",
+  },
+  {
     id: ComponentId.DUAL_STATE_TOGGLE,
     size: "compact",
   },

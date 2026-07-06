@@ -23,6 +23,7 @@
 - `typewriter`
 - `markdown-renderer`
 - `color-picker`
+- `smooth-corners`
 - `tour`
 
 ## 核心目录

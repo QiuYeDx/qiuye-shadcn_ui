@@ -16,6 +16,7 @@ export enum ComponentId {
   TYPEWRITER = "typewriter",
   MARKDOWN_RENDERER = "markdown-renderer",
   COLOR_PICKER = "color-picker",
+  SMOOTH_CORNERS = "smooth-corners",
   TOUR = "tour",
 }
 
@@ -179,6 +180,16 @@ return (
     <span className="font-mono text-sm">{color}</span>
   </div>
 );`,
+  },
+  [ComponentId.SMOOTH_CORNERS]: {
+    import: `import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";`,
+    usage: `<SmoothCorners
+  radius={28}
+  smoothing={0.7}
+  className="bg-primary p-6 text-primary-foreground"
+>
+  Smooth corner card
+</SmoothCorners>`,
   },
   [ComponentId.TOUR]: {
     import: `import { Tour } from "@/components/qiuye-ui/tour";

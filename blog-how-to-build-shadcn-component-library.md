@@ -49,6 +49,7 @@ qiuye-shadcn_ui/
 │   │   ├── color-picker.tsx
 │   │   ├── responsive-tabs.tsx
 │   │   ├── scrollable-dialog.tsx
+│   │   ├── smooth-corners.tsx
 │   │   ├── tour.tsx
 │   │   ├── typewriter.tsx
 │   │   └── demos/                  # 组件演示（用于站点展示）
@@ -63,6 +64,7 @@ qiuye-shadcn_ui/
 │       ├── markdown-renderer.json
 │       ├── responsive-tabs.json
 │       ├── scrollable-dialog.json
+│       ├── smooth-corners.json
 │       ├── tour.json
 │       └── typewriter.json
 └── scripts/
