@@ -95,7 +95,9 @@
         "motion",
         "lucide-react"
       ],
-      "registryDependencies": [],
+      "registryDependencies": [
+        "@qiuye-ui/smooth-corners"
+      ],
       "files": [
         {
           "type": "registry:component",

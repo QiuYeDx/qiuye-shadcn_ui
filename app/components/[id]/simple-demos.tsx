@@ -179,6 +179,10 @@ export function ImageViewerSimpleDemo() {
         alt="荒漠公路"
         maxHeight={400}
         hoverScale={1.05}
+        rounded="2xl"
+        lightboxRounded="2xl"
+        smoothCorners
+        smoothCornerSmoothing={0.72}
         className="w-full"
         wrapperClassName="flex justify-center items-center"
       />

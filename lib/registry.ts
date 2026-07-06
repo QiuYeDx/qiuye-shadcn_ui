@@ -432,7 +432,7 @@ export const componentRegistry: ComponentRegistry = {
   [ComponentId.IMAGE_VIEWER]: {
     name: "Image Viewer",
     description:
-      "带灯箱预览的图片查看器，支持点击放大、滚轮/触控缩放与拖拽平移，内置骨架屏加载过渡与悬浮放大动效。",
+      "带灯箱预览的图片查看器，支持点击放大、滚轮/触控缩放、拖拽平移、平滑圆角、骨架屏加载过渡与悬浮放大动效。",
     category: "媒体",
     dependencies: ["motion", "lucide-react"],
     files: {
@@ -470,6 +470,21 @@ export const componentRegistry: ComponentRegistry = {
         type: '"none" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "full"',
         description: "灯箱图片圆角大小（默认跟随 rounded）",
         required: false,
+      },
+      {
+        name: "smoothCorners",
+        type: "boolean",
+        description:
+          '是否启用 Figma/iOS 风格平滑圆角；rounded="none" 与 rounded="full" 会保留原始几何语义',
+        required: false,
+        default: "false",
+      },
+      {
+        name: "smoothCornerSmoothing",
+        type: "number",
+        description: "平滑圆角强度（0..1），仅在 smoothCorners 为 true 时生效",
+        required: false,
+        default: "0.7",
       },
       {
         name: "wrapperClassName",
@@ -579,7 +594,7 @@ export const componentRegistry: ComponentRegistry = {
         required: false,
       },
     ],
-    version: "1.1.0",
+    version: "1.2.0",
     author: "QiuYeDx",
     tags: [
       "image",
@@ -590,6 +605,7 @@ export const componentRegistry: ComponentRegistry = {
       "preview",
       "hover",
       "animation",
+      "smooth-corners",
     ],
     cliName: "image-viewer",
     basicUsage: basicUsageExamples[ComponentId.IMAGE_VIEWER],

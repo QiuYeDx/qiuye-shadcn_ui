@@ -34,7 +34,9 @@ const sourceCodes = {
   src="https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?auto=format&fit=crop&w=900&q=80"
   alt="山峰与云海"
   rounded="2xl"
-  lightboxRounded="lg"
+  lightboxRounded="2xl"
+  smoothCorners
+  smoothCornerSmoothing={0.72}
   overlayBlur
   lightboxPadding={24}
   className="w-full"
@@ -205,7 +207,7 @@ export function ImageViewerDemo() {
           <div className="flex items-start justify-between">
             <div className="space-y-1.5">
               <CardTitle>灯箱增强</CardTitle>
-              <CardDescription>圆角、遮罩模糊与边距控制</CardDescription>
+              <CardDescription>平滑圆角、遮罩模糊与边距控制</CardDescription>
             </div>
             <ViewSourceButton code={sourceCodes.lightbox} title="灯箱增强 - 源码" />
           </div>
@@ -215,13 +217,16 @@ export function ImageViewerDemo() {
             <Badge variant="secondary">overlayBlur</Badge>
             <Badge variant="secondary">lightboxPadding</Badge>
             <Badge variant="secondary">lightboxRounded</Badge>
+            <Badge variant="secondary">smoothCorners</Badge>
           </div>
           <div className="max-w-2xl mx-auto">
             <ImageViewer
               src={demoImages.portrait}
               alt="山峰与云海"
               rounded="2xl"
-              lightboxRounded="lg"
+              lightboxRounded="2xl"
+              smoothCorners
+              smoothCornerSmoothing={0.72}
               overlayBlur
               lightboxPadding={24}
               className="w-full"

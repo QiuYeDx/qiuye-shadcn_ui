@@ -574,6 +574,8 @@ function ImageViewerPreview() {
         hoverScale={1.045}
         rounded="2xl"
         lightboxRounded="2xl"
+        smoothCorners
+        smoothCornerSmoothing={0.72}
         className="shadow-2xl shadow-black/25 dark:shadow-black/45"
         wrapperClassName="relative z-10 my-0 flex w-full items-center justify-center overflow-visible py-4"
       />
