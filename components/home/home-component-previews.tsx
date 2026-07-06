@@ -54,7 +54,6 @@ function ResponsiveTabsPreview() {
         ]}
         layout="grid"
         gridColsClass="grid-cols-3"
-        size="sm"
         scrollButtons={false}
         fadeMasks={false}
       >
