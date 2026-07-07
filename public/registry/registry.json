@@ -161,6 +161,10 @@
         },
         {
           "type": "registry:component",
+          "path": "components/qiuye-ui/markdown-renderer/MarkdownTableContainer.tsx"
+        },
+        {
+          "type": "registry:component",
           "path": "components/qiuye-ui/markdown-renderer/MarkdownWidgetRenderer.tsx"
         },
         {

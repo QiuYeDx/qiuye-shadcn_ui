@@ -226,10 +226,16 @@ function ScrollableDialogContent({
       className={cn(
         "relative overflow-hidden",
         "[&_[data-radix-scroll-area-viewport]]:border-t [&_[data-radix-scroll-area-viewport]]:border-b [&_[data-radix-scroll-area-viewport]]:border-background",
+        "[&_[data-radix-scroll-area-viewport]>div]:!block [&_[data-radix-scroll-area-viewport]>div]:!min-w-0 [&_[data-radix-scroll-area-viewport]>div]:!w-full",
         className
       )}
     >
-      <div className={cn("px-4 py-4 w-full", horizontalScroll && "min-w-max")}>
+      <div
+        className={cn(
+          "px-4 py-4 w-full min-w-0",
+          horizontalScroll ? "min-w-max" : "max-w-full overflow-x-hidden"
+        )}
+      >
       {/* <div className={cn("px-4 py-4 w-full")}> */}
         {children}
       </div>

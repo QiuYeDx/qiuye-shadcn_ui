@@ -28,6 +28,7 @@ import { CodeBlock, CodeBlockPanel } from "@/components/qiuye-ui/code-block";
 import { ColorPicker } from "@/components/qiuye-ui/color-picker";
 import { DotGlass } from "@/components/qiuye-ui/dot-glass";
 import { DualStateToggle } from "@/components/qiuye-ui/dual-state-toggle";
+import { MarkdownRenderer } from "@/components/qiuye-ui/markdown-renderer";
 import { ThemeTransitionToggle } from "@/components/qiuye-ui/theme-transition-toggle";
 import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
 import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
@@ -709,89 +710,252 @@ function TypewriterPreview() {
   );
 }
 
+const homeMarkdownPreviewContent = [
+  "# MarkdownRenderer",
+  "",
+  "这是一段放在首页弹窗里的 Markdown 内容，用来展示长文排版、GFM 表格、任务列表和代码块高亮。",
+  "",
+  "## 发布检查",
+  "",
+  "- [x] 标题、段落和列表保持稳定间距",
+  "- [x] 表格在弹窗内容区内可读",
+  "- [x] 代码块使用 QiuYe UI CodeBlock 渲染",
+  "- [ ] 接入你自己的内容源",
+  "",
+  "## 能力表",
+  "",
+  "| 场景 | 默认表现 | 适合内容 |",
+  "| --- | --- | --- |",
+  "| Blog | 标题锚点 + 文章密度 | 文档、教程、知识库 |",
+  "| Code | 语法高亮 + 行号 | API 示例、配置片段 |",
+  "| GFM | 表格 + 任务列表 | 发布说明、检查清单 |",
+  "",
+  "## 代码示例",
+  "",
+  "```tsx title=\"preview.tsx\" {4}",
+  "import { MarkdownRenderer } from \"@/components/qiuye-ui/markdown-renderer\";",
+  "",
+  "export function Preview({ content }: { content: string }) {",
+  "  return <MarkdownRenderer content={content} />;",
+  "}",
+  "```",
+  "",
+  "> 弹窗头尾保持固定，正文区域负责滚动，MarkdownRenderer 专注内容渲染。",
+].join("\n");
+
 function MarkdownRendererPreview() {
+  const [open, setOpen] = React.useState(false);
+  const [ctaVisible, setCtaVisible] = React.useState(false);
+  const prefersReducedMotion = useReducedMotion();
+  const canHover = useHoverSupport();
   const paragraphLines = ["w-full", "w-11/12", "w-8/12"];
   const tableRows = ["w-7/12", "w-5/12", "w-6/12"];
   const codeLines = ["w-8/12", "w-11/12", "w-6/12"];
 
+  const isFirstEffect = React.useRef(true);
+
+  React.useEffect(() => {
+    if (isFirstEffect.current) {
+      isFirstEffect.current = false;
+      if (!window.matchMedia("(hover: hover)").matches && !open) {
+        setCtaVisible(true);
+      }
+      return;
+    }
+
+    if (!canHover && !open) {
+      setCtaVisible(true);
+    } else if (canHover && !open) {
+      setCtaVisible(false);
+    }
+  }, [canHover, open]);
+
+  const showCta = () => {
+    if (open) return;
+    setCtaVisible(true);
+  };
+
+  const hideCta = () => {
+    if (open || !canHover) return;
+    setCtaVisible(false);
+  };
+
+  const openMarkdownDialog = () => {
+    setCtaVisible(false);
+    setOpen(true);
+  };
+
   return (
-    <div
-      aria-hidden="true"
-      className="relative -m-4 h-full min-h-0 w-[calc(100%+2rem)] overflow-hidden"
-    >
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-16 bg-gradient-to-t from-background to-transparent" />
+    <div className="group/markdown-renderer-preview relative -m-4 flex h-[calc(100%+2rem)] min-h-[260px] w-[calc(100%+2rem)] items-center justify-center overflow-hidden p-5 sm:p-6">
+      <div
+        aria-hidden="true"
+        className={cn(
+          "relative z-0 h-full min-h-[210px] w-full max-w-lg overflow-hidden rounded-lg border bg-background transition-[filter,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none group-hover/markdown-renderer-preview:saturate-[0.9] group-hover/markdown-renderer-preview:opacity-90 group-hover/markdown-renderer-preview:duration-300",
+          !canHover && !open && "saturate-[0.94] opacity-[0.96]",
+        )}
+      >
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-16 bg-gradient-to-t from-background to-transparent" />
 
-      <div className="absolute inset-0 flex items-center justify-center px-7 py-6 sm:px-8">
-        <div className="relative w-full max-w-[340px]">
-          <div className="absolute top-1 bottom-2 left-0 w-px bg-border" />
-          <div className="absolute top-1 left-0 size-2 -translate-x-[3.5px] rounded-full bg-muted-foreground/26" />
-          <div className="absolute top-24 left-0 size-2 -translate-x-[3.5px] rounded-full bg-muted-foreground/16" />
-          <div className="absolute top-48 left-0 size-2 -translate-x-[3.5px] rounded-full bg-muted-foreground/16" />
+        <div className="absolute inset-0 flex items-center justify-center px-7 py-6 sm:px-8">
+          <div className="relative w-full max-w-[340px]">
+            <div className="absolute top-1 bottom-2 left-0 w-px bg-border" />
+            <div className="absolute top-1 left-0 size-2 -translate-x-[3.5px] rounded-full bg-muted-foreground/26" />
+            <div className="absolute top-24 left-0 size-2 -translate-x-[3.5px] rounded-full bg-muted-foreground/16" />
+            <div className="absolute top-48 left-0 size-2 -translate-x-[3.5px] rounded-full bg-muted-foreground/16" />
 
-          <div className="space-y-4 pl-5">
-            <div className="space-y-2">
-              <div className="h-4 w-7/12 rounded-full bg-foreground/22" />
-              <div className="h-2.5 w-9/12 rounded-full bg-muted-foreground/16" />
-            </div>
-
-            <div className="space-y-2">
-              {paragraphLines.map((width, index) => (
-                <div
-                  key={index}
-                  className={cn("h-2 rounded-full bg-muted-foreground/14", width)}
-                />
-              ))}
-            </div>
-
-            <div className="overflow-hidden rounded-md bg-muted/30">
-              <div className="grid grid-cols-3 gap-2 bg-muted/45 px-3 py-2">
-                <div className="h-2 rounded-full bg-muted-foreground/22" />
-                <div className="h-2 rounded-full bg-muted-foreground/22" />
-                <div className="h-2 rounded-full bg-muted-foreground/22" />
+            <div className="space-y-4 pl-5">
+              <div className="space-y-2">
+                <div className="h-4 w-7/12 rounded-full bg-foreground/22" />
+                <div className="h-2.5 w-9/12 rounded-full bg-muted-foreground/16" />
               </div>
-              {tableRows.map((width, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-3 gap-2 border-t border-background/80 px-3 py-2 dark:border-background/40"
-                >
+
+              <div className="space-y-2">
+                {paragraphLines.map((width, index) => (
                   <div
+                    key={index}
                     className={cn(
                       "h-2 rounded-full bg-muted-foreground/14",
                       width,
                     )}
                   />
-                  <div className="h-2 rounded-full bg-muted-foreground/12" />
-                  <div className="h-2 rounded-full bg-muted-foreground/12" />
-                </div>
-              ))}
-            </div>
-
-            <div className="rounded-md bg-foreground/[0.075] p-3 dark:bg-white/[0.09]">
-              <div className="mb-3 flex gap-1.5">
-                <div className="size-2 rounded-full bg-muted-foreground/22" />
-                <div className="size-2 rounded-full bg-muted-foreground/16" />
-              </div>
-              <div className="space-y-2">
-                {codeLines.map((width, index) => (
-                  <div
-                    key={index}
-                    className={cn("h-2 rounded-full bg-foreground/14", width)}
-                  />
                 ))}
               </div>
-            </div>
 
-            <div className="flex items-center gap-3 rounded-r-md border-l-2 border-foreground/12 bg-muted/25 py-2.5 pr-3 pl-3">
-              <div className="size-8 rounded-md bg-foreground/12" />
-              <div className="min-w-0 flex-1 space-y-2">
-                <div className="h-2.5 w-5/12 rounded-full bg-foreground/18" />
-                <div className="h-2 w-full rounded-full bg-muted-foreground/14" />
+              <div className="overflow-hidden rounded-md bg-muted/30">
+                <div className="grid grid-cols-3 gap-2 bg-muted/45 px-3 py-2">
+                  <div className="h-2 rounded-full bg-muted-foreground/22" />
+                  <div className="h-2 rounded-full bg-muted-foreground/22" />
+                  <div className="h-2 rounded-full bg-muted-foreground/22" />
+                </div>
+                {tableRows.map((width, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-3 gap-2 border-t border-background/80 px-3 py-2 dark:border-background/40"
+                  >
+                    <div
+                      className={cn(
+                        "h-2 rounded-full bg-muted-foreground/14",
+                        width,
+                      )}
+                    />
+                    <div className="h-2 rounded-full bg-muted-foreground/12" />
+                    <div className="h-2 rounded-full bg-muted-foreground/12" />
+                  </div>
+                ))}
               </div>
-              <div className="size-6 rounded-full bg-background ring-1 ring-border" />
+
+              <div className="rounded-md bg-foreground/[0.075] p-3 dark:bg-white/[0.09]">
+                <div className="mb-3 flex gap-1.5">
+                  <div className="size-2 rounded-full bg-muted-foreground/22" />
+                  <div className="size-2 rounded-full bg-muted-foreground/16" />
+                </div>
+                <div className="space-y-2">
+                  {codeLines.map((width, index) => (
+                    <div
+                      key={index}
+                      className={cn(
+                        "h-2 rounded-full bg-foreground/14",
+                        width,
+                      )}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 rounded-r-md border-l-2 border-foreground/12 bg-muted/25 py-2.5 pr-3 pl-3">
+                <div className="size-8 rounded-md bg-foreground/12" />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <div className="h-2.5 w-5/12 rounded-full bg-foreground/18" />
+                  <div className="h-2 w-full rounded-full bg-muted-foreground/14" />
+                </div>
+                <div className="size-6 rounded-full bg-background ring-1 ring-border" />
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <button
+        type="button"
+        aria-label="打开 MarkdownRenderer 预览"
+        onPointerEnter={showCta}
+        onPointerLeave={hideCta}
+        onMouseEnter={showCta}
+        onMouseLeave={hideCta}
+        onFocus={showCta}
+        onBlur={hideCta}
+        onClick={openMarkdownDialog}
+        className={cn(
+          "absolute inset-0 z-10 isolate flex items-center justify-center overflow-hidden bg-background/0 px-6 text-center",
+          "transition-[background-color,backdrop-filter] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+          "hover:bg-background/20 hover:backdrop-blur-[0.75px] hover:duration-300 focus-visible:bg-background/20 focus-visible:backdrop-blur-[0.75px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/45 focus-visible:ring-inset",
+          "[&:focus-visible_.markdown-renderer-preview-glow]:scale-100 [&:focus-visible_.markdown-renderer-preview-glow]:opacity-100 [&:focus-visible_.markdown-renderer-preview-glow]:duration-500",
+          "[&:hover_.markdown-renderer-preview-glow]:scale-100 [&:hover_.markdown-renderer-preview-glow]:opacity-100 [&:hover_.markdown-renderer-preview-glow]:duration-500",
+          open ? "pointer-events-none" : "cursor-pointer",
+        )}
+      >
+        <span
+          aria-hidden
+          className="markdown-renderer-preview-glow pointer-events-none absolute size-64 scale-75 rounded-full bg-background/70 opacity-0 blur-3xl transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
+        />
+        <motion.span
+          className="group/markdown-renderer-cta relative flex items-center gap-2.5 rounded-full border border-foreground/10 bg-background/88 py-1.5 pr-3.5 pl-1.5 text-foreground shadow-[0_14px_36px_-18px_rgba(0,0,0,0.5),0_1px_0_rgba(255,255,255,0.7)_inset] backdrop-blur-xl transition-shadow duration-500 ease-out hover:shadow-[0_18px_42px_-18px_rgba(0,0,0,0.58),0_1px_0_rgba(255,255,255,0.7)_inset] dark:border-white/80 dark:bg-white/95 dark:text-zinc-950 dark:shadow-[0_18px_48px_-18px_rgba(0,0,0,0.9),0_1px_0_rgba(255,255,255,0.95)_inset] dark:hover:shadow-[0_20px_52px_-18px_rgba(0,0,0,0.95),0_1px_0_rgba(255,255,255,0.95)_inset]"
+          initial={false}
+          animate={{
+            opacity: ctaVisible ? 1 : 0,
+            y: prefersReducedMotion ? 0 : ctaVisible ? 0 : 16,
+            scale: ctaVisible ? 1 : 0.975,
+          }}
+          transition={{
+            duration: prefersReducedMotion ? 0 : ctaVisible ? 0.28 : 0.36,
+            ease: [0.25, 0.1, 0.25, 1],
+          }}
+        >
+          <span className="flex size-8 items-center justify-center rounded-full bg-foreground text-background shadow-sm dark:bg-zinc-950 dark:text-white">
+            <MousePointer2Icon className="size-3.5" />
+          </span>
+          <span className="text-sm font-medium">预览 Markdown</span>
+          <ArrowUpRightIcon className="size-3.5 text-muted-foreground transition-transform duration-300 ease-out group-hover/markdown-renderer-cta:translate-x-0.5 group-hover/markdown-renderer-cta:-translate-y-0.5 motion-reduce:transition-none dark:text-zinc-500" />
+        </motion.span>
+      </button>
+
+      <ScrollableDialog
+        open={open}
+        onOpenChange={setOpen}
+        maxWidth="sm:max-w-[600px] md:max-w-[720px]"
+      >
+        <ScrollableDialogHeader className="px-5 py-4 pr-12 text-left">
+          <DialogTitle>MarkdownRenderer Preview</DialogTitle>
+          <DialogDescription>
+            使用 MarkdownRenderer 在弹窗内容区渲染真实 Markdown。
+          </DialogDescription>
+        </ScrollableDialogHeader>
+        <ScrollableDialogContent fadeMaskHeight={48}>
+          <MarkdownRenderer
+            content={homeMarkdownPreviewContent}
+            codeBlockDisplayMode="collapse"
+            codeBlockMaxLines={7}
+            codeBlockColorTheme="github"
+            className={cn(
+              "min-w-0 max-w-full overflow-hidden",
+              "[&_h1]:mt-6 [&_h1]:mb-4 [&_h1]:break-words [&_h1]:text-[clamp(2rem,9vw,2.5rem)]",
+              "[&_h2]:break-words [&_h2]:text-[clamp(1.625rem,7vw,1.875rem)]",
+              "[&_p]:break-words",
+              "[&_ul]:ml-0 [&_ul]:list-inside sm:[&_ul]:ml-6 sm:[&_ul]:list-disc",
+              "[&_table]:table-fixed [&_td]:break-words [&_td]:px-3 [&_th]:break-words [&_th]:px-3",
+            )}
+          />
+        </ScrollableDialogContent>
+        <ScrollableDialogFooter className="flex flex-col-reverse items-center justify-end gap-2 sm:flex-row">
+          <Button
+            size="sm"
+            className="w-full sm:w-auto"
+            onClick={() => setOpen(false)}
+          >
+            关闭
+          </Button>
+        </ScrollableDialogFooter>
+      </ScrollableDialog>
     </div>
   );
 }
