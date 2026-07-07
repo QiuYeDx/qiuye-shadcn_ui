@@ -2,40 +2,14 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { HomeIcon, MenuIcon, SearchIcon } from "lucide-react";
+import { HomeIcon, MenuIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
+import { NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/ui/sidebar";
-
-const components = [
-  {
-    title: "首页",
-    href: "/",
-    description: "欢迎来到QiuYe UI",
-  },
-  {
-    title: "组件列表",
-    href: "/components",
-    description: "丰富的UI组件库",
-  },
-  {
-    title: "CLI 工具",
-    href: "/cli",
-    description: "CLI 工具与使用说明",
-  },
-];
 
 export function Header() {
   const { toggleSidebar } = useSidebar();
@@ -62,7 +36,7 @@ export function Header() {
             href="/cli"
             className="mr-1 group inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:focus:bg-accent data-[state=open]:bg-accent/50 focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1"
           >
-            CLI 工具
+            快速开始
           </Link>
         </div>
 
@@ -109,7 +83,7 @@ const ListItem = React.forwardRef<
           ref={ref}
           className={cn(
             "hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors",
-            className
+            className,
           )}
           {...props}
         >

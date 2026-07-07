@@ -1,796 +1,611 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
-import { Copy, CheckCircle, Terminal, Package } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
-import { useTheme } from "next-themes";
-
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { useMemo, useState, type ReactNode } from "react";
 import {
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  ArrowRightIcon,
+  CheckCircle2Icon,
+  CheckIcon,
+  CopyIcon,
+  ExternalLinkIcon,
+  GithubIcon,
+  LifeBuoyIcon,
+  PackageCheckIcon,
+  PaletteIcon,
+  RocketIcon,
+  Settings2Icon,
+  SparklesIcon,
+  WandSparklesIcon,
+  type LucideIcon,
+} from "lucide-react";
+import { useTheme } from "next-themes";
+import { toast } from "sonner";
+import { useClipboard } from "use-clipboard-copy";
+
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   CodeBlock as CodeBlockDisplay,
   CodeBlockPanel,
 } from "@/components/qiuye-ui/code-block";
 import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
 import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
-import { Separator } from "@/components/ui/separator";
-import { useClipboard } from "use-clipboard-copy";
-import { toast } from "sonner";
-import { ComponentId } from "@/lib/component-constants";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { getAllComponents, type ComponentInfo } from "@/lib/registry";
+import { cn } from "@/lib/utils";
 
-function CliDocCard({ children }: { children: ReactNode }) {
+type PackageManager = "npm" | "pnpm";
+
+const registryConfig = `{
+  "registries": {
+    "@qiuye-ui": "https://ui.qiuyedx.com/registry/{name}.json"
+  }
+}`;
+
+const usageExample = `import { useState } from "react";
+import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
+
+const items = [
+  { value: "overview", label: "Overview" },
+  { value: "details", label: "Details" },
+];
+
+export function Demo() {
+  const [value, setValue] = useState("overview");
+
+  return (
+    <ResponsiveTabs value={value} onValueChange={setValue} items={items}>
+      <div className="rounded-md border p-4">Your content</div>
+    </ResponsiveTabs>
+  );
+}`;
+
+const cursorMcpConfig = `{
+  "mcpServers": {
+    "@qiuye-ui/mcp": {
+      "command": "npx",
+      "args": ["-y", "--package", "@qiuye-ui/mcp@latest", "qiuye-ui-mcp"]
+    }
+  }
+}`;
+
+function Surface({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <SmoothCorners
-      radius={18}
-      smoothing={0.66}
-      className="rounded-lg border bg-card text-card-foreground shadow-sm"
+      radius={8}
+      smoothing={0.62}
+      className={cn(
+        "min-w-0 max-w-full rounded-lg border bg-card text-card-foreground",
+        className,
+      )}
     >
       {children}
     </SmoothCorners>
   );
 }
 
-export default function CLIPage() {
-  const { resolvedTheme } = useTheme();
-  const clipboard = useClipboard();
-  const [copiedStates, setCopiedStates] = useState<{ [key: string]: boolean }>(
-    {}
-  );
-  const [packageManager, setPackageManager] = useState<"npm" | "pnpm">("pnpm");
-  const isDark = resolvedTheme === "dark";
-
-  const getCommandPrefix = () => {
-    return packageManager === "npm" ? "npx" : "pnpm dlx";
-  };
-
-  const generateCommand = (command: string) => {
-    return command.replace(/^npx/, getCommandPrefix());
-  };
-
-  const handleCopy = (text: string, key: string) => {
-    clipboard.copy(text);
-    setCopiedStates((prev) => ({ ...prev, [key]: true }));
-    setTimeout(() => {
-      setCopiedStates((prev) => ({ ...prev, [key]: false }));
-    }, 2000);
-    toast.success("复制成功！", {
-      description: `已复制: ${text}`,
-    });
-  };
-
-  const CopyButton = ({ text, copyKey }: { text: string; copyKey: string }) => (
-    <Button
-      variant="ghost"
-      size="sm"
-      onClick={() => handleCopy(text, copyKey)}
-      className="h-6 w-6 p-0"
-      aria-label="复制代码"
-    >
-      {copiedStates[copyKey] ? (
-        <CheckCircle className="h-3 w-3 text-green-500" />
-      ) : (
-        <Copy className="h-3 w-3" />
-      )}
-    </Button>
-  );
-
-  const CodeBlock = ({
-    code,
-    language = "bash",
-    showCopyButton = true,
-  }: {
-    code: string;
-    language?: string;
-    copyKey: string;
-    showCopyButton?: boolean;
-  }) => (
+function CodeSample({
+  code,
+  language = "bash",
+  filename,
+  isDark,
+}: {
+  code: string;
+  language?: string;
+  filename?: string;
+  isDark: boolean;
+}) {
+  return (
     <CodeBlockPanel
       code={code}
+      filename={filename}
       language={language}
-      showCopyButton={showCopyButton}
       isDark={isDark}
-      className="min-w-0"
+      colorTheme="github"
+      className="min-w-0 rounded-lg"
     >
       <CodeBlockDisplay
         language={language}
         isDark={isDark}
+        colorTheme="github"
         showLineNumbers={false}
       >
         {code}
       </CodeBlockDisplay>
     </CodeBlockPanel>
   );
+}
 
-  // --- Tabs 受控 + 方向判定 ---
-  const tabOrder = ["installation", "usage", "commands", "api"] as const;
-  type Tab = (typeof tabOrder)[number];
-  const [tab, setTab] = useState<Tab>("installation");
-  const [prevTab, setPrevTab] = useState<Tab>("installation");
-  const direction =
-    Math.sign(tabOrder.indexOf(tab) - tabOrder.indexOf(prevTab)) || 1; // 1:向右，-1:向左
+function CopyCommandButton({
+  copied,
+  label,
+  onCopy,
+}: {
+  copied: boolean;
+  label: string;
+  onCopy: () => void;
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="size-8"
+          onClick={onCopy}
+          aria-label={label}
+        >
+          {copied ? (
+            <CheckIcon className="size-4 text-emerald-500" />
+          ) : (
+            <CopyIcon className="size-4" />
+          )}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>{copied ? "已复制" : "复制命令"}</TooltipContent>
+    </Tooltip>
+  );
+}
 
-  const panelVariants = {
-    enter: (dir: number) => ({
-      x: dir * 80, // 新面板从右进(向右切) / 从左进(向左切)
-      opacity: 0,
-      position: "absolute" as const,
-      width: "100%",
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-      position: "relative" as const,
-      width: "100%",
-    },
-    exit: (dir: number) => ({
-      x: -dir * 80, // 旧面板往左出(向右切) / 往右出(向左切)
-      opacity: 0,
-      position: "absolute" as const,
-      width: "100%",
-    }),
+function StepIcon({ icon: Icon }: { icon: LucideIcon }) {
+  return (
+    <div className="flex size-10 items-center justify-center rounded-md border bg-background text-foreground">
+      <Icon className="size-5" />
+    </div>
+  );
+}
+
+export default function QuickStartPage() {
+  const { resolvedTheme } = useTheme();
+  const clipboard = useClipboard();
+  const [packageManager, setPackageManager] = useState<PackageManager>("pnpm");
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const isDark = resolvedTheme === "dark";
+
+  const components = useMemo(() => getAllComponents(), []);
+  const featuredComponents = useMemo(() => {
+    const priority = [
+      "responsive-tabs",
+      "scrollable-dialog",
+      "code-block",
+      "smooth-corners",
+      "tour",
+      "color-picker",
+    ];
+    const byCliName = new Map(
+      components.map((component) => [component.cliName, component]),
+    );
+    const prioritized = priority
+      .map((name) => byCliName.get(name))
+      .filter(Boolean) as ComponentInfo[];
+    const remaining = components.filter(
+      (component) => !priority.includes(component.cliName),
+    );
+
+    return [...prioritized, ...remaining].slice(0, 6);
+  }, [components]);
+
+  const commandPrefix = packageManager === "npm" ? "npx" : "pnpm dlx";
+  const initCommand = `${commandPrefix} shadcn@latest init`;
+  const addCommand = `${commandPrefix} shadcn@latest add @qiuye-ui/responsive-tabs`;
+  const directUrlCommand = `${commandPrefix} shadcn@latest add https://ui.qiuyedx.com/registry/responsive-tabs.json`;
+
+  const copyText = (text: string, key: string, label = "内容") => {
+    clipboard.copy(text);
+    setCopiedKey(key);
+    window.setTimeout(() => setCopiedKey(null), 1800);
+    toast.success(`${label}已复制`);
   };
 
-  return (
-    <div className="container mx-auto px-6 py-8">
-      {/* Header */}
-      <motion.div
-        className="mb-8"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          type: "spring",
-          stiffness: 120,
-          damping: 40,
-          duration: 0.25,
-        }}
-      >
-        <div className="flex items-center gap-3 mb-6">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-            <Terminal className="h-6 w-6 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-4xl font-bold tracking-tight">CLI 工具</h1>
-            <p className="text-muted-foreground">
-              一键安装和管理 QiuYe UI 组件
-            </p>
-          </div>
-        </div>
-
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Package className="h-4 w-4" />
-              <span>基于 shadcn/ui CLI</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="hidden sm:inline">•</span>
-              <span>官方工具支持</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="hidden sm:inline">•</span>
-              <span>无需额外安装</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 sm:shrink-0">
-            <span className="text-sm text-muted-foreground shrink-0">包管理器:</span>
-            <ResponsiveTabs
-              value={packageManager}
-              onValueChange={(value) =>
-                setPackageManager(value as "npm" | "pnpm")
-              }
-              items={[
-                { value: "npm", label: "npm" },
-                { value: "pnpm", label: "pnpm" },
-              ]}
-              layout="grid"
-              gridColsClass="grid-cols-2"
-              listClassName="w-[140px] sm:w-[180px]"
-              size="sm"
-              scrollButtons={false}
-              fadeMasks={false}
-            />
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Content */}
-      <div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            type: "spring",
-            stiffness: 120,
-            damping: 40,
-            duration: 0.5,
-            delay: 0.45,
-          }}
-        >
-          <ResponsiveTabs
-            value={tab}
-            onValueChange={(v) => {
-              setPrevTab(tab);
-              setTab(v as Tab);
-            }}
-            items={[
-              { value: "installation", label: "安装" },
-              { value: "usage", label: "使用" },
-              { value: "commands", label: "命令" },
-              { value: "api", label: "API" },
-            ]}
-            layout="grid"
-            gridColsClass="grid-cols-4"
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                type: "spring",
-                stiffness: 120,
-                damping: 40,
-                duration: 0.5,
-                delay: 0.3,
-              }}
-            >
-            {/* Animated panels */}
-            <div className="relative min-h-[480px]">
-              <AnimatePresence
-                initial={false}
-                custom={direction}
-                mode="popLayout"
-              >
-                <motion.div
-                  key={tab}
-                  custom={direction}
-                  variants={panelVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{
-                    type: "spring",
-                    stiffness: 220,
-                    damping: 28,
-                    mass: 0.8,
-                  }}
-                  role="tabpanel"
-                >
-                  {tab === "installation" && (
-                    <div className="space-y-6">
-                      <CliDocCard>
-                        <CardHeader>
-                          <CardTitle>使用 Shadcn/ui CLI</CardTitle>
-                          <CardDescription>
-                            使用官方 shadcn/ui CLI 工具安装 QiuYe UI 组件
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                          <div>
-                            <h3 className="text-lg font-semibold mb-3">
-                              前置要求
-                            </h3>
-                            <p className="text-sm text-muted-foreground mb-3">
-                              确保您的项目已经安装并配置了 shadcn/ui：
-                            </p>
-                            <CodeBlock
-                              code={generateCommand("npx shadcn@latest init")}
-                              copyKey="shadcn-init"
-                            />
-                            <p className="text-sm text-muted-foreground mt-2">
-                              如果还没有初始化 shadcn/ui，请先运行上述命令
-                            </p>
-                          </div>
-
-                          <Separator />
-
-                          <div>
-                            <h3 className="text-lg font-semibold mb-3">
-                              方式一：配置注册表（推荐）
-                            </h3>
-                            <p className="text-sm text-muted-foreground mb-3">
-                              在项目根目录的{" "}
-                              <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                                components.json
-                              </code>{" "}
-                              文件中添加QiuYe UI的注册表：
-                            </p>
-                            <CodeBlock
-                              code={`{
-  "registries": {
-    "@qiuye-ui": "https://qiuye-ui.vercel.app/registry/{name}.json"
-  }
-}`}
-                              language="json"
-                              copyKey="registry-config"
-                            />
-                            <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
-                              <p className="text-sm text-blue-800 dark:text-blue-200">
-                                <strong>中国大陆用户注意:</strong> 如果访问
-                                vercel.app 域名有困难，可以使用国内镜像域名：
-                              </p>
-                              <CodeBlock
-                                code={`{
-  "registries": {
-    "@qiuye-ui": "https://ui.qiuyedx.com/registry/{name}.json"
-  }
-}`}
-                                language="json"
-                                copyKey="registry-config-cn"
-                              />
-                            </div>
-                            <p className="text-sm text-muted-foreground mt-3 mb-3">
-                              然后使用简化的命令安装组件：
-                            </p>
-                            <CodeBlock
-                              code={generateCommand(
-                                "npx shadcn@latest add @qiuye-ui/responsive-tabs"
-                              )}
-                              copyKey="install-component"
-                            />
-                          </div>
-
-                          <Separator />
-
-                          <div>
-                            <h3 className="text-lg font-semibold mb-3">
-                              方式二：直接URL安装
-                            </h3>
-                            <p className="text-sm text-muted-foreground mb-3">
-                              如果不想配置注册表，可以直接使用URL安装组件：
-                            </p>
-                            <div className="space-y-3">
-                              <div>
-                                <p className="text-sm font-medium mb-2">
-                                  国际域名（推荐）：
-                                </p>
-                                <CodeBlock
-                                  code={generateCommand(
-                                    "npx shadcn@latest add https://qiuye-ui.vercel.app/registry/responsive-tabs.json"
-                                  )}
-                                  copyKey="install-component-url"
-                                />
-                              </div>
-                              <div>
-                                <p className="text-sm font-medium mb-2">
-                                  中国大陆镜像域名：
-                                </p>
-                                <CodeBlock
-                                  code={generateCommand(
-                                    "npx shadcn@latest add https://ui.qiuyedx.com/registry/responsive-tabs.json"
-                                  )}
-                                  copyKey="install-component-url-cn"
-                                />
-                              </div>
-                            </div>
-                            <p className="text-sm text-muted-foreground mt-2">
-                              直接指定组件的注册表JSON文件URL进行安装，中国大陆用户建议使用镜像域名
-                            </p>
-                          </div>
-                        </CardContent>
-                      </CliDocCard>
-                    </div>
-                  )}
-
-                  {tab === "usage" && (
-                    <div className="space-y-6">
-                      <CliDocCard>
-                        <CardHeader>
-                          <CardTitle>基本使用</CardTitle>
-                          <CardDescription>
-                            学习如何在您的项目中使用 QiuYe UI 组件
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                          <div>
-                            <h3 className="text-lg font-semibold mb-3">
-                              1. 安装组件
-                            </h3>
-                            <p className="text-sm text-muted-foreground mb-3">
-                              方式一：使用注册表名称（需先配置注册表）
-                            </p>
-                            <div className="space-y-3">
-                              <CodeBlock
-                                code={generateCommand(
-                                  "npx shadcn@latest add @qiuye-ui/responsive-tabs"
-                                )}
-                                copyKey="add-single"
-                              />
-                              <CodeBlock
-                                code={generateCommand(
-                                  "npx shadcn@latest add @qiuye-ui/scrollable-dialog @qiuye-ui/dot-glass"
-                                )}
-                                copyKey="add-multiple"
-                              />
-                            </div>
-                            <p className="text-sm text-muted-foreground mt-3 mb-3">
-                              方式二：直接使用URL（无需配置）
-                            </p>
-                            <div className="space-y-3">
-                              <div>
-                                <p className="text-sm font-medium mb-2">
-                                  国际域名：
-                                </p>
-                                <CodeBlock
-                                  code={generateCommand(
-                                    "npx shadcn@latest add https://qiuye-ui.vercel.app/registry/responsive-tabs.json"
-                                  )}
-                                  copyKey="add-single-url"
-                                />
-                              </div>
-                              <div>
-                                <p className="text-sm font-medium mb-2">
-                                  中国大陆镜像：
-                                </p>
-                                <CodeBlock
-                                  code={generateCommand(
-                                    "npx shadcn@latest add https://ui.qiuyedx.com/registry/responsive-tabs.json"
-                                  )}
-                                  copyKey="add-single-url-cn"
-                                />
-                              </div>
-                            </div>
-                            <p className="text-sm text-muted-foreground mt-2">
-                              支持单个组件安装或批量安装多个组件
-                            </p>
-                          </div>
-
-                          <div>
-                            <h3 className="text-lg font-semibold mb-3">
-                              2. 在代码中使用
-                            </h3>
-                            <CodeBlock
-                              code={`import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
-import { useState } from "react";
-
-export default function App() {
-  const [value, setValue] = useState("tab1");
-  const items = [
-    { value: "tab1", label: "标签一" },
-    { value: "tab2", label: "标签二" },
+  const steps = [
+    {
+      eyebrow: "01",
+      title: "准备 shadcn/ui 项目",
+      description:
+        "QiuYe UI 组件会被添加到你的项目源码里，因此先确认项目已经完成 shadcn/ui 初始化。",
+      icon: Settings2Icon,
+      code: initCommand,
+      language: "bash",
+      filename: "Terminal",
+    },
+    {
+      eyebrow: "02",
+      title: "接入 QiuYe UI registry",
+      description:
+        "在 components.json 里添加 registry alias，之后就可以用 @qiuye-ui/name 安装组件。",
+      icon: PackageCheckIcon,
+      code: registryConfig,
+      language: "json",
+      filename: "components.json",
+    },
+    {
+      eyebrow: "03",
+      title: "添加第一个组件",
+      description:
+        "从一个组件开始验证路径。安装完成后，组件文件会出现在你的 components 目录中。",
+      icon: RocketIcon,
+      code: addCommand,
+      language: "bash",
+      filename: "Terminal",
+    },
+    {
+      eyebrow: "04",
+      title: "在业务界面中使用",
+      description:
+        "组件是普通 React 代码，可以按项目需要继续改样式、组合交互或抽象业务封装。",
+      icon: PaletteIcon,
+      code: usageExample,
+      language: "tsx",
+      filename: "Demo.tsx",
+    },
   ];
 
   return (
-    <ResponsiveTabs value={value} onValueChange={setValue} items={items}>
-      <div className="p-4">
-        {value === "tab1" && <div>标签一的内容</div>}
-        {value === "tab2" && <div>标签二的内容</div>}
-      </div>
-    </ResponsiveTabs>
-  );
-}`}
-                              language="tsx"
-                              copyKey="usage-example"
-                            />
-                          </div>
-
-                          <div>
-                            <h3 className="text-lg font-semibold mb-3">
-                              3. 查看可用组件
-                            </h3>
-                            <p className="text-sm text-muted-foreground mb-3">
-                              访问组件浏览器查看所有可用组件和演示：
-                            </p>
-                            <div className="space-y-3">
-                              <div>
-                                <p className="text-sm font-medium mb-2">
-                                  国际域名：
-                                </p>
-                                <CodeBlock
-                                  code="https://qiuye-ui.vercel.app/components"
-                                  copyKey="component-browser"
-                                />
-                              </div>
-                              <div>
-                                <p className="text-sm font-medium mb-2">
-                                  中国大陆镜像：
-                                </p>
-                                <CodeBlock
-                                  code="https://ui.qiuyedx.com/components"
-                                  copyKey="component-browser-cn"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </CliDocCard>
-
-                      <CliDocCard>
-                        <CardHeader>
-                          <CardTitle>项目配置</CardTitle>
-                          <CardDescription>
-                            自定义CLI工具的行为和设置
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          <div>
-                            <h4 className="font-semibold mb-2">配置文件示例</h4>
-                            <CodeBlock
-                              code={`{
-  "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "new-york",
-  "rsc": false, // 是否启用 React Server Components
-  "tsx": true,
-  "tailwind": {
-    "config": "",
-    "css": "src/index.css",
-    "baseColor": "neutral",
-    "cssVariables": true,
-    "prefix": ""
-  },
-  "iconLibrary": "lucide",
-  "aliases": {
-    "components": "@/components",
-    "utils": "@/lib/utils",
-    "ui": "@/components/ui",
-    "lib": "@/lib",
-    "hooks": "@/hooks"
-  },
-  "registries": {
-    "@qiuye-ui": "https://ui.qiuyedx.com/registry/{name}.json"
-  }
-}
-`}
-                              language="json"
-                              copyKey="config-example"
-                            />
-                          </div>
-                        </CardContent>
-                      </CliDocCard>
-                    </div>
-                  )}
-
-                  {tab === "commands" && (
-                    <div className="space-y-6">
-                      <CliDocCard>
-                        <CardHeader>
-                          <CardTitle>常用命令</CardTitle>
-                          <CardDescription>
-                            使用官方 shadcn/ui CLI 管理 QiuYe UI 组件
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                          <div className="grid gap-4">
-                            {[
-                              {
-                                command: `${getCommandPrefix()} shadcn@latest init`,
-                                description: "初始化 shadcn/ui 项目配置",
-                                example: generateCommand(
-                                  "npx shadcn@latest init"
-                                ),
-                              },
-                              {
-                                command: `${getCommandPrefix()} shadcn@latest add @qiuye-ui/[component]`,
-                                description:
-                                  "添加 QiuYe UI 组件（需配置注册表）",
-                                example: generateCommand(
-                                  "npx shadcn@latest add @qiuye-ui/responsive-tabs"
-                                ),
-                              },
-                              {
-                                command: `${getCommandPrefix()} shadcn@latest add [URL]`,
-                                description: "直接使用URL添加组件",
-                                example: generateCommand(
-                                  "npx shadcn@latest add https://qiuye-ui.vercel.app/registry/responsive-tabs.json"
-                                ),
-                              },
-                              {
-                                command: `${getCommandPrefix()} shadcn@latest add @qiuye-ui/[multiple]`,
-                                description: "批量添加多个组件",
-                                example: generateCommand(
-                                  "npx shadcn@latest add @qiuye-ui/scrollable-dialog @qiuye-ui/dot-glass"
-                                ),
-                              },
-                              {
-                                command: `${getCommandPrefix()} shadcn@latest --help`,
-                                description: "查看CLI工具帮助信息",
-                                example: generateCommand(
-                                  "npx shadcn@latest --help"
-                                ),
-                              },
-                            ].map((item, index) => (
-                              <div
-                                key={index}
-                                className="border rounded-lg p-4"
-                              >
-                                <div className="flex items-start justify-between mb-2">
-                                  <div>
-                                    <code className="text-sm font-mono bg-muted px-2 py-1 rounded">
-                                      {item.command}
-                                    </code>
-                                    <p className="text-sm text-muted-foreground mt-1">
-                                      {item.description}
-                                    </p>
-                                  </div>
-                                  <CopyButton
-                                    text={item.example}
-                                    copyKey={`cmd-${index}`}
-                                  />
-                                </div>
-                                <CodeBlock
-                                  code={`$ ${item.example}`}
-                                  copyKey={`cmd-example-${index}`}
-                                  showCopyButton={false}
-                                />
-                              </div>
-                            ))}
-                          </div>
-
-                          <Separator />
-
-                          <div>
-                            <h3 className="text-lg font-semibold mb-3">
-                              可用组件列表
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              {[
-                                // TODO: 后续需要添加更多组件, 或支持动态加载组件列表
-                                ComponentId.RESPONSIVE_TABS,
-                                ComponentId.SCROLLABLE_DIALOG,
-                                ComponentId.DOT_GLASS,
-                                ComponentId.IMAGE_VIEWER,
-                                ComponentId.DUAL_STATE_TOGGLE,
-                                ComponentId.THEME_TRANSITION_TOGGLE,
-                                ComponentId.CODE_BLOCK,
-                                ComponentId.TYPEWRITER,
-                                ComponentId.MARKDOWN_RENDERER,
-                                ComponentId.COLOR_PICKER,
-                                ComponentId.SMOOTH_CORNERS,
-                                ComponentId.TOUR,
-                              ].map((component) => (
-                                <div
-                                  key={component}
-                                  className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
-                                >
-                                  <code className="text-sm font-mono">
-                                    @qiuye-ui/{component}
-                                  </code>
-                                  <CopyButton
-                                    text={generateCommand(
-                                      `npx shadcn@latest add @qiuye-ui/${component}`
-                                    )}
-                                    copyKey={`component-${component}`}
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </CliDocCard>
-                    </div>
-                  )}
-
-                  {tab === "api" && (
-                    <div className="space-y-6">
-                      <CliDocCard>
-                        <CardHeader>
-                          <CardTitle>注册表结构</CardTitle>
-                          <CardDescription>
-                            静态注册表文件的结构和访问方式
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                          <div className="grid gap-4">
-                            {[
-                              {
-                                endpoint: "/registry/[component].json",
-                                description: "单个组件的详细配置和源代码",
-                                example:
-                                  "https://qiuye-ui.vercel.app/registry/responsive-tabs.json",
-                              },
-                            ].map((api, index) => (
-                              <div
-                                key={index}
-                                className="border rounded-lg p-4"
-                              >
-                                <div className="flex items-center gap-3 mb-2">
-                                  <Badge variant="secondary">GET</Badge>
-                                  <code className="text-sm font-mono">
-                                    {api.endpoint}
-                                  </code>
-                                </div>
-                                <p className="text-sm text-muted-foreground mb-2">
-                                  {api.description}
-                                </p>
-                                <div className="bg-muted/30 rounded p-2 text-xs font-mono flex items-center justify-between">
-                                  <span>{api.example}</span>
-                                  <CopyButton
-                                    text={api.example}
-                                    copyKey={`endpoint-${index}`}
-                                  />
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-
-                          <Separator />
-
-                          <div>
-                            <h3 className="text-lg font-semibold mb-3">
-                              注册表配置
-                            </h3>
-                            <p className="text-sm text-muted-foreground mb-3">
-                              在您的项目中添加以下配置到{" "}
-                              <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                                components.json
-                              </code>
-                              ：
-                            </p>
-                            <div className="space-y-3">
-                              <div>
-                                <p className="text-sm font-medium mb-2">
-                                  国际域名（推荐）：
-                                </p>
-                                <CodeBlock
-                                  code={`{
-  "registries": {
-    "@qiuye-ui": "https://qiuye-ui.vercel.app/registry/{name}.json"
-  }
-}`}
-                                  language="json"
-                                  copyKey="registry-config-final"
-                                />
-                              </div>
-                              <div>
-                                <p className="text-sm font-medium mb-2">
-                                  中国大陆镜像域名：
-                                </p>
-                                <CodeBlock
-                                  code={`{
-  "registries": {
-    "@qiuye-ui": "https://ui.qiuyedx.com/registry/{name}.json"
-  }
-}`}
-                                  language="json"
-                                  copyKey="registry-config-final-cn"
-                                />
-                              </div>
-                            </div>
-                          </div>
-
-                          <Separator />
-
-                          <div>
-                            <h3 className="text-lg font-semibold mb-3">
-                              组件文件结构
-                            </h3>
-                            <p className="text-sm text-muted-foreground mb-3">
-                              每个组件的JSON文件包含以下信息：
-                            </p>
-                            <CodeBlock
-                              code={`{
-  "name": "component-name",
-  "type": "registry:component",
-  "dependencies": ["react", "motion"],
-  "registryDependencies": [],
-  "files": [
-    {
-      "type": "registry:component",
-      "name": "component-name.tsx",
-      "content": "组件源代码..."
-    }
-  ]
-}`}
-                              language="json"
-                              copyKey="component-structure"
-                            />
-                          </div>
-                        </CardContent>
-                      </CliDocCard>
-                    </div>
-                  )}
-                </motion.div>
-              </AnimatePresence>
+    <div className="bg-background">
+      <section className="border-b">
+        <div className="mx-auto grid w-full max-w-screen-2xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,1fr)_28rem] lg:px-8 lg:py-16">
+          <div className="flex min-w-0 flex-col justify-center">
+            <div className="mb-5 flex flex-wrap items-center gap-2">
+              <Badge variant="outline" className="gap-1.5">
+                <SparklesIcon className="size-3" />
+                {components.length} 个可安装组件
+              </Badge>
+              <Badge variant="secondary">Based on shadcn/ui</Badge>
             </div>
-            </motion.div>
-          </ResponsiveTabs>
-        </motion.div>
-      </div>
+
+            <h1 className="max-w-3xl text-4xl font-semibold tracking-normal text-foreground sm:text-5xl lg:text-6xl">
+              QiuYe UI 快速开始
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
+              用 shadcn/ui 熟悉的方式，把 QiuYe UI 的交互组件添加到你的项目里。
+              先接入 registry，再按需安装组件，组件源码会落在你自己的代码库中。
+            </p>
+
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <Button asChild size="lg" className="w-full sm:w-auto">
+                <Link href="/components">
+                  浏览组件
+                  <ArrowRightIcon className="size-4" />
+                </Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto"
+              >
+                <Link
+                  href="https://github.com/qiuyedx/qiuye-shadcn_ui"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <GithubIcon className="size-4" />
+                  GitHub
+                </Link>
+              </Button>
+            </div>
+          </div>
+
+          <Surface className="p-4 shadow-sm">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-medium">推荐第一步</p>
+                <p className="text-sm text-muted-foreground">
+                  选择你的包管理器后复制命令
+                </p>
+              </div>
+              <ResponsiveTabs
+                value={packageManager}
+                onValueChange={(value) =>
+                  setPackageManager(value as PackageManager)
+                }
+                items={[
+                  { value: "pnpm", label: "pnpm" },
+                  { value: "npm", label: "npm" },
+                ]}
+                layout="grid"
+                gridColsClass="grid-cols-2"
+                listClassName="w-full sm:w-36"
+                size="sm"
+                scrollButtons={false}
+                fadeMasks={false}
+              />
+            </div>
+
+            <CodeSample
+              code={addCommand}
+              language="bash"
+              filename="Terminal"
+              isDark={isDark}
+            />
+
+            <div className="mt-4 grid gap-2 text-sm text-muted-foreground">
+              <div className="flex items-start gap-2">
+                <CheckCircle2Icon className="mt-0.5 size-4 text-emerald-500" />
+                <span>已配置 registry 时，用组件名安装最顺手。</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2Icon className="mt-0.5 size-4 text-emerald-500" />
+                <span>还没配置时，也可以先用下方 URL 方式验证。</span>
+              </div>
+            </div>
+          </Surface>
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-screen-2xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mb-7 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">
+              Start Path
+            </p>
+            <h2 className="mt-2 text-3xl font-semibold tracking-normal">
+              四步接入
+            </h2>
+          </div>
+          <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+            这条路径适合 Next.js、Vite、React Router 等已经使用 shadcn/ui
+            的项目。复制命令前先确认当前终端位于项目根目录。
+          </p>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-2">
+          {steps.map((step) => (
+            <Surface key={step.eyebrow} className="p-5 shadow-sm">
+              <div className="mb-5 flex items-start gap-4">
+                <StepIcon icon={step.icon} />
+                <div className="min-w-0">
+                  <div className="mb-1 text-xs font-medium text-muted-foreground">
+                    {step.eyebrow}
+                  </div>
+                  <h3 className="text-xl font-semibold tracking-normal">
+                    {step.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {step.description}
+                  </p>
+                </div>
+              </div>
+              <CodeSample
+                code={step.code}
+                language={step.language}
+                filename={step.filename}
+                isDark={isDark}
+              />
+            </Surface>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-y bg-muted/25">
+        <div className="mx-auto grid w-full max-w-screen-2xl gap-6 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:px-8">
+          <div>
+            <div className="mb-6 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Components
+                </p>
+                <h2 className="mt-2 text-3xl font-semibold tracking-normal">
+                  先从这些组件开始
+                </h2>
+              </div>
+              <Button
+                asChild
+                variant="outline"
+                className="hidden sm:inline-flex"
+              >
+                <Link href="/components">
+                  全部组件
+                  <ArrowRightIcon className="size-4" />
+                </Link>
+              </Button>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {featuredComponents.map((component) => {
+                const command = `${commandPrefix} shadcn@latest add @qiuye-ui/${component.cliName}`;
+                const key = `component-${component.cliName}`;
+
+                return (
+                  <div
+                    key={component.cliName}
+                    className="flex min-h-52 flex-col justify-between rounded-lg border bg-background p-4 shadow-sm"
+                  >
+                    <div className="min-w-0">
+                      <div className="mb-3 flex items-center justify-between gap-3">
+                        <Badge variant="secondary">{component.category}</Badge>
+                        <span className="text-xs text-muted-foreground">
+                          v{component.version}
+                        </span>
+                      </div>
+                      <Link
+                        href={`/components/${component.cliName}`}
+                        className="text-lg font-semibold tracking-normal transition-colors hover:text-primary"
+                      >
+                        {component.name}
+                      </Link>
+                      <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">
+                        {component.description}
+                      </p>
+                    </div>
+
+                    <div className="mt-5 flex min-w-0 items-center gap-2 rounded-md border bg-muted/35 px-2 py-1.5">
+                      <code className="min-w-0 flex-1 truncate text-xs">
+                        @qiuye-ui/{component.cliName}
+                      </code>
+                      <CopyCommandButton
+                        copied={copiedKey === key}
+                        label={`复制 ${component.name} 安装命令`}
+                        onCopy={() => copyText(command, key, "安装命令")}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="grid content-start gap-4">
+            <Surface className="p-5">
+              <div className="mb-4 flex items-center gap-3">
+                <WandSparklesIcon className="size-5" />
+                <h3 className="text-lg font-semibold tracking-normal">
+                  不想先改配置？
+                </h3>
+              </div>
+              <p className="mb-4 text-sm leading-6 text-muted-foreground">
+                可以直接使用 registry JSON
+                地址安装组件，适合快速验证或临时试用。
+              </p>
+              <CodeSample
+                code={directUrlCommand}
+                language="bash"
+                filename="Terminal"
+                isDark={isDark}
+              />
+            </Surface>
+
+            <Surface className="p-5">
+              <div className="mb-4 flex items-center gap-3">
+                <LifeBuoyIcon className="size-5" />
+                <h3 className="text-lg font-semibold tracking-normal">
+                  接入检查
+                </h3>
+              </div>
+              <ul className="space-y-3 text-sm leading-6 text-muted-foreground">
+                <li className="flex gap-2">
+                  <CheckCircle2Icon className="mt-1 size-4 text-emerald-500" />
+                  <span>项目根目录存在 components.json。</span>
+                </li>
+                <li className="flex gap-2">
+                  <CheckCircle2Icon className="mt-1 size-4 text-emerald-500" />
+                  <span>components.json 里的 aliases 指向项目真实目录。</span>
+                </li>
+                <li className="flex gap-2">
+                  <CheckCircle2Icon className="mt-1 size-4 text-emerald-500" />
+                  <span>安装后按组件详情页示例补齐必要状态和 props。</span>
+                </li>
+              </ul>
+            </Surface>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto grid w-full max-w-screen-2xl gap-4 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:px-8">
+        <Surface className="p-5">
+          <div className="mb-4 flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                Registry
+              </p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-normal">
+                国内访问优先使用 ui.qiuyedx.com
+              </h2>
+            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() =>
+                copyText(registryConfig, "registry", "Registry 配置")
+              }
+              aria-label="复制 Registry 配置"
+            >
+              {copiedKey === "registry" ? (
+                <CheckIcon className="size-4 text-emerald-500" />
+              ) : (
+                <CopyIcon className="size-4" />
+              )}
+            </Button>
+          </div>
+          <CodeSample
+            code={registryConfig}
+            language="json"
+            filename="components.json"
+            isDark={isDark}
+          />
+          <div className="mt-4 rounded-md border bg-muted/30 p-3 text-sm text-muted-foreground">
+            国际备用地址：{" "}
+            <code className="break-all text-foreground">
+              https://qiuye-ui.vercel.app/registry/{"{name}"}.json
+            </code>
+          </div>
+        </Surface>
+
+        <Surface className="p-5">
+          <div className="mb-4 flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                AI Assistant
+              </p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-normal">
+                在编辑器里读取组件库
+              </h2>
+            </div>
+            <Button asChild variant="outline" size="icon">
+              <Link
+                href="https://www.npmjs.com/package/@qiuye-ui/mcp"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="打开 @qiuye-ui/mcp"
+              >
+                <ExternalLinkIcon className="size-4" />
+              </Link>
+            </Button>
+          </div>
+          <p className="mb-4 text-sm leading-6 text-muted-foreground">
+            Cursor、Claude、Codex 等支持 MCP 的工具可以通过 @qiuye-ui/mcp
+            查询组件、读取 registry，并生成安装命令。
+          </p>
+          <CodeSample
+            code={cursorMcpConfig}
+            language="json"
+            filename=".cursor/mcp.json"
+            isDark={isDark}
+          />
+        </Surface>
+      </section>
+
+      <section className="border-t">
+        <div className="mx-auto flex w-full max-w-screen-2xl flex-col gap-4 px-4 py-10 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-normal">
+              准备挑组件了？
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              组件页包含预览、Props、基础用法和安装命令。
+            </p>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button asChild>
+              <Link href="/components">
+                打开组件列表
+                <ArrowRightIcon className="size-4" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link
+                href="https://github.com/qiuyedx/qiuye-shadcn_ui/issues"
+                target="_blank"
+                rel="noreferrer"
+              >
+                反馈问题
+                <ExternalLinkIcon className="size-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

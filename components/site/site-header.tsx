@@ -54,7 +54,7 @@ export function SiteHeader() {
       <div
         className={cn(
           "absolute inset-x-0 top-0 h-14 bg-background/80",
-          mobileNavOpen ? "md:border-b" : "border-b"
+          mobileNavOpen ? "md:border-b" : "border-b",
         )}
         style={glassSurfaceStyle}
         aria-hidden="true"
@@ -69,10 +69,7 @@ export function SiteHeader() {
 
         <div className="ml-auto flex items-center gap-1.5 md:hidden">
           <ThemeToggle className="rounded-md" />
-          <SiteMobileNav
-            open={mobileNavOpen}
-            onOpenChange={setMobileNavOpen}
-          />
+          <SiteMobileNav open={mobileNavOpen} onOpenChange={setMobileNavOpen} />
         </div>
 
         <nav className="ml-5 hidden items-center gap-1 md:flex">
@@ -89,7 +86,7 @@ export function SiteHeader() {
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
-                  active && "text-foreground"
+                  active && "text-foreground",
                 )}
               >
                 {item.title}
@@ -114,7 +111,7 @@ export function SiteHeader() {
           </Button>
           <ThemeToggle className="rounded-md" />
           <Button asChild size="sm">
-            <Link href="/cli">Install</Link>
+            <Link href="/cli">Start</Link>
           </Button>
         </div>
       </div>
@@ -184,7 +181,7 @@ export function SiteHeader() {
                         "flex h-10 items-center rounded-md px-3 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
                         active
                           ? "bg-accent text-accent-foreground"
-                          : "text-muted-foreground"
+                          : "text-muted-foreground",
                       )}
                     >
                       {item.title}

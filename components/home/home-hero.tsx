@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRightIcon, Code2Icon, SparklesIcon } from "lucide-react";
+import { ArrowRightIcon, RocketIcon, SparklesIcon } from "lucide-react";
 import { motion, useReducedMotion, type Variants } from "motion/react";
 
 import { Badge } from "@/components/ui/badge";
@@ -136,8 +136,8 @@ export function HomeHero({ componentCount }: HomeHeroProps) {
           <motion.div variants={heroActionVariants}>
             <Button asChild variant="outline" size="lg">
               <Link href="/cli">
-                <Code2Icon className="size-4" />
-                CLI 安装
+                <RocketIcon className="size-4" />
+                快速开始
               </Link>
             </Button>
           </motion.div>

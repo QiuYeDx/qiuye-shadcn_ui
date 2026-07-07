@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRightIcon, TerminalIcon } from "lucide-react";
+import { ArrowRightIcon, RocketIcon } from "lucide-react";
 import { motion, useReducedMotion, type Variants } from "motion/react";
 
 import { Button } from "@/components/ui/button";
@@ -69,7 +69,7 @@ export function HomeCta() {
           <h2 className="text-3xl font-semibold">从一个组件开始。</h2>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">
             QiuYe UI 组件可以通过 shadcn/ui registry 方式按需安装。
-            先浏览组件，再复制 CLI 命令，把需要的代码带进你的项目。
+            先浏览组件，再复制安装命令，把需要的代码带进你的项目。
           </p>
         </motion.div>
         <motion.div
@@ -87,8 +87,8 @@ export function HomeCta() {
           <motion.div variants={ctaActionVariants}>
             <Button asChild variant="outline">
               <Link href="/cli">
-                <TerminalIcon className="size-4" />
-                CLI 指南
+                <RocketIcon className="size-4" />
+                快速开始
               </Link>
             </Button>
           </motion.div>

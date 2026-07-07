@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { HomeIcon, PaletteIcon, PackageIcon, TerminalIcon } from "lucide-react";
+import { HomeIcon, PaletteIcon, PackageIcon, RocketIcon } from "lucide-react";
 
 import {
   Sidebar,
@@ -37,10 +37,10 @@ const data = {
   ],
   navDevelopment: [
     {
-      title: "CLI 工具",
+      title: "快速开始",
       url: "/cli",
-      icon: TerminalIcon,
-      description: "命令行工具使用指南",
+      icon: RocketIcon,
+      description: "项目接入与组件安装指南",
     },
   ],
 };

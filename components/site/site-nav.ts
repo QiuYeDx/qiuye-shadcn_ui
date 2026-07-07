@@ -8,7 +8,7 @@ export const siteNavItems = [
     href: "/components",
   },
   {
-    title: "CLI",
+    title: "Quick Start",
     href: "/cli",
   },
 ] as const;
