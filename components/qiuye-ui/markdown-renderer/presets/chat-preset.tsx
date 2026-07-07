@@ -311,6 +311,7 @@ export const chatPreset: MarkdownPresetConfig = {
     maxHeight: "240px",
     stickyLineNumbers: false,
     colorTheme: "github",
+    mermaidShowShadow: false,
   },
   createComponents: createChatComponents,
 };

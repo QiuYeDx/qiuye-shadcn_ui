@@ -78,6 +78,7 @@ function createBlogComponents(ctx: MarkdownPresetComponentContext): Components {
             stickyLineNumbers={codeBlock.stickyLineNumbers}
             colorTheme={codeBlock.colorTheme}
             customTheme={codeBlock.customTheme}
+            showContainerShadow={codeBlock.mermaidShowShadow}
           >
             {rawCode}
           </MermaidBlock>
@@ -285,6 +286,7 @@ export const blogPreset: MarkdownPresetConfig = {
     maxLines: 15,
     stickyLineNumbers: true,
     colorTheme: "github",
+    mermaidShowShadow: false,
   },
   createComponents: createBlogComponents,
 };

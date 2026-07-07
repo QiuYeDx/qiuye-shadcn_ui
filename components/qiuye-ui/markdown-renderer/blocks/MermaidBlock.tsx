@@ -305,6 +305,8 @@ export interface MermaidBlockProps {
   stickyLineNumbers?: boolean;
   colorTheme?: CodeBlockColorThemeName;
   customTheme?: CodeBlockThemeConfig | PrismTheme;
+  /** 是否显示 Mermaid 容器阴影 */
+  showContainerShadow?: boolean;
 }
 
 export function MermaidBlock({
@@ -312,6 +314,7 @@ export function MermaidBlock({
   stickyLineNumbers = true,
   colorTheme,
   customTheme,
+  showContainerShadow = false,
 }: MermaidBlockProps) {
   const code = children.trim();
   const [showPreview, setShowPreview] = useState(true);
@@ -684,7 +687,10 @@ export function MermaidBlock({
 
   if (!mounted) {
     return (
-      <div className="mermaid-block rounded-lg bg-muted/20 p-4">
+      <div
+        className="mermaid-block rounded-lg bg-muted/20 p-4"
+        data-container-shadow={showContainerShadow ? "true" : undefined}
+      >
         <div className="flex items-center justify-center py-8 text-muted-foreground">
           加载中...
         </div>
@@ -802,7 +808,10 @@ export function MermaidBlock({
 
   return (
     <>
-      <div className="mermaid-block rounded-lg overflow-hidden">
+      <div
+        className="mermaid-block rounded-lg overflow-hidden"
+        data-container-shadow={showContainerShadow ? "true" : undefined}
+      >
         <div className="mermaid-toolbar flex items-center justify-between pl-4 pr-2 py-2 bg-muted/30">
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
             Mermaid

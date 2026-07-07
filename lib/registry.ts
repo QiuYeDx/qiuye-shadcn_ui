@@ -1430,6 +1430,13 @@ export const componentRegistry: ComponentRegistry = {
             default: "github",
           },
           {
+            name: "mermaidShowShadow",
+            type: "boolean",
+            description: "Mermaid 图表容器是否显示阴影",
+            required: false,
+            default: "false",
+          },
+          {
             name: "components",
             type: "Components",
             description: "覆盖或扩展 react-markdown 的 components 映射",
