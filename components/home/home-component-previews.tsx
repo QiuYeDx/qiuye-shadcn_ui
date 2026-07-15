@@ -1182,20 +1182,17 @@ function SmoothCornersPreview() {
         {
           label: "0",
           smoothing: 0,
-          height: "h-24",
           className:
             "border border-sky-500/35 bg-sky-50 text-sky-950 shadow-[inset_0_0_0_1px_rgba(14,165,233,0.12)] dark:border-sky-400/35 dark:bg-sky-950/35 dark:text-sky-50",
         },
         {
           label: "0.6",
           smoothing: 0.6,
-          height: "h-32",
           className: "bg-primary text-primary-foreground",
         },
         {
           label: "0.95",
           smoothing: 0.95,
-          height: "h-28",
           className: "bg-foreground text-background",
         },
       ].map((item) => (
@@ -1204,8 +1201,7 @@ function SmoothCornersPreview() {
           radius={24}
           smoothing={item.smoothing}
           className={cn(
-            "flex w-20 flex-col justify-between p-3 text-xs shadow-sm",
-            item.height,
+            "flex h-28 w-[72px] shrink-0 flex-col justify-between p-3 text-xs shadow-sm",
             item.className
           )}
         >
