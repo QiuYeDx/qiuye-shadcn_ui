@@ -13,6 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
+import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
 import { cn } from "@/lib/utils";
 
 /* ────────────────────────────────────────────────────────────── */
@@ -284,9 +285,18 @@ interface SvPanelProps {
   width: number;
   height: number;
   onChange: (s: number, v: number) => void;
+  smoothCorners: boolean;
+  smoothCornerSmoothing: number;
 }
 
-function SvPanel({ hsv, width, height, onChange }: SvPanelProps) {
+function SvPanel({
+  hsv,
+  width,
+  height,
+  onChange,
+  smoothCorners,
+  smoothCornerSmoothing,
+}: SvPanelProps) {
   const ref = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
 
@@ -334,31 +344,38 @@ function SvPanel({ hsv, width, height, onChange }: SvPanelProps) {
   const hueColor = hsvToHex(hsv.h, 100, 100);
 
   return (
-    <div
-      ref={ref}
-      className="relative cursor-crosshair rounded-md border border-border overflow-hidden touch-none"
-      style={{
-        width,
-        height,
-        backgroundImage: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, ${hueColor})`,
-        backgroundClip: "padding-box",
-      }}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerEnd}
-      onPointerCancel={handlePointerEnd}
-      onLostPointerCapture={handlePointerEnd}
+    <SmoothCorners
+      asChild
+      radius={8}
+      smoothing={smoothCornerSmoothing}
+      disabled={!smoothCorners}
     >
       <div
-        className="absolute size-3.5 rounded-full border-2 border-white pointer-events-none -translate-x-1/2 -translate-y-1/2"
+        ref={ref}
+        className="relative cursor-crosshair rounded-md border border-border overflow-hidden touch-none"
         style={{
-          left: `${clamp(hsv.s, 0, 100)}%`,
-          top: `${100 - clamp(hsv.v, 0, 100)}%`,
-          boxShadow:
-            "0 0 0 1px rgba(0,0,0,.3), inset 0 0 0 1px rgba(0,0,0,.15)",
+          width,
+          height,
+          backgroundImage: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, ${hueColor})`,
+          backgroundClip: "padding-box",
         }}
-      />
-    </div>
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerEnd}
+        onPointerCancel={handlePointerEnd}
+        onLostPointerCapture={handlePointerEnd}
+      >
+        <div
+          className="absolute size-3.5 rounded-full border-2 border-white pointer-events-none -translate-x-1/2 -translate-y-1/2"
+          style={{
+            left: `${clamp(hsv.s, 0, 100)}%`,
+            top: `${100 - clamp(hsv.v, 0, 100)}%`,
+            boxShadow:
+              "0 0 0 1px rgba(0,0,0,.3), inset 0 0 0 1px rgba(0,0,0,.15)",
+          }}
+        />
+      </div>
+    </SmoothCorners>
   );
 }
 
@@ -542,10 +559,25 @@ interface SwatchProps {
   active?: boolean;
   size?: "sm" | "md";
   onClick?: () => void;
+  smoothCorners: boolean;
+  smoothCornerSmoothing: number;
 }
 
-function Swatch({ color, active, size = "md", onClick }: SwatchProps) {
-  const dim = size === "sm" ? "size-5" : "size-7";
+const SWATCH_STYLES = {
+  sm: { size: "size-5", radius: 4, rounded: "rounded-[4px]" },
+  md: { size: "size-7", radius: 6, rounded: "rounded-[6px]" },
+} as const;
+
+function Swatch({
+  color,
+  active,
+  size = "md",
+  onClick,
+  smoothCorners,
+  smoothCornerSmoothing,
+}: SwatchProps) {
+  const swatchStyle = SWATCH_STYLES[size];
+  const swatchSmoothing = clamp(smoothCornerSmoothing * 0.65, 0, 0.5);
   const isLight = useMemo(() => {
     const rgb = hexToRgb(color);
     if (!rgb) return false;
@@ -553,21 +585,30 @@ function Swatch({ color, active, size = "md", onClick }: SwatchProps) {
   }, [color]);
 
   return (
-    <button
-      type="button"
-      className={cn(
-        dim,
-        "rounded-md border-2 cursor-pointer transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
-        active
-          ? "border-primary ring-1 ring-primary/40"
-          : isLight
-            ? "border-border"
-            : "border-transparent",
-      )}
-      style={{ backgroundColor: color }}
-      onClick={onClick}
-      title={color}
-    />
+    <SmoothCorners
+      asChild
+      radius={swatchStyle.radius}
+      smoothing={swatchSmoothing}
+      disabled={!smoothCorners}
+    >
+      <button
+        type="button"
+        className={cn(
+          swatchStyle.size,
+          swatchStyle.rounded,
+          "cursor-pointer border transition-[transform,box-shadow,border-color] duration-150 hover:scale-105 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1",
+          active
+            ? "border-ring ring-1 ring-ring/35 ring-offset-1 ring-offset-background"
+            : isLight
+              ? "border-border"
+              : "border-transparent",
+        )}
+        style={{ backgroundColor: color }}
+        onClick={onClick}
+        title={color}
+        aria-pressed={active}
+      />
+    </SmoothCorners>
   );
 }
 
@@ -589,6 +630,8 @@ interface ColorPickerPanelProps {
   onAlphaChange: (alpha: number) => void;
   panelWidth: number;
   panelHeight: number;
+  smoothCorners: boolean;
+  smoothCornerSmoothing: number;
 }
 
 function ColorPickerPanel({
@@ -605,6 +648,8 @@ function ColorPickerPanel({
   onAlphaChange,
   panelWidth,
   panelHeight,
+  smoothCorners,
+  smoothCornerSmoothing,
 }: ColorPickerPanelProps) {
   const [hexInput, setHexInput] = useState(color);
   const [alphaInput, setAlphaInput] = useState(String(alpha));
@@ -665,6 +710,8 @@ function ColorPickerPanel({
           width={panelWidth}
           height={panelHeight}
           onChange={handleSvChange}
+          smoothCorners={smoothCorners}
+          smoothCornerSmoothing={smoothCornerSmoothing}
         />
         <HueSlider hue={hsv.h} width={panelWidth} onChange={handleHueChange} />
         {showAlpha && (
@@ -680,30 +727,35 @@ function ColorPickerPanel({
       {/* Hex 输入 + 预览 + 透明度输入 */}
       {showHexInput && (
         <div className="flex items-center gap-2">
-          <div
-            className={cn(
-              "size-8 shrink-0 rounded-md border border-border",
-              showAlpha && "relative overflow-hidden",
-            )}
-            style={
-              showAlpha ? undefined : { backgroundColor: color }
-            }
+          <SmoothCorners
+            asChild
+            radius={8}
+            smoothing={smoothCornerSmoothing}
+            disabled={!smoothCorners}
           >
-            {showAlpha && (
-              <>
-                <div
-                  className="absolute inset-0"
-                  style={CHECKERBOARD_STYLE}
-                />
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    backgroundColor: hexToRgbaString(color, alpha),
-                  }}
-                />
-              </>
-            )}
-          </div>
+            <div
+              className={cn(
+                "size-8 shrink-0 rounded-md border border-border",
+                showAlpha && "relative overflow-hidden",
+              )}
+              style={showAlpha ? undefined : { backgroundColor: color }}
+            >
+              {showAlpha && (
+                <>
+                  <div
+                    className="absolute inset-0"
+                    style={CHECKERBOARD_STYLE}
+                  />
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      backgroundColor: hexToRgbaString(color, alpha),
+                    }}
+                  />
+                </>
+              )}
+            </div>
+          </SmoothCorners>
           <Input
             value={hexInput}
             onChange={(e) => setHexInput(e.target.value)}
@@ -742,6 +794,8 @@ function ColorPickerPanel({
                 active={color.toUpperCase() === c.toUpperCase()}
                 size="sm"
                 onClick={() => onColorSelect(c)}
+                smoothCorners={smoothCorners}
+                smoothCornerSmoothing={smoothCornerSmoothing}
               />
             ))}
           </div>
@@ -762,6 +816,8 @@ function ColorPickerPanel({
                 active={color.toUpperCase() === c.toUpperCase()}
                 size="sm"
                 onClick={() => onColorSelect(c)}
+                smoothCorners={smoothCorners}
+                smoothCornerSmoothing={smoothCornerSmoothing}
               />
             ))}
           </div>
@@ -855,6 +911,17 @@ export interface ColorPickerProps {
    */
   triggerSize?: "sm" | "md" | "lg";
   /**
+   * 是否启用 Figma/iOS 风格平滑圆角。
+   * 启用后会对触发器、弹层/内嵌容器、SV 面板、颜色预览与小色块做渐进增强。
+   * @default true
+   */
+  smoothCorners?: boolean;
+  /**
+   * 平滑圆角强度，范围 0..1。仅在 `smoothCorners` 为 true 时生效
+   * @default 0.7
+   */
+  smoothCornerSmoothing?: number;
+  /**
    * 触发器额外类名（仅 popover 模式）
    */
   triggerClassName?: string;
@@ -878,6 +945,7 @@ export interface ColorPickerProps {
  * - 内置 40 色预设色卡，支持自定义或隐藏
  * - 自动记录最近使用颜色，方便快速回选
  * - 支持 popover 弹出与 inline 内嵌两种布局模式
+ * - 默认启用 Figma/iOS 风格平滑圆角，并在不支持的浏览器中自动回退
  * - 受控 / 非受控双模式
  *
  * @example
@@ -908,6 +976,8 @@ export function ColorPicker({
   panelWidth = 224,
   panelHeight = 150,
   triggerSize = "md",
+  smoothCorners = true,
+  smoothCornerSmoothing = 0.7,
   triggerClassName,
   contentClassName,
   className,
@@ -1014,6 +1084,8 @@ export function ColorPicker({
       onAlphaChange={handleAlphaChange}
       panelWidth={panelWidth}
       panelHeight={panelHeight}
+      smoothCorners={smoothCorners}
+      smoothCornerSmoothing={smoothCornerSmoothing}
     />
   );
 
@@ -1022,7 +1094,14 @@ export function ColorPicker({
   if (mode === "inline") {
     return (
       <div className={cn("inline-block", className)}>
-        <div className={cn("p-1", contentClassName)}>{panel}</div>
+        <SmoothCorners
+          asChild
+          radius={8}
+          smoothing={smoothCornerSmoothing}
+          disabled={!smoothCorners}
+        >
+          <div className={cn("rounded-md p-1", contentClassName)}>{panel}</div>
+        </SmoothCorners>
       </div>
     );
   }
@@ -1030,42 +1109,56 @@ export function ColorPicker({
   return (
     <Popover>
       <PopoverTrigger asChild disabled={disabled}>
-        <button
-          type="button"
-          className={cn(
-            TRIGGER_SIZES[triggerSize],
-            showAlpha && "relative overflow-hidden",
-            "rounded-md border-2 border-border shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-            triggerClassName,
-            className,
-          )}
-          style={showAlpha ? undefined : { backgroundColor: color }}
-          disabled={disabled}
-          aria-label={`当前颜色 ${outputColor}`}
+        <SmoothCorners
+          asChild
+          radius={8}
+          smoothing={smoothCornerSmoothing}
+          disabled={!smoothCorners}
         >
-          {showAlpha && (
-            <>
-              <div
-                className="absolute inset-0"
-                style={CHECKERBOARD_STYLE}
-              />
-              <div
-                className="absolute inset-0"
-                style={{
-                  backgroundColor: hexToRgbaString(color, alpha),
-                }}
-              />
-            </>
-          )}
-        </button>
+          <button
+            type="button"
+            className={cn(
+              TRIGGER_SIZES[triggerSize],
+              showAlpha && "relative overflow-hidden",
+              "rounded-md border-2 border-border shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+              triggerClassName,
+              className,
+            )}
+            style={showAlpha ? undefined : { backgroundColor: color }}
+            disabled={disabled}
+            aria-label={`当前颜色 ${outputColor}`}
+          >
+            {showAlpha && (
+              <>
+                <div
+                  className="absolute inset-0"
+                  style={CHECKERBOARD_STYLE}
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    backgroundColor: hexToRgbaString(color, alpha),
+                  }}
+                />
+              </>
+            )}
+          </button>
+        </SmoothCorners>
       </PopoverTrigger>
-      <PopoverContent
-        className={cn("w-auto p-3", contentClassName)}
-        align="start"
-        onOpenAutoFocus={(e) => e.preventDefault()}
+      <SmoothCorners
+        asChild
+        radius={8}
+        smoothing={smoothCornerSmoothing}
+        disabled={!smoothCorners}
       >
-        {panel}
-      </PopoverContent>
+        <PopoverContent
+          className={cn("w-auto p-3", contentClassName)}
+          align="start"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
+          {panel}
+        </PopoverContent>
+      </SmoothCorners>
     </Popover>
   );
 }

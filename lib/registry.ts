@@ -1525,7 +1525,7 @@ export const componentRegistry: ComponentRegistry = {
   [ComponentId.COLOR_PICKER]: {
     name: "Color Picker",
     description:
-      "通用取色器组件：基于 HSV 色彩模型的饱和度/亮度面板与色相条拖拽选色，支持可选透明度（Alpha）选择、触屏操作、十六进制输入、40 色预设色卡、最近使用颜色记录，提供 Popover 弹出与 Inline 内嵌两种布局模式。",
+      "通用取色器组件：基于 HSV 色彩模型的饱和度/亮度面板与色相条拖拽选色，支持可选透明度（Alpha）选择、触屏操作、十六进制输入、40 色预设色卡、最近使用颜色记录、渐进增强平滑圆角，以及 Popover 弹出与 Inline 内嵌两种布局模式。",
     category: "表单",
     dependencies: [],
     files: {
@@ -1628,6 +1628,21 @@ export const componentRegistry: ComponentRegistry = {
         default: '"md"',
       },
       {
+        name: "smoothCorners",
+        type: "boolean",
+        description:
+          "是否对触发器、弹层/内嵌容器、SV 面板、颜色预览与小色块启用 Figma/iOS 风格平滑圆角",
+        required: false,
+        default: "true",
+      },
+      {
+        name: "smoothCornerSmoothing",
+        type: "number",
+        description: "平滑圆角强度（0..1），仅在 smoothCorners 为 true 时生效",
+        required: false,
+        default: "0.7",
+      },
+      {
         name: "triggerClassName",
         type: "string",
         description: "触发器额外类名（仅 popover 模式）",
@@ -1660,6 +1675,7 @@ export const componentRegistry: ComponentRegistry = {
       "form",
       "popover",
       "inline",
+      "smooth-corners",
     ],
     cliName: "color-picker",
     basicUsage: basicUsageExamples[ComponentId.COLOR_PICKER],

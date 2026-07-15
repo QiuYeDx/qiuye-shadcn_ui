@@ -43,6 +43,7 @@
       "author": "QiuYeDx <me@qiuyedx.com>",
       "dependencies": [],
       "registryDependencies": [
+        "@qiuye-ui/smooth-corners",
         "popover",
         "input"
       ],

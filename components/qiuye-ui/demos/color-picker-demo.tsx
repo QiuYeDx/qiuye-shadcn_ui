@@ -51,6 +51,24 @@ function SizesDemo() {
     </div>
   );
 }`,
+  smoothCorners: `import { ColorPicker } from "@/components/qiuye-ui/color-picker";
+
+function SmoothCornersDemo() {
+  return (
+    <div className="grid gap-6 sm:grid-cols-2">
+      <ColorPicker
+        mode="inline"
+        defaultValue="#F97316"
+        smoothCorners={false}
+      />
+      <ColorPicker
+        mode="inline"
+        defaultValue="#6366F1"
+        smoothCornerSmoothing={0.75}
+      />
+    </div>
+  );
+}`,
   inline: `import { useState } from "react";
 import { ColorPicker } from "@/components/qiuye-ui/color-picker";
 
@@ -270,6 +288,44 @@ export function ColorPickerDemo() {
             <div className="flex flex-col items-center gap-2">
               <ColorPicker defaultValue="#3B82F6" triggerSize="lg" />
               <span className="text-xs text-muted-foreground">lg</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 平滑圆角 */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="space-y-1.5">
+              <CardTitle>平滑圆角</CardTitle>
+              <CardDescription>
+                默认启用渐进增强平滑圆角，也可关闭或调整平滑强度
+              </CardDescription>
+            </div>
+            <ViewSourceButton
+              code={sourceCodes.smoothCorners}
+              title="平滑圆角 - 源码"
+            />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div className="space-y-3">
+              <Badge variant="secondary">标准圆角</Badge>
+              <ColorPicker
+                mode="inline"
+                defaultValue="#F97316"
+                smoothCorners={false}
+              />
+            </div>
+            <div className="space-y-3">
+              <Badge variant="secondary">平滑圆角 · 0.75</Badge>
+              <ColorPicker
+                mode="inline"
+                defaultValue="#6366F1"
+                smoothCornerSmoothing={0.75}
+              />
             </div>
           </div>
         </CardContent>
