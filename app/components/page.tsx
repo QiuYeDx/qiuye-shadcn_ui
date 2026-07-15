@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
+import { SegmentedControl } from "@/components/qiuye-ui/segmented-control";
 import {
   ResponsiveTabs,
   type TabItem,
@@ -178,7 +179,8 @@ export default function ComponentsPage() {
 
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground shrink-0">包管理器:</span>
-            <ResponsiveTabs
+            <SegmentedControl
+              aria-label="包管理器"
               value={packageManager}
               onValueChange={(value) =>
                 setPackageManager(value as "npm" | "pnpm")
@@ -187,12 +189,8 @@ export default function ComponentsPage() {
                 { value: "npm", label: "npm" },
                 { value: "pnpm", label: "pnpm" },
               ]}
-              layout="grid"
-              gridColsClass="grid-cols-2"
-              listClassName="w-[140px]"
               size="sm"
-              scrollButtons={false}
-              fadeMasks={false}
+              className="w-[140px]"
             />
           </div>
         </div>

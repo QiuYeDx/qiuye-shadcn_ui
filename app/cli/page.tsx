@@ -28,7 +28,7 @@ import {
   CodeBlock as CodeBlockDisplay,
   CodeBlockPanel,
 } from "@/components/qiuye-ui/code-block";
-import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
+import { SegmentedControl } from "@/components/qiuye-ui/segmented-control";
 import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
 import {
   Tooltip,
@@ -306,7 +306,8 @@ export default function QuickStartPage() {
                   选择你的包管理器后复制命令
                 </p>
               </div>
-              <ResponsiveTabs
+              <SegmentedControl
+                aria-label="包管理器"
                 value={packageManager}
                 onValueChange={(value) =>
                   setPackageManager(value as PackageManager)
@@ -315,12 +316,9 @@ export default function QuickStartPage() {
                   { value: "pnpm", label: "pnpm" },
                   { value: "npm", label: "npm" },
                 ]}
-                layout="grid"
-                gridColsClass="grid-cols-2"
-                listClassName="w-full sm:w-36"
                 size="sm"
-                scrollButtons={false}
-                fadeMasks={false}
+                fullWidth
+                className="sm:w-36"
               />
             </div>
 

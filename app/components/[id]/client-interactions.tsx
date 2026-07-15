@@ -13,6 +13,10 @@ import {
   ResponsiveTabs,
   type TabItem,
 } from "@/components/qiuye-ui/responsive-tabs";
+import {
+  SegmentedControl,
+  type SegmentedControlItem,
+} from "@/components/qiuye-ui/segmented-control";
 import { useClipboard } from "use-clipboard-copy";
 import { toast } from "sonner";
 
@@ -59,7 +63,7 @@ function usePackageManager() {
   return { packageManager, setPackageManager };
 }
 
-const pmItems: TabItem[] = [
+const pmItems: SegmentedControlItem[] = [
   { value: "npm", label: "npm" },
   { value: "pnpm", label: "pnpm" },
 ];
@@ -71,17 +75,13 @@ function PackageManagerSelector() {
   return (
     <div className="flex min-w-0 items-center gap-2">
       <span className="text-sm text-muted-foreground shrink-0">包管理器:</span>
-      <ResponsiveTabs
+      <SegmentedControl
+        aria-label="包管理器"
         value={packageManager}
         onValueChange={(value) => setPackageManager(value as PackageManager)}
         items={pmItems}
-        layout="grid"
-        gridColsClass="grid-cols-2"
-        className="min-w-0 flex-1 w-auto!"
-        listClassName="w-full"
-        triggerClassName="text-sm h-7.5"
-        scrollButtons={false}
-        fadeMasks={false}
+        size="sm"
+        className="min-w-0 flex-1"
       />
     </div>
   );
