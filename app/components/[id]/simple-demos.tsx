@@ -2,6 +2,7 @@
 
 import React from "react";
 import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
+import { SegmentedControl } from "@/components/qiuye-ui/segmented-control";
 import {
   ScrollableDialog,
   ScrollableDialogHeader,
@@ -52,6 +53,29 @@ export function ResponsiveTabsSimpleDemo() {
         {value === "tab3" && <p>标签三的内容</p>}
       </div>
     </ResponsiveTabs>
+  );
+}
+
+// SegmentedControl 简单演示
+export function SegmentedControlSimpleDemo() {
+  const [value, setValue] = React.useState("chat");
+
+  return (
+    <div className="w-full max-w-md space-y-3">
+      <SegmentedControl
+        aria-label="工作模式"
+        value={value}
+        onValueChange={setValue}
+        items={[
+          { value: "chat", label: "Chat" },
+          { value: "work", label: "Work" },
+        ]}
+        className="w-full"
+      />
+      <p className="text-center text-sm text-muted-foreground">
+        Current: <span className="font-medium text-foreground">{value}</span>
+      </p>
+    </div>
   );
 }
 

@@ -275,6 +275,23 @@
       ]
     },
     {
+      "name": "segmented-control",
+      "type": "registry:component",
+      "title": "SegmentedControl",
+      "author": "QiuYeDx <me@qiuyedx.com>",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/segmented-control.tsx"
+        }
+      ],
+      "description": "ChatGPT 风格的分段单选控件，支持 Motion spring 滑块过渡与大、中、小三档尺寸。"
+    },
+    {
       "name": "smooth-corners",
       "type": "registry:component",
       "title": "Smooth Corners",

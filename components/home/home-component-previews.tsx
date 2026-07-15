@@ -32,6 +32,7 @@ import { MarkdownRenderer } from "@/components/qiuye-ui/markdown-renderer";
 import { ThemeTransitionToggle } from "@/components/qiuye-ui/theme-transition-toggle";
 import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
 import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
+import { SegmentedControl } from "@/components/qiuye-ui/segmented-control";
 import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
 import { Tour, type TourStep } from "@/components/qiuye-ui/tour";
 import { Typewriter } from "@/components/qiuye-ui/typewriter";
@@ -69,6 +70,28 @@ function ResponsiveTabsPreview() {
           </div>
         </div>
       </ResponsiveTabs>
+    </div>
+  );
+}
+
+function SegmentedControlPreview() {
+  const [value, setValue] = React.useState("chat");
+
+  return (
+    <div className="w-full max-w-xs space-y-4">
+      <SegmentedControl
+        aria-label="工作模式"
+        value={value}
+        onValueChange={setValue}
+        items={[
+          { value: "chat", label: "Chat" },
+          { value: "work", label: "Work" },
+        ]}
+        className="w-full"
+      />
+      <p className="text-center text-xs text-muted-foreground">
+        {value === "chat" ? "Conversation mode" : "Workspace mode"}
+      </p>
     </div>
   );
 }
@@ -1215,6 +1238,7 @@ function SmoothCornersPreview() {
 
 export const homePreviewComponents = {
   [ComponentId.RESPONSIVE_TABS]: ResponsiveTabsPreview,
+  [ComponentId.SEGMENTED_CONTROL]: SegmentedControlPreview,
   [ComponentId.SCROLLABLE_DIALOG]: ScrollableDialogPreview,
   [ComponentId.DOT_GLASS]: DotGlassPreview,
   [ComponentId.IMAGE_VIEWER]: ImageViewerPreview,

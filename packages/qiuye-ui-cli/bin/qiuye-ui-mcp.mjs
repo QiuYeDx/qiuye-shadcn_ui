@@ -13,6 +13,7 @@ import { z } from "zod";
 const DEFAULT_REGISTRY_BASE = "https://ui.qiuyedx.com/registry";
 const DEFAULT_COMPONENT_NAMES = [
   "responsive-tabs",
+  "segmented-control",
   "scrollable-dialog",
   "dot-glass",
   "image-viewer",

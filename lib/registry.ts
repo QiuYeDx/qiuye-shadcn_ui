@@ -179,6 +179,114 @@ export const componentRegistry: ComponentRegistry = {
     basicUsage: basicUsageExamples[ComponentId.RESPONSIVE_TABS],
   },
 
+  [ComponentId.SEGMENTED_CONTROL]: {
+    name: "Segmented Control",
+    description:
+      "ChatGPT 风格的分段单选控件：使用 Motion layoutId 与 spring 弹性滑块过渡，提供大、中、小三档尺寸，并支持受控/非受控状态、键盘导航、禁用项与表单提交。",
+    category: "交互",
+    dependencies: ["motion"],
+    files: {
+      component: "components/qiuye-ui/segmented-control.tsx",
+      demo: "components/qiuye-ui/demos/segmented-control-demo.tsx",
+    },
+    props: [
+      {
+        name: "items",
+        type: "SegmentedControlItem[]",
+        description:
+          "分段选项配置数组，支持 label、icon、disabled 与 ariaLabel，value 应保持唯一",
+        required: true,
+      },
+      {
+        name: "value",
+        type: "string",
+        description: "当前选中值（受控模式）",
+        required: false,
+      },
+      {
+        name: "defaultValue",
+        type: "string",
+        description: "非受控模式的默认选中值，未传时选中第一个可用项",
+        required: false,
+      },
+      {
+        name: "onValueChange",
+        type: "(value: string) => void",
+        description: "选中值变化回调",
+        required: false,
+      },
+      {
+        name: "size",
+        type: '"sm" | "md" | "lg"',
+        description:
+          "控件尺寸：lg 用于页面级内容切换，md 用于局部内容切换，sm 用于单个配置项",
+        required: false,
+        default: '"md"',
+      },
+      {
+        name: "fullWidth",
+        type: "boolean",
+        description: "是否撑满父容器宽度",
+        required: false,
+        default: "false",
+      },
+      {
+        name: "disabled",
+        type: "boolean",
+        description: "是否禁用整个控件",
+        required: false,
+        default: "false",
+      },
+      {
+        name: "name",
+        type: "string",
+        description: "用于原生表单提交的字段名",
+        required: false,
+      },
+      {
+        name: "indicatorClassName",
+        type: "string",
+        description: "选中态滑块的额外类名",
+        required: false,
+      },
+      {
+        name: "itemClassName",
+        type: "string",
+        description: "每个选项按钮的额外类名",
+        required: false,
+      },
+      {
+        name: "indicatorTransition",
+        type: "Transition",
+        description: "选中态滑块的 Motion 过渡配置",
+        required: false,
+        default: '{ type: "spring", duration: 0.38, bounce: 0.18 }',
+      },
+      {
+        name: "className",
+        type: "string",
+        description: "根容器额外类名",
+        required: false,
+      },
+    ],
+    version: "1.0.0",
+    author: "QiuYeDx",
+    tags: [
+      "segmented-control",
+      "radio-group",
+      "tabs",
+      "switcher",
+      "motion",
+      "spring",
+      "layout-id",
+      "keyboard",
+      "form",
+      "chatgpt",
+    ],
+    cliName: "segmented-control",
+    basicUsage: basicUsageExamples[ComponentId.SEGMENTED_CONTROL],
+  },
+
   [ComponentId.SCROLLABLE_DIALOG]: {
     name: "Scrollable Dialog",
     description:

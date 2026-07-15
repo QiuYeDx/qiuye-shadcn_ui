@@ -36,6 +36,7 @@ export async function generateStaticParams() {
 
 // 导入演示组件
 import { ResponsiveTabsDemo } from "@/components/qiuye-ui/demos/responsive-tabs-demo";
+import { SegmentedControlDemo } from "@/components/qiuye-ui/demos/segmented-control-demo";
 import { ScrollableDialogDemo } from "@/components/qiuye-ui/demos/scrollable-dialog-demo";
 import { DotGlassDemo } from "@/components/qiuye-ui/demos/dot-glass-demo";
 import { ImageViewerDemo } from "@/components/qiuye-ui/demos/image-viewer-demo";
@@ -51,6 +52,7 @@ import { TourDemo } from "@/components/qiuye-ui/demos/tour-demo";
 // TODO: 新增 qiuye-ui 自定义组件时需要完善 demo 文件
 const demoComponents = {
   [ComponentId.RESPONSIVE_TABS]: ResponsiveTabsDemo,
+  [ComponentId.SEGMENTED_CONTROL]: SegmentedControlDemo,
   [ComponentId.SCROLLABLE_DIALOG]: ScrollableDialogDemo,
   [ComponentId.DOT_GLASS]: DotGlassDemo,
   [ComponentId.IMAGE_VIEWER]: ImageViewerDemo,
@@ -67,6 +69,7 @@ const demoComponents = {
 // 导入简单演示组件
 import {
   ResponsiveTabsSimpleDemo,
+  SegmentedControlSimpleDemo,
   ScrollableDialogSimpleDemo,
   DotGlassSimpleDemo,
   ImageViewerSimpleDemo,
@@ -83,6 +86,7 @@ import {
 // 精简的单例演示组件
 const simpleDemoComponents = {
   [ComponentId.RESPONSIVE_TABS]: ResponsiveTabsSimpleDemo,
+  [ComponentId.SEGMENTED_CONTROL]: SegmentedControlSimpleDemo,
   [ComponentId.SCROLLABLE_DIALOG]: ScrollableDialogSimpleDemo,
   [ComponentId.DOT_GLASS]: DotGlassSimpleDemo,
   [ComponentId.IMAGE_VIEWER]: ImageViewerSimpleDemo,

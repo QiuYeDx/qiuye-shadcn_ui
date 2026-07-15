@@ -7,6 +7,7 @@
 // TODO: 新增自定义组件时需要更新这里
 export enum ComponentId {
   RESPONSIVE_TABS = "responsive-tabs",
+  SEGMENTED_CONTROL = "segmented-control",
   SCROLLABLE_DIALOG = "scrollable-dialog",
   DOT_GLASS = "dot-glass",
   IMAGE_VIEWER = "image-viewer",
@@ -49,6 +50,23 @@ return (
       {value === "tab2" && <div>标签二的内容</div>}
     </div>
   </ResponsiveTabs>
+);`,
+  },
+  [ComponentId.SEGMENTED_CONTROL]: {
+    import: `import { SegmentedControl } from "@/components/qiuye-ui/segmented-control";
+import { useState } from "react";`,
+    usage: `const [mode, setMode] = useState("chat");
+
+return (
+  <SegmentedControl
+    aria-label="工作模式"
+    value={mode}
+    onValueChange={setMode}
+    items={[
+      { value: "chat", label: "Chat" },
+      { value: "work", label: "Work" },
+    ]}
+  />
 );`,
   },
   [ComponentId.SCROLLABLE_DIALOG]: {

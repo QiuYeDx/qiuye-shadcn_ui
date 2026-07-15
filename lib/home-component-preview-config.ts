@@ -33,6 +33,10 @@ export const homePreviewConfigs: HomePreviewConfig[] = [
     size: "square",
   },
   {
+    id: ComponentId.SEGMENTED_CONTROL,
+    size: "compact",
+  },
+  {
     id: ComponentId.COLOR_PICKER,
     size: "compact",
   },
