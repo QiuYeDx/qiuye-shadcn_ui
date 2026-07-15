@@ -11,7 +11,10 @@ import {
 import { cn } from "@/lib/utils";
 
 /** SegmentedControl 的尺寸 */
-export type SegmentedControlSize = "sm" | "md" | "lg";
+export type SegmentedControlSize = "sm" | "md";
+
+/** SegmentedControl 的视觉风格 */
+export type SegmentedControlVariant = "contained" | "floating";
 
 /** 单个分段选项的配置 */
 export interface SegmentedControlItem {
@@ -46,12 +49,18 @@ export interface SegmentedControlProps
   onValueChange?: (value: string) => void;
   /**
    * 控件尺寸
-   * - `"lg"`：页面级内容切换
    * - `"md"`：卡片或局部内容切换
    * - `"sm"`：单个配置项切换
    * @default "md"
    */
   size?: SegmentedControlSize;
+  /**
+   * 视觉风格
+   * - `"contained"`：选中滑块内嵌于灰色轨道
+   * - `"floating"`：选中滑块比灰色轨道略大，呈现悬浮效果
+   * @default "floating"
+   */
+  variant?: SegmentedControlVariant;
   /**
    * 是否撑满父容器宽度
    * @default false
@@ -77,22 +86,24 @@ export interface SegmentedControlProps
 
 const sizeStyles: Record<
   SegmentedControlSize,
-  { root: string; item: string; content: string }
+  {
+    root: string;
+    containedItem: string;
+    floatingItem: string;
+    content: string;
+  }
 > = {
   sm: {
-    root: "p-0.5",
-    item: "h-7 min-w-14 px-2.5 text-xs",
+    root: "h-7",
+    containedItem: "h-6 min-w-14 px-2.5 text-xs",
+    floatingItem: "h-7 min-w-14 px-2.5 text-xs",
     content: "gap-1.5 [&_svg]:size-3.5",
   },
   md: {
-    root: "p-1",
-    item: "h-9 min-w-20 px-4 text-sm",
+    root: "h-9",
+    containedItem: "h-8 min-w-20 px-4 text-sm",
+    floatingItem: "h-9 min-w-20 px-4 text-sm",
     content: "gap-2 [&_svg]:size-4",
-  },
-  lg: {
-    root: "p-1.5",
-    item: "h-14 min-w-0 px-2 text-sm sm:min-w-28 sm:px-6 sm:text-base",
-    content: "gap-1 sm:gap-2.5 [&_svg]:size-4 sm:[&_svg]:size-5",
   },
 };
 
@@ -111,7 +122,8 @@ function getFirstEnabledValue(items: SegmentedControlItem[]) {
  *
  * 适合在少量互斥选项之间切换：
  * - 使用 Motion `layoutId` 和 spring 实现选中胶囊的弹性滑动
- * - 支持受控与非受控状态，以及 `sm` / `md` / `lg` 三档尺寸
+ * - 支持受控与非受控状态，以及 `sm` / `md` 两档尺寸
+ * - 提供内嵌与悬浮两种视觉风格，切换时文字尺寸和字重保持稳定
  * - 使用 radiogroup 语义，支持方向键、Home、End 键盘导航
  * - 支持禁用项、整组禁用和原生表单字段提交
  *
@@ -140,6 +152,7 @@ export const SegmentedControl = React.forwardRef<
     defaultValue,
     onValueChange,
     size = "md",
+    variant = "floating",
     fullWidth = false,
     disabled = false,
     name,
@@ -226,9 +239,13 @@ export const SegmentedControl = React.forwardRef<
         role="radiogroup"
         data-slot="segmented-control"
         data-size={size}
+        data-variant={variant}
         aria-disabled={disabled || undefined}
         className={cn(
-          "relative isolate max-w-full grid overflow-hidden rounded-full bg-muted/70 text-foreground",
+          "relative isolate grid max-w-full rounded-full text-foreground",
+          variant === "contained"
+            ? "overflow-hidden bg-muted/70 p-0.5"
+            : "overflow-visible",
           styles.root,
           fullWidth ? "w-full" : "inline-grid",
           disabled && "opacity-60",
@@ -239,6 +256,13 @@ export const SegmentedControl = React.forwardRef<
           ...style,
         }}
       >
+        {variant === "floating" && (
+          <span
+            data-slot="segmented-control-track"
+            className="pointer-events-none absolute inset-x-0 inset-y-0.5 z-0 rounded-full bg-muted/70"
+          />
+        )}
+
         {items.map((item) => {
           const active = item.value === resolvedValue;
           const itemDisabled = disabled || item.disabled;
@@ -260,13 +284,15 @@ export const SegmentedControl = React.forwardRef<
               disabled={itemDisabled}
               tabIndex={active ? 0 : -1}
               className={cn(
-                "relative flex min-w-0 cursor-pointer items-center justify-center rounded-full outline-none transition-colors",
+                "relative flex min-w-0 cursor-pointer items-center justify-center rounded-full font-medium outline-none transition-colors",
                 "focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-inset",
                 active
-                  ? "z-0 font-medium text-foreground"
-                  : "z-[1] font-normal text-muted-foreground hover:text-foreground",
+                  ? "z-0 text-foreground"
+                  : "z-[1] text-muted-foreground hover:text-foreground",
                 itemDisabled && "cursor-not-allowed opacity-45",
-                styles.item,
+                variant === "contained"
+                  ? styles.containedItem
+                  : styles.floatingItem,
                 itemClassName,
               )}
               onClick={() => selectValue(item.value)}
@@ -279,7 +305,10 @@ export const SegmentedControl = React.forwardRef<
                   initial={false}
                   transition={transition}
                   className={cn(
-                    "pointer-events-none absolute inset-0 rounded-full border border-border/80 bg-background shadow-[0_1px_2px_rgba(0,0,0,0.06),0_6px_18px_-12px_rgba(0,0,0,0.34)] dark:border-white/10 dark:bg-input/75",
+                    "pointer-events-none absolute inset-0 rounded-full border bg-background dark:border-white/10 dark:bg-input/75",
+                    variant === "contained"
+                      ? "border-border/80 shadow-[0_1px_2px_rgba(0,0,0,0.06),0_6px_18px_-12px_rgba(0,0,0,0.34)]"
+                      : "border-border/70 shadow-[0_1px_3px_rgba(0,0,0,0.05),0_6px_16px_-10px_rgba(0,0,0,0.14)] dark:bg-input",
                     indicatorClassName,
                   )}
                 />

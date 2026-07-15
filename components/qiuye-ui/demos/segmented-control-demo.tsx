@@ -3,11 +3,8 @@
 import { useState } from "react";
 import {
   BriefcaseBusinessIcon,
-  ChartNoAxesCombinedIcon,
   CheckIcon,
-  LayoutDashboardIcon,
   MessageCircleIcon,
-  Settings2Icon,
 } from "lucide-react";
 
 import {
@@ -25,43 +22,56 @@ import {
 } from "@/components/ui/card";
 
 const sourceCodes = {
-  basic: `import { useState } from "react";
+  variants: `import { useState } from "react";
 import { SegmentedControl } from "@/components/qiuye-ui/segmented-control";
 
+const items = [
+  { value: "chat", label: "Chat" },
+  { value: "work", label: "Work" },
+];
+
 export function Demo() {
-  const [mode, setMode] = useState("chat");
+  const [containedValue, setContainedValue] = useState("chat");
+  const [floatingValue, setFloatingValue] = useState("chat");
 
   return (
-    <SegmentedControl
-      aria-label="工作模式"
-      value={mode}
-      onValueChange={setMode}
-      items={[
-        { value: "chat", label: "Chat" },
-        { value: "work", label: "Work" },
-      ]}
-    />
+    <div className="space-y-8">
+      <SegmentedControl
+        aria-label="内嵌风格"
+        size="md"
+        variant="contained"
+        value={containedValue}
+        onValueChange={setContainedValue}
+        items={items}
+      />
+      <SegmentedControl
+        aria-label="悬浮风格"
+        size="md"
+        value={floatingValue}
+        onValueChange={setFloatingValue}
+        items={items}
+      />
+    </div>
   );
 }`,
-  sizes: `<SegmentedControl size="lg" fullWidth items={pageItems} />
-<SegmentedControl size="md" items={cardItems} />
-<SegmentedControl size="sm" items={settingItems} />`,
-  pageLevel: `const [section, setSection] = useState("overview");
-
-<SegmentedControl
-  aria-label="页面内容"
-  size="lg"
-  fullWidth
-  value={section}
-  onValueChange={setSection}
-  items={[
-    { value: "overview", label: "Overview" },
-    { value: "activity", label: "Activity" },
-    { value: "settings", label: "Settings" },
-  ]}
+  sizes: `<SegmentedControl
+  size="md"
+  items={cardItems}
 />
-
-<main>{renderSection(section)}</main>`,
+<SegmentedControl
+  size="md"
+  variant="contained"
+  items={cardItems}
+/>
+<SegmentedControl
+  size="sm"
+  items={settingItems}
+/>
+<SegmentedControl
+  size="sm"
+  variant="contained"
+  items={settingItems}
+/>`,
   states: `<SegmentedControl
   aria-label="响应风格"
   size="sm"
@@ -80,20 +90,6 @@ const chatItems: SegmentedControlItem[] = [
   { value: "work", label: "Work" },
 ];
 
-const pageItems: SegmentedControlItem[] = [
-  {
-    value: "overview",
-    label: "Overview",
-    icon: <LayoutDashboardIcon />,
-  },
-  {
-    value: "activity",
-    label: "Activity",
-    icon: <ChartNoAxesCombinedIcon />,
-  },
-  { value: "settings", label: "Settings", icon: <Settings2Icon /> },
-];
-
 const cardItems: SegmentedControlItem[] = [
   { value: "conversation", label: "Conversation", icon: <MessageCircleIcon /> },
   { value: "workspace", label: "Workspace", icon: <BriefcaseBusinessIcon /> },
@@ -105,34 +101,15 @@ const settingItems: SegmentedControlItem[] = [
   { value: "detailed", label: "Detailed", disabled: true },
 ];
 
-const sectionContent = {
-  overview: {
-    eyebrow: "Workspace overview",
-    title: "A focused view of the work that matters now.",
-    description:
-      "Use the large control for top-level sections where the selected value changes most of the page.",
-  },
-  activity: {
-    eyebrow: "Recent activity",
-    title: "Review decisions, updates, and handoffs in one place.",
-    description:
-      "The spring indicator preserves spatial context while moving between peer sections.",
-  },
-  settings: {
-    eyebrow: "Workspace settings",
-    title: "Tune defaults without leaving the current workflow.",
-    description:
-      "Keyboard users can move with arrow keys and jump with Home or End.",
-  },
-} as const;
-
 export function SegmentedControlDemo() {
   const [mode, setMode] = useState("chat");
-  const [largeValue, setLargeValue] = useState("overview");
-  const [mediumValue, setMediumValue] = useState("conversation");
-  const [smallValue, setSmallValue] = useState("balanced");
-  const [section, setSection] = useState<keyof typeof sectionContent>("overview");
-  const content = sectionContent[section];
+  const [floatingMode, setFloatingMode] = useState("chat");
+  const [mediumFloatingValue, setMediumFloatingValue] =
+    useState("conversation");
+  const [mediumContainedValue, setMediumContainedValue] =
+    useState("conversation");
+  const [smallFloatingValue, setSmallFloatingValue] = useState("balanced");
+  const [smallContainedValue, setSmallContainedValue] = useState("balanced");
 
   return (
     <div className="space-y-8">
@@ -140,72 +117,48 @@ export function SegmentedControlDemo() {
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1.5">
-              <CardTitle>ChatGPT 风格</CardTitle>
+              <CardTitle>Variant 模式</CardTitle>
               <CardDescription>
-                浅灰轨道与白色选中胶囊，切换时使用 spring 弹性过渡
+                contained 保留内嵌胶囊，floating 让白色滑块外扩并悬浮在轨道之上
               </CardDescription>
             </div>
-            <ViewSourceButton code={sourceCodes.basic} title="基础用法 - 源码" />
+            <ViewSourceButton
+              code={sourceCodes.variants}
+              title="风格模式 - 源码"
+            />
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap items-center gap-4">
+        <CardContent className="space-y-8">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Badge variant="outline">contained</Badge>
+              <span className="text-xs text-muted-foreground">{mode}</span>
+            </div>
             <SegmentedControl
-              aria-label="工作模式"
+              aria-label="内嵌风格"
+              size="md"
+              variant="contained"
               value={mode}
               onValueChange={setMode}
               items={chatItems}
               className="w-full max-w-md"
             />
-            <Badge variant="secondary">{mode}</Badge>
           </div>
-        </CardContent>
-      </Card>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-1.5">
-              <CardTitle>三种尺寸</CardTitle>
-              <CardDescription>
-                大尺寸用于页面级切换，中尺寸用于局部内容，小尺寸用于配置项
-              </CardDescription>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Badge variant="outline">floating</Badge>
+              <span className="text-xs text-muted-foreground">
+                {floatingMode}
+              </span>
             </div>
-            <ViewSourceButton code={sourceCodes.sizes} title="三种尺寸 - 源码" />
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <Badge variant="outline">lg</Badge>
             <SegmentedControl
-              aria-label="页面级示例"
-              size="lg"
-              fullWidth
-              value={largeValue}
-              onValueChange={setLargeValue}
-              items={pageItems}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Badge variant="outline">md</Badge>
-            <SegmentedControl
-              aria-label="局部内容示例"
+              aria-label="悬浮风格"
               size="md"
-              value={mediumValue}
-              onValueChange={setMediumValue}
-              items={cardItems}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Badge variant="outline">sm</Badge>
-            <SegmentedControl
-              aria-label="配置项示例"
-              size="sm"
-              value={smallValue}
-              onValueChange={setSmallValue}
-              items={settingItems}
+              value={floatingMode}
+              onValueChange={setFloatingMode}
+              items={chatItems}
+              className="w-full max-w-md"
             />
           </div>
         </CardContent>
@@ -215,39 +168,75 @@ export function SegmentedControlDemo() {
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1.5">
-              <CardTitle>页面级内容切换</CardTitle>
+              <CardTitle>两种尺寸</CardTitle>
               <CardDescription>
-                fullWidth 配合 lg 尺寸，适合驱动主要页面区域
+                md 用于局部内容切换，sm 用于紧凑配置项
               </CardDescription>
             </div>
-            <ViewSourceButton
-              code={sourceCodes.pageLevel}
-              title="页面级切换 - 源码"
-            />
+            <ViewSourceButton code={sourceCodes.sizes} title="两种尺寸 - 源码" />
           </div>
         </CardHeader>
-        <CardContent>
-          <SegmentedControl
-            aria-label="页面内容"
-            size="lg"
-            fullWidth
-            value={section}
-            onValueChange={(value) =>
-              setSection(value as keyof typeof sectionContent)
-            }
-            items={pageItems}
-          />
+        <CardContent className="space-y-8">
+          <div className="grid gap-3 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-start sm:gap-x-6">
+            <Badge variant="outline" className="w-fit sm:mt-6">
+              md
+            </Badge>
+            <div className="flex min-w-0 flex-wrap items-start gap-x-8 gap-y-4">
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground">
+                  floating · default
+                </p>
+                <SegmentedControl
+                  aria-label="中尺寸悬浮风格"
+                  size="md"
+                  value={mediumFloatingValue}
+                  onValueChange={setMediumFloatingValue}
+                  items={cardItems}
+                />
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground">contained</p>
+                <SegmentedControl
+                  aria-label="中尺寸内嵌风格"
+                  size="md"
+                  variant="contained"
+                  value={mediumContainedValue}
+                  onValueChange={setMediumContainedValue}
+                  items={cardItems}
+                />
+              </div>
+            </div>
+          </div>
 
-          <div className="mt-6 min-h-36 border-t pt-6" aria-live="polite">
-            <p className="text-xs font-medium uppercase text-muted-foreground">
-              {content.eyebrow}
-            </p>
-            <h3 className="mt-2 max-w-2xl text-xl font-semibold">
-              {content.title}
-            </h3>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-              {content.description}
-            </p>
+          <div className="grid gap-3 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-start sm:gap-x-6">
+            <Badge variant="outline" className="w-fit sm:mt-6">
+              sm
+            </Badge>
+            <div className="flex min-w-0 flex-wrap items-start gap-x-8 gap-y-4">
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground">
+                  floating · default
+                </p>
+                <SegmentedControl
+                  aria-label="小尺寸悬浮风格"
+                  size="sm"
+                  value={smallFloatingValue}
+                  onValueChange={setSmallFloatingValue}
+                  items={settingItems}
+                />
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground">contained</p>
+                <SegmentedControl
+                  aria-label="小尺寸内嵌风格"
+                  size="sm"
+                  variant="contained"
+                  value={smallContainedValue}
+                  onValueChange={setSmallContainedValue}
+                  items={settingItems}
+                />
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

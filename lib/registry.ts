@@ -182,7 +182,7 @@ export const componentRegistry: ComponentRegistry = {
   [ComponentId.SEGMENTED_CONTROL]: {
     name: "Segmented Control",
     description:
-      "ChatGPT 风格的分段单选控件：使用 Motion layoutId 与 spring 弹性滑块过渡，提供大、中、小三档尺寸，并支持受控/非受控状态、键盘导航、禁用项与表单提交。",
+      "ChatGPT 风格的分段单选控件：使用 Motion layoutId 与 spring 弹性滑块过渡，提供内嵌与悬浮两种风格及中、小两档尺寸，并支持受控/非受控状态、键盘导航、禁用项与表单提交。",
     category: "交互",
     dependencies: ["motion"],
     files: {
@@ -217,11 +217,19 @@ export const componentRegistry: ComponentRegistry = {
       },
       {
         name: "size",
-        type: '"sm" | "md" | "lg"',
+        type: '"sm" | "md"',
         description:
-          "控件尺寸：lg 用于页面级内容切换，md 用于局部内容切换，sm 用于单个配置项",
+          "控件尺寸：md 用于局部内容切换，sm 用于紧凑配置项",
         required: false,
         default: '"md"',
+      },
+      {
+        name: "variant",
+        type: '"contained" | "floating"',
+        description:
+          "视觉风格：contained 将选中滑块内嵌于轨道，floating 让滑块外扩并呈现悬浮感",
+        required: false,
+        default: '"floating"',
       },
       {
         name: "fullWidth",
@@ -269,7 +277,7 @@ export const componentRegistry: ComponentRegistry = {
         required: false,
       },
     ],
-    version: "1.0.0",
+    version: "2.0.0",
     author: "QiuYeDx",
     tags: [
       "segmented-control",
@@ -279,6 +287,7 @@ export const componentRegistry: ComponentRegistry = {
       "motion",
       "spring",
       "layout-id",
+      "floating",
       "keyboard",
       "form",
       "chatgpt",

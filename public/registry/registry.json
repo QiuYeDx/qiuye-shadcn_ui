@@ -289,7 +289,7 @@
           "path": "components/qiuye-ui/segmented-control.tsx"
         }
       ],
-      "description": "ChatGPT 风格的分段单选控件，支持 Motion spring 滑块过渡与大、中、小三档尺寸。"
+      "description": "ChatGPT 风格的分段单选控件，支持内嵌与悬浮两种风格、Motion spring 滑块过渡及中、小两档尺寸。"
     },
     {
       "name": "smooth-corners",
