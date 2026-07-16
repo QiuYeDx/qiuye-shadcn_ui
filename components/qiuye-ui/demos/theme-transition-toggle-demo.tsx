@@ -3,11 +3,14 @@
 import * as React from "react";
 import { useTheme } from "next-themes";
 import {
+  Columns3Icon,
   DiamondIcon,
   HexagonIcon,
   LaptopIcon,
+  MoveDiagonal2Icon,
   MoonIcon,
   MousePointer2Icon,
+  ScanLineIcon,
   ShapesIcon,
   SparklesIcon,
   StarIcon,
@@ -16,6 +19,7 @@ import {
 
 import {
   ThemeTransitionToggle,
+  type ThemeTransitionEffect,
   type ThemeTransitionShape,
   useThemeTransition,
 } from "@/components/qiuye-ui/theme-transition-toggle";
@@ -58,7 +62,7 @@ function GeometryDemo() {
   const isDark = resolvedTheme === "dark";
   const { run, isTransitioning } = useThemeTransition({
     isDark,
-    shape: "ellipse",
+    transitionEffect: "split",
     timing: "spring",
     updateTheme: () => setTheme(isDark ? "light" : "dark"),
   });
@@ -129,6 +133,28 @@ const geometryExamples: Array<{
   },
 ];
 
+const transitionEffectExamples: Array<{
+  transitionEffect: Exclude<ThemeTransitionEffect, "reveal">;
+  label: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+}> = [
+  {
+    transitionEffect: "wipe",
+    label: "边缘扫入",
+    icon: ScanLineIcon,
+  },
+  {
+    transitionEffect: "split",
+    label: "轴线展开",
+    icon: Columns3Icon,
+  },
+  {
+    transitionEffect: "diagonal",
+    label: "对角揭幕",
+    icon: MoveDiagonal2Icon,
+  },
+];
+
 function useResolvedDark() {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
@@ -183,7 +209,7 @@ export function ThemeTransitionToggleDemo() {
   const { run, isTransitioning } = useThemeTransition({
     isDark,
     origin: hookButtonRef,
-    shape: "ellipse",
+    transitionEffect: "split",
     timing: "spring",
     updateTheme: () => setTheme(isDark ? "light" : "dark"),
     onFinish: () => setOriginLog("custom trigger"),
@@ -242,9 +268,9 @@ export function ThemeTransitionToggleDemo() {
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1.5">
-              <CardTitle>几何揭幕形状</CardTitle>
+              <CardTitle>可选几何转场</CardTitle>
               <CardDescription>
-                使用 useThemeTransition 接入自定义触发器，也可以直接切换星形、菱形和六边形遮罩
+                分别控制揭幕形状与快照的运动路径，触发点会决定最近的边、轴线或视口角
               </CardDescription>
             </div>
             <ViewSourceButton
@@ -257,7 +283,7 @@ export function ThemeTransitionToggleDemo() {
           <div className="grid gap-4 rounded-lg border bg-muted/20 p-4 sm:grid-cols-[1fr_auto] sm:items-center">
             <div>
               <div className="mb-1 text-sm font-medium">
-                自定义椭圆揭幕触发器
+                自定义轴线展开触发器
               </div>
               <p className="text-sm text-muted-foreground">
                 最近一次动画原点：{originLog}
@@ -304,6 +330,51 @@ export function ThemeTransitionToggleDemo() {
                 />
               </div>
             ))}
+          </div>
+
+          <div className="space-y-3 border-t pt-4">
+            <div>
+              <div className="text-sm font-medium">快照运动路径</div>
+              <p className="text-sm text-muted-foreground">
+                保持新旧主题快照的层级语义，只替换裁剪路径
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {transitionEffectExamples.map(
+                ({ transitionEffect, label, icon: Icon }) => (
+                  <div
+                    key={transitionEffect}
+                    className="flex items-center justify-between gap-3 rounded-lg border bg-muted/20 p-3"
+                  >
+                    <div className="flex min-w-0 items-center gap-2">
+                      <div className="flex size-8 shrink-0 items-center justify-center rounded-md border bg-background">
+                        <Icon className="size-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium">
+                          {label}
+                        </div>
+                        <code className="block truncate text-xs text-muted-foreground">
+                          {`transitionEffect="${transitionEffect}"`}
+                        </code>
+                      </div>
+                    </div>
+                    <ThemeTransitionToggle
+                      isDark={isDark}
+                      onToggle={(nextDark) =>
+                        setTheme(nextDark ? "dark" : "light")
+                      }
+                      transitionEffect={transitionEffect}
+                      variant="secondary"
+                      lightIcon={<Icon className="size-4" />}
+                      darkIcon={<Icon className="size-4" />}
+                      lightLabel={`${label}切换到深色主题`}
+                      darkLabel={`${label}切换到浅色主题`}
+                    />
+                  </div>
+                ),
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>

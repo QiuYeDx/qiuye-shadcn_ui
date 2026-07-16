@@ -844,7 +844,7 @@ export const componentRegistry: ComponentRegistry = {
   [ComponentId.THEME_TRANSITION_TOGGLE]: {
     name: "Theme Transition Toggle",
     description:
-      "基于浏览器 View Transition API 的深浅模式切换组件：从触发点播放圆形、椭圆或多边形揭幕动画，封装按钮、Hook 与纯函数三种复用方式，并在不支持 API 或减少动态效果偏好下自动降级。",
+      "基于浏览器 View Transition API 的深浅模式切换组件：支持从触发点播放圆形、椭圆或多边形揭幕，也可选择边缘扫入、轴线展开与对角揭幕，封装按钮、Hook 与纯函数三种复用方式，并在不支持 API 或减少动态效果偏好下自动降级。",
     category: "交互",
     dependencies: ["lucide-react", "motion", "next-themes"],
     files: {
@@ -891,9 +891,18 @@ export const componentRegistry: ComponentRegistry = {
             default: '"spring"',
           },
           {
+            name: "transitionEffect",
+            type: '"reveal" | "wipe" | "split" | "diagonal"',
+            description:
+              "几何过渡效果：孔径揭幕、最近边缘扫入、触发点轴线展开或最近视口角对角揭幕",
+            required: false,
+            default: '"reveal"',
+          },
+          {
             name: "shape",
             type: '"circle" | "ellipse" | "star" | "diamond" | "hexagon"',
-            description: "揭幕形状：圆形、椭圆、五角星、菱形或六边形",
+            description:
+              "reveal 过渡使用的揭幕形状：圆形、椭圆、五角星、菱形或六边形",
             required: false,
             default: '"circle"',
           },
@@ -923,7 +932,7 @@ export const componentRegistry: ComponentRegistry = {
           {
             name: "extraRadius",
             type: "number",
-            description: "额外覆盖半径，避免视口边角露白",
+            description: "reveal 过渡的额外覆盖半径，避免视口边角露白",
             required: false,
             default: "48",
           },
@@ -1084,9 +1093,18 @@ export const componentRegistry: ComponentRegistry = {
             default: '"spring"',
           },
           {
+            name: "transitionEffect",
+            type: '"reveal" | "wipe" | "split" | "diagonal"',
+            description:
+              "几何过渡效果：孔径揭幕、最近边缘扫入、触发点轴线展开或最近视口角对角揭幕",
+            required: false,
+            default: '"reveal"',
+          },
+          {
             name: "shape",
             type: '"circle" | "ellipse" | "star" | "diamond" | "hexagon"',
-            description: "揭幕形状：圆形、椭圆、五角星、菱形或六边形",
+            description:
+              "reveal 过渡使用的揭幕形状：圆形、椭圆、五角星、菱形或六边形",
             required: false,
             default: '"circle"',
           },
@@ -1153,9 +1171,18 @@ export const componentRegistry: ComponentRegistry = {
             default: '"spring"',
           },
           {
+            name: "transitionEffect",
+            type: '"reveal" | "wipe" | "split" | "diagonal"',
+            description:
+              "几何过渡效果：孔径揭幕、最近边缘扫入、触发点轴线展开或最近视口角对角揭幕",
+            required: false,
+            default: '"reveal"',
+          },
+          {
             name: "shape",
             type: '"circle" | "ellipse" | "star" | "diamond" | "hexagon"',
-            description: "揭幕形状：圆形、椭圆、五角星、菱形或六边形",
+            description:
+              "reveal 过渡使用的揭幕形状：圆形、椭圆、五角星、菱形或六边形",
             required: false,
             default: '"circle"',
           },
@@ -1172,6 +1199,8 @@ export const componentRegistry: ComponentRegistry = {
       "toggle",
       "animation",
       "clip-path",
+      "wipe",
+      "diagonal",
       "next-themes",
       "shadcn",
     ],
