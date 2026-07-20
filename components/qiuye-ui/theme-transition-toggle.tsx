@@ -23,6 +23,8 @@ type DocumentWithViewTransition = Document & {
 
 type ThemeTransitionLayer = "new" | "old";
 type PolygonTransitionShape = "star" | "diamond" | "hexagon";
+type ViewportEdge = "top" | "right" | "bottom" | "left";
+type ViewportCorner = "top-left" | "top-right" | "bottom-right" | "bottom-left";
 
 const ELLIPSE_Y_RATIO = 0.72;
 const STAR_INNER_RADIUS_RATIO = 0.46;
@@ -33,6 +35,8 @@ const POLYGON_COVER_MULTIPLIERS: Record<PolygonTransitionShape, number> = {
 };
 const DEFAULT_TRANSITION_DURATION = 580;
 const DEFAULT_TRANSITION_EASING = "cubic-bezier(0.17,0.84,0.44,1)";
+let activeThemeViewTransition: ViewTransitionLike | undefined;
+let activeThemeClipPathAnimation: Animation | undefined;
 
 /** 主题切换时的几何揭幕形状 */
 export type ThemeTransitionShape =
@@ -47,6 +51,9 @@ export type ThemeTransitionDirection = "auto" | "enter" | "exit";
 
 /** 主题切换动画的时间预设 */
 export type ThemeTransitionTiming = "spring" | "smooth";
+
+/** 主题切换时的几何过渡效果 */
+export type ThemeTransitionEffect = "reveal" | "wipe" | "split" | "diagonal";
 
 /** 计算揭幕动画起点时可使用的来源 */
 export type ThemeTransitionOrigin =
@@ -85,7 +92,16 @@ export interface ThemeTransitionOptions {
    */
   timing?: ThemeTransitionTiming;
   /**
-   * 揭幕形状
+   * 几何过渡效果
+   * - `"reveal"`：从触发点按 shape 扩散或收束
+   * - `"wipe"`：从离触发点最近的视口边缘扫入或扫出
+   * - `"split"`：从穿过触发点的轴线向两侧展开或收拢
+   * - `"diagonal"`：从离触发点最近的视口角做对角揭幕
+   * @default "reveal"
+   */
+  transitionEffect?: ThemeTransitionEffect;
+  /**
+   * reveal 过渡使用的揭幕形状
    * - `"circle"`：圆形揭幕
    * - `"ellipse"`：椭圆揭幕
    * - `"star"`：五角星揭幕
@@ -114,7 +130,7 @@ export interface ThemeTransitionOptions {
    */
   themeClassName?: string | null;
   /**
-   * 额外覆盖半径，避免大屏和缩放场景下边角露白
+   * reveal 过渡的额外覆盖半径，避免大屏和缩放场景下边角露白
    * @default 48
    */
   extraRadius?: number;
@@ -284,6 +300,42 @@ function getViewportSize() {
   };
 }
 
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function getNearestViewportEdge(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): ViewportEdge {
+  const pointX = clamp(x, 0, width);
+  const pointY = clamp(y, 0, height);
+  const distances: Array<{ edge: ViewportEdge; distance: number }> = [
+    { edge: "left", distance: pointX },
+    { edge: "right", distance: width - pointX },
+    { edge: "top", distance: pointY },
+    { edge: "bottom", distance: height - pointY },
+  ];
+
+  return distances.reduce((nearest, current) =>
+    current.distance < nearest.distance ? current : nearest,
+  ).edge;
+}
+
+function getNearestViewportCorner(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): ViewportCorner {
+  const horizontal = x <= width / 2 ? "left" : "right";
+  const vertical = y <= height / 2 ? "top" : "bottom";
+
+  return `${vertical}-${horizontal}` as ViewportCorner;
+}
+
 function getCircleCoverRadius(x: number, y: number, extraRadius: number) {
   if (typeof window === "undefined") return extraRadius;
 
@@ -407,24 +459,85 @@ function waitForNextPaint() {
 function getClipPathKeyframes({
   x,
   y,
+  width,
+  height,
   radiusX,
   radiusY,
   shape,
+  transitionEffect,
   layer,
 }: {
   x: number;
   y: number;
+  width: number;
+  height: number;
   radiusX: number;
   radiusY: number;
   shape: ThemeTransitionShape;
+  transitionEffect: ThemeTransitionEffect;
   layer: ThemeTransitionLayer;
 }) {
-  const zero = getClipPathValue({ x, y, radiusX: 0, radiusY: 0, shape });
-  const full = getClipPathValue({ x, y, radiusX, radiusY, shape });
+  const edge = getNearestViewportEdge(x, y, width, height);
+  const pointX = clamp(x, 0, width);
+  const pointY = clamp(y, 0, height);
+  let hidden: string;
+  let visible: string;
+
+  if (transitionEffect === "wipe") {
+    const hiddenInsets: Record<ViewportEdge, string> = {
+      top: "inset(0% 0% 100% 0%)",
+      right: "inset(0% 0% 0% 100%)",
+      bottom: "inset(100% 0% 0% 0%)",
+      left: "inset(0% 100% 0% 0%)",
+    };
+
+    hidden = hiddenInsets[edge];
+    visible = "inset(0% 0% 0% 0%)";
+  } else if (transitionEffect === "split") {
+    hidden =
+      edge === "left" || edge === "right"
+        ? `inset(0px ${width - pointX}px 0px ${pointX}px)`
+        : `inset(${pointY}px 0px ${height - pointY}px 0px)`;
+    visible = "inset(0px 0px 0px 0px)";
+  } else if (transitionEffect === "diagonal") {
+    const corner = getNearestViewportCorner(x, y, width, height);
+    const diagonalPaths: Record<
+      ViewportCorner,
+      { hidden: string; visible: string }
+    > = {
+      "top-left": {
+        hidden: "polygon(0% 0%, 0% 0%, 0% 0%)",
+        visible: "polygon(0% 0%, 202% 0%, 0% 202%)",
+      },
+      "top-right": {
+        hidden: "polygon(100% 0%, 100% 0%, 100% 0%)",
+        visible: "polygon(100% 0%, -102% 0%, 100% 202%)",
+      },
+      "bottom-right": {
+        hidden: "polygon(100% 100%, 100% 100%, 100% 100%)",
+        visible: "polygon(100% 100%, -102% 100%, 100% -102%)",
+      },
+      "bottom-left": {
+        hidden: "polygon(0% 100%, 0% 100%, 0% 100%)",
+        visible: "polygon(0% 100%, 0% -102%, 202% 100%)",
+      },
+    };
+
+    ({ hidden, visible } = diagonalPaths[corner]);
+  } else {
+    hidden = getClipPathValue({
+      x,
+      y,
+      radiusX: 0,
+      radiusY: 0,
+      shape,
+    });
+    visible = getClipPathValue({ x, y, radiusX, radiusY, shape });
+  }
 
   return layer === "old"
-    ? [{ clipPath: full }, { clipPath: zero }]
-    : [{ clipPath: zero }, { clipPath: full }];
+    ? [{ clipPath: visible }, { clipPath: hidden }]
+    : [{ clipPath: hidden }, { clipPath: visible }];
 }
 
 function getTransitionLayer(
@@ -473,7 +586,6 @@ function createViewTransitionStyle(layer: ThemeTransitionLayer) {
   animation: none !important;
   mix-blend-mode: normal !important;
   backface-visibility: hidden;
-  will-change: clip-path;
 }
 
 ::view-transition-old(root) {
@@ -482,6 +594,10 @@ function createViewTransitionStyle(layer: ThemeTransitionLayer) {
 
 ::view-transition-new(root) {
   z-index: ${layer === "new" ? 2 : 1};
+}
+
+::view-transition-${layer}(root) {
+  will-change: clip-path;
 }
 `;
   document.head.appendChild(style);
@@ -515,6 +631,7 @@ export async function runThemeViewTransition({
   duration = DEFAULT_TRANSITION_DURATION,
   easing = DEFAULT_TRANSITION_EASING,
   timing = "spring",
+  transitionEffect = "reveal",
   shape = "circle",
   direction = "auto",
   isDark = false,
@@ -539,6 +656,7 @@ export async function runThemeViewTransition({
   }
 
   const { x, y } = getPointFromOrigin(origin);
+  const { width, height } = getViewportSize();
   const circleRadius = getCircleCoverRadius(x, y, extraRadius);
   const { radiusX, radiusY } =
     shape === "ellipse"
@@ -550,9 +668,12 @@ export async function runThemeViewTransition({
   const keyframes = getClipPathKeyframes({
     x,
     y,
+    width,
+    height,
     radiusX,
     radiusY,
     shape,
+    transitionEffect,
     layer,
   });
   const pseudoElement =
@@ -560,6 +681,9 @@ export async function runThemeViewTransition({
       ? "::view-transition-old(root)"
       : "::view-transition-new(root)";
   const documentWithTransition = document as DocumentWithViewTransition;
+
+  activeThemeClipPathAnimation?.cancel();
+  activeThemeViewTransition?.skipTransition();
   const style = createViewTransitionStyle(layer);
   let clipPathAnimation: Animation | undefined;
 
@@ -577,6 +701,19 @@ export async function runThemeViewTransition({
     return;
   }
 
+  activeThemeViewTransition = transition;
+  let didRequestFinish = false;
+  const finishOnResize = () => {
+    if (didRequestFinish) return;
+    didRequestFinish = true;
+    clipPathAnimation?.cancel();
+    transition.skipTransition();
+  };
+  window.addEventListener("resize", finishOnResize, { once: true });
+  window.visualViewport?.addEventListener("resize", finishOnResize, {
+    once: true,
+  });
+
   try {
     await transition.ready;
 
@@ -586,6 +723,7 @@ export async function runThemeViewTransition({
       fill: "both",
       pseudoElement,
     });
+    activeThemeClipPathAnimation = clipPathAnimation;
 
     await Promise.allSettled([
       transition.finished,
@@ -594,9 +732,17 @@ export async function runThemeViewTransition({
   } catch {
     await transition.updateCallbackDone.catch(() => undefined);
   } finally {
+    window.removeEventListener("resize", finishOnResize);
+    window.visualViewport?.removeEventListener("resize", finishOnResize);
     await waitForNextPaint();
     clipPathAnimation?.cancel();
     style.remove();
+    if (activeThemeViewTransition === transition) {
+      activeThemeViewTransition = undefined;
+    }
+    if (activeThemeClipPathAnimation === clipPathAnimation) {
+      activeThemeClipPathAnimation = undefined;
+    }
     onFinish?.();
   }
 }
@@ -623,6 +769,7 @@ export function useThemeTransition({
   duration = DEFAULT_TRANSITION_DURATION,
   easing = DEFAULT_TRANSITION_EASING,
   timing = "spring",
+  transitionEffect = "reveal",
   shape = "circle",
   direction = "auto",
   isDark = false,
@@ -644,6 +791,7 @@ export function useThemeTransition({
         duration,
         easing,
         timing,
+        transitionEffect,
         shape,
         direction,
         isDark,
@@ -672,6 +820,7 @@ export function useThemeTransition({
       timing,
       targetDark,
       themeClassName,
+      transitionEffect,
       updateTheme,
     ],
   );
@@ -683,7 +832,7 @@ export function useThemeTransition({
  * ThemeTransitionToggle — View Transition 深浅模式切换按钮
  *
  * 提供可直接安装使用的主题按钮：
- * - 用浏览器 View Transition API 做全屏圆形、椭圆或多边形揭幕
+ * - 用浏览器 View Transition API 做孔径揭幕、边缘扫入、轴线展开或对角揭幕
  * - 复用 DualStateToggle，默认带图标旋转与点击缩放反馈
  * - 默认从按钮中心扩散，支持鼠标点击位置、坐标或居中降级
  * - 暴露 `runThemeViewTransition` 与 `useThemeTransition` 复用能力
@@ -714,6 +863,7 @@ export const ThemeTransitionToggle = React.forwardRef<
     duration = DEFAULT_TRANSITION_DURATION,
     easing = DEFAULT_TRANSITION_EASING,
     timing = "spring",
+    transitionEffect = "reveal",
     shape = "circle",
     direction = "auto",
     targetDark,
@@ -766,6 +916,7 @@ export const ThemeTransitionToggle = React.forwardRef<
         duration,
         easing,
         timing,
+        transitionEffect,
         shape,
         direction,
         targetDark: targetDark ?? nextDark,
@@ -797,6 +948,7 @@ export const ThemeTransitionToggle = React.forwardRef<
       timing,
       targetDark,
       themeClassName,
+      transitionEffect,
     ],
   );
 
