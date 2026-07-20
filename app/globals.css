@@ -121,6 +121,24 @@
   }
 }
 
+/* SmoothCorners 的全局渐进增强规则，避免组件挂载后才注入样式。 */
+.smooth-corners {
+  border-radius: var(--sc-r);
+}
+
+.button-smooth-corners {
+  --sc-r: 8px;
+  --sc-i: 12.8px;
+  --sc-s: superellipse(1.7775);
+}
+
+@supports (corner-shape: superellipse(2)) {
+  .smooth-corners {
+    border-radius: var(--sc-i);
+    corner-shape: var(--sc-s);
+  }
+}
+
 html {
   /* 始终预留滚动条宽度, 防止页面内容宽度来回变化出现视觉闪烁 */
   overflow-y: scroll;               /* 用 scroll 而非 auto, 确保 scrollbar-gutter 始终生效 */
