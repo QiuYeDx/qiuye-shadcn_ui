@@ -63,17 +63,11 @@ const sectionVariants = {
 } satisfies Variants;
 
 const gridVariants = {
-  hidden: {},
-  show: {
-    transition: {
-      delayChildren: 0.14,
-      staggerChildren: 0.04,
-    },
-  },
   exit: {
+    opacity: 0,
     transition: {
-      staggerChildren: 0.015,
-      staggerDirection: -1,
+      duration: 0.14,
+      ease: ENTRANCE_EASE,
     },
   },
 } satisfies Variants;
@@ -83,14 +77,15 @@ const cardVariants = {
     opacity: 0,
     transform: "translate3d(0, 12px, 0) scale(0.992)",
   },
-  show: {
+  show: (index: number = 0) => ({
     opacity: 1,
     transform: "translate3d(0, 0, 0) scale(1)",
     transition: {
+      delay: 0.14 + index * 0.04,
       duration: 0.36,
       ease: ENTRANCE_EASE,
     },
-  },
+  }),
   exit: {
     opacity: 0,
     transform: "translate3d(0, -4px, 0) scale(0.995)",
@@ -265,15 +260,17 @@ export default function ComponentsPage() {
             key="grid"
             className="grid grid-cols-1 @xl:grid-cols-2 @4xl:grid-cols-3 gap-6"
             variants={gridVariants}
-            initial={initialState}
-            animate="show"
             exit={prefersReducedMotion ? undefined : "exit"}
           >
             <AnimatePresence mode="popLayout">
-              {filteredComponents.map((component) => (
+              {filteredComponents.map((component, index) => (
                 <motion.div
                   key={component.cliName}
+                  custom={index}
                   variants={cardVariants}
+                  initial={prefersReducedMotion ? false : "hidden"}
+                  animate="show"
+                  exit={prefersReducedMotion ? undefined : "exit"}
                   layout={!prefersReducedMotion}
                   transition={{
                     layout: {
