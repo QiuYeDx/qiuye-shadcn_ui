@@ -288,7 +288,7 @@ export const SegmentedControl = React.forwardRef<
                 "focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-inset",
                 active
                   ? "z-0 text-foreground"
-                  : "z-[1] text-muted-foreground hover:text-foreground",
+                  : "z-[1] text-muted-foreground",
                 itemDisabled && "cursor-not-allowed opacity-45",
                 variant === "contained"
                   ? styles.containedItem
