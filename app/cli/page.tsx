@@ -18,6 +18,12 @@ import {
   WandSparklesIcon,
   type LucideIcon,
 } from "lucide-react";
+import {
+  motion,
+  useReducedMotion,
+  type HTMLMotionProps,
+  type Variants,
+} from "motion/react";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { useClipboard } from "use-clipboard-copy";
@@ -39,6 +45,161 @@ import { getAllComponents, type ComponentInfo } from "@/lib/registry";
 import { cn } from "@/lib/utils";
 
 type PackageManager = "npm" | "pnpm";
+
+const ENTRANCE_EASE = [0.22, 1, 0.36, 1] as const;
+const REVEAL_VIEWPORT = {
+  once: true,
+  amount: 0.08,
+  margin: "0px 0px -56px 0px",
+} as const;
+
+const heroCopyVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      delayChildren: 0.06,
+      staggerChildren: 0.06,
+    },
+  },
+} satisfies Variants;
+
+const heroItemVariants = {
+  hidden: {
+    opacity: 0,
+    transform: "translate3d(0, 10px, 0)",
+  },
+  visible: {
+    opacity: 1,
+    transform: "translate3d(0, 0, 0)",
+    transition: {
+      duration: 0.42,
+      ease: ENTRANCE_EASE,
+    },
+  },
+} satisfies Variants;
+
+const heroTitleVariants = {
+  hidden: {
+    opacity: 0,
+    transform: "translate3d(0, 14px, 0)",
+  },
+  visible: {
+    opacity: 1,
+    transform: "translate3d(0, 0, 0)",
+    transition: {
+      duration: 0.5,
+      ease: ENTRANCE_EASE,
+    },
+  },
+} satisfies Variants;
+
+const heroPanelVariants = {
+  hidden: {
+    opacity: 0,
+    transform: "translate3d(14px, 8px, 0) scale(0.985)",
+  },
+  visible: {
+    opacity: 1,
+    transform: "translate3d(0, 0, 0) scale(1)",
+    transition: {
+      delay: 0.16,
+      duration: 0.52,
+      ease: ENTRANCE_EASE,
+    },
+  },
+} satisfies Variants;
+
+const sectionFlowVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      delayChildren: 0.02,
+      staggerChildren: 0.1,
+    },
+  },
+} satisfies Variants;
+
+const sectionColumnsVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      delayChildren: 0.02,
+      staggerChildren: 0.08,
+    },
+  },
+} satisfies Variants;
+
+const sectionHeaderVariants = {
+  hidden: {
+    opacity: 0,
+    transform: "translate3d(0, 12px, 0)",
+  },
+  visible: {
+    opacity: 1,
+    transform: "translate3d(0, 0, 0)",
+    transition: {
+      duration: 0.4,
+      ease: ENTRANCE_EASE,
+    },
+  },
+} satisfies Variants;
+
+const cardGridVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.07,
+    },
+  },
+} satisfies Variants;
+
+const componentGridVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.045,
+    },
+  },
+} satisfies Variants;
+
+const sideColumnVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+} satisfies Variants;
+
+const cardVariants = {
+  hidden: {
+    opacity: 0,
+    transform: "translate3d(0, 14px, 0) scale(0.99)",
+  },
+  visible: {
+    opacity: 1,
+    transform: "translate3d(0, 0, 0) scale(1)",
+    transition: {
+      duration: 0.42,
+      ease: ENTRANCE_EASE,
+    },
+  },
+} satisfies Variants;
+
+const footerActionsVariants = {
+  hidden: {
+    opacity: 0,
+    transform: "translate3d(10px, 0, 0)",
+  },
+  visible: {
+    opacity: 1,
+    transform: "translate3d(0, 0, 0)",
+    transition: {
+      duration: 0.4,
+      ease: ENTRANCE_EASE,
+    },
+  },
+} satisfies Variants;
 
 const registryConfig = `{
   "registries": {
@@ -76,20 +237,21 @@ const cursorMcpConfig = `{
 function Surface({
   children,
   className,
-}: {
+  ...props
+}: HTMLMotionProps<"div"> & {
   children: ReactNode;
-  className?: string;
 }) {
   return (
-    <SmoothCorners
-      radius={8}
-      smoothing={0.62}
-      className={cn(
-        "min-w-0 max-w-full rounded-lg border bg-card text-card-foreground",
-        className,
-      )}
-    >
-      {children}
+    <SmoothCorners asChild radius={8} smoothing={0.62}>
+      <motion.div
+        className={cn(
+          "min-w-0 max-w-full rounded-lg border bg-card text-card-foreground",
+          className,
+        )}
+        {...props}
+      >
+        {children}
+      </motion.div>
     </SmoothCorners>
   );
 }
@@ -168,10 +330,12 @@ function StepIcon({ icon: Icon }: { icon: LucideIcon }) {
 
 export default function QuickStartPage() {
   const { resolvedTheme } = useTheme();
+  const prefersReducedMotion = useReducedMotion();
   const clipboard = useClipboard();
   const [packageManager, setPackageManager] = useState<PackageManager>("pnpm");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const isDark = resolvedTheme === "dark";
+  const initialState = prefersReducedMotion ? "visible" : "hidden";
 
   const components = useMemo(() => getAllComponents(), []);
   const featuredComponents = useMemo(() => {
@@ -254,26 +418,45 @@ export default function QuickStartPage() {
 
   return (
     <div className="bg-background">
-      <section className="border-b">
+      <motion.section
+        className="border-b"
+        initial={initialState}
+        animate="visible"
+      >
         <div className="mx-auto grid w-full max-w-screen-2xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,1fr)_28rem] lg:px-8 lg:py-16">
-          <div className="flex min-w-0 flex-col justify-center">
-            <div className="mb-5 flex flex-wrap items-center gap-2">
+          <motion.div
+            className="flex min-w-0 flex-col justify-center"
+            variants={heroCopyVariants}
+          >
+            <motion.div
+              className="mb-5 flex flex-wrap items-center gap-2"
+              variants={heroItemVariants}
+            >
               <Badge variant="outline" className="gap-1.5">
                 <SparklesIcon className="size-3" />
                 {components.length} 个可安装组件
               </Badge>
               <Badge variant="secondary">Based on shadcn/ui</Badge>
-            </div>
+            </motion.div>
 
-            <h1 className="max-w-3xl text-4xl font-semibold tracking-normal text-foreground sm:text-5xl lg:text-6xl">
+            <motion.h1
+              className="max-w-3xl text-4xl font-semibold tracking-normal text-foreground sm:text-5xl lg:text-6xl"
+              variants={heroTitleVariants}
+            >
               QiuYe UI 快速开始
-            </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
+            </motion.h1>
+            <motion.p
+              className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg"
+              variants={heroItemVariants}
+            >
               用 shadcn/ui 熟悉的方式，把 QiuYe UI 的交互组件添加到你的项目里。
               先接入 registry，再按需安装组件，组件源码会落在你自己的代码库中。
-            </p>
+            </motion.p>
 
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <motion.div
+              className="mt-7 flex flex-col gap-3 sm:flex-row"
+              variants={heroItemVariants}
+            >
               <Button asChild size="lg" className="w-full sm:w-auto">
                 <Link href="/components">
                   浏览组件
@@ -295,10 +478,10 @@ export default function QuickStartPage() {
                   GitHub
                 </Link>
               </Button>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          <Surface className="p-4 shadow-sm">
+          <Surface className="p-4 shadow-sm" variants={heroPanelVariants}>
             <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-medium">推荐第一步</p>
@@ -341,10 +524,19 @@ export default function QuickStartPage() {
             </div>
           </Surface>
         </div>
-      </section>
+      </motion.section>
 
-      <section className="mx-auto w-full max-w-screen-2xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mb-7 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+      <motion.section
+        className="mx-auto w-full max-w-screen-2xl px-4 py-12 sm:px-6 lg:px-8"
+        variants={sectionFlowVariants}
+        initial={initialState}
+        whileInView="visible"
+        viewport={REVEAL_VIEWPORT}
+      >
+        <motion.div
+          className="mb-7 flex flex-col gap-3 md:flex-row md:items-end md:justify-between"
+          variants={sectionHeaderVariants}
+        >
           <div>
             <p className="text-sm font-medium text-muted-foreground">
               Start Path
@@ -357,11 +549,18 @@ export default function QuickStartPage() {
             这条路径适合 Next.js、Vite、React Router 等已经使用 shadcn/ui
             的项目。复制命令前先确认当前终端位于项目根目录。
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid gap-4 lg:grid-cols-2">
+        <motion.div
+          className="grid gap-4 lg:grid-cols-2"
+          variants={cardGridVariants}
+        >
           {steps.map((step) => (
-            <Surface key={step.eyebrow} className="p-5 shadow-sm">
+            <Surface
+              key={step.eyebrow}
+              className="p-5 shadow-sm"
+              variants={cardVariants}
+            >
               <div className="mb-5 flex items-start gap-4">
                 <StepIcon icon={step.icon} />
                 <div className="min-w-0">
@@ -384,13 +583,24 @@ export default function QuickStartPage() {
               />
             </Surface>
           ))}
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
-      <section className="border-y bg-muted/25">
-        <div className="mx-auto grid w-full max-w-screen-2xl gap-6 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:px-8">
-          <div>
-            <div className="mb-6 flex items-center justify-between gap-4">
+      <motion.section
+        className="border-y bg-muted/25"
+        initial={initialState}
+        whileInView="visible"
+        viewport={REVEAL_VIEWPORT}
+      >
+        <motion.div
+          className="mx-auto grid w-full max-w-screen-2xl gap-6 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:px-8"
+          variants={sectionColumnsVariants}
+        >
+          <motion.div variants={sectionFlowVariants}>
+            <motion.div
+              className="mb-6 flex items-center justify-between gap-4"
+              variants={sectionHeaderVariants}
+            >
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
                   Components
@@ -409,17 +619,21 @@ export default function QuickStartPage() {
                   <ArrowRightIcon className="size-4" />
                 </Link>
               </Button>
-            </div>
+            </motion.div>
 
-            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            <motion.div
+              className="grid gap-3 md:grid-cols-2 xl:grid-cols-3"
+              variants={componentGridVariants}
+            >
               {featuredComponents.map((component) => {
                 const command = `${commandPrefix} shadcn@latest add @qiuye-ui/${component.cliName}`;
                 const key = `component-${component.cliName}`;
 
                 return (
-                  <div
+                  <motion.div
                     key={component.cliName}
                     className="flex min-h-52 flex-col justify-between rounded-lg border bg-background p-4 shadow-sm"
+                    variants={cardVariants}
                   >
                     <div className="min-w-0">
                       <div className="mb-3 flex items-center justify-between gap-3">
@@ -449,14 +663,17 @@ export default function QuickStartPage() {
                         onCopy={() => copyText(command, key, "安装命令")}
                       />
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          <div className="grid content-start gap-4">
-            <Surface className="p-5">
+          <motion.div
+            className="grid content-start gap-4"
+            variants={sideColumnVariants}
+          >
+            <Surface className="p-5" variants={cardVariants}>
               <div className="mb-4 flex items-center gap-3">
                 <WandSparklesIcon className="size-5" />
                 <h3 className="text-lg font-semibold tracking-normal">
@@ -475,7 +692,7 @@ export default function QuickStartPage() {
               />
             </Surface>
 
-            <Surface className="p-5">
+            <Surface className="p-5" variants={cardVariants}>
               <div className="mb-4 flex items-center gap-3">
                 <LifeBuoyIcon className="size-5" />
                 <h3 className="text-lg font-semibold tracking-normal">
@@ -497,12 +714,18 @@ export default function QuickStartPage() {
                 </li>
               </ul>
             </Surface>
-          </div>
-        </div>
-      </section>
+          </motion.div>
+        </motion.div>
+      </motion.section>
 
-      <section className="mx-auto grid w-full max-w-screen-2xl gap-4 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:px-8">
-        <Surface className="p-5">
+      <motion.section
+        className="mx-auto grid w-full max-w-screen-2xl gap-4 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:px-8"
+        variants={cardGridVariants}
+        initial={initialState}
+        whileInView="visible"
+        viewport={REVEAL_VIEWPORT}
+      >
+        <Surface className="p-5" variants={cardVariants}>
           <div className="mb-4 flex items-start justify-between gap-4">
             <div>
               <p className="text-sm font-medium text-muted-foreground">
@@ -541,7 +764,7 @@ export default function QuickStartPage() {
           </div>
         </Surface>
 
-        <Surface className="p-5">
+        <Surface className="p-5" variants={cardVariants}>
           <div className="mb-4 flex items-start justify-between gap-4">
             <div>
               <p className="text-sm font-medium text-muted-foreground">
@@ -573,19 +796,30 @@ export default function QuickStartPage() {
             isDark={isDark}
           />
         </Surface>
-      </section>
+      </motion.section>
 
-      <section className="border-t">
-        <div className="mx-auto flex w-full max-w-screen-2xl flex-col gap-4 px-4 py-10 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
-          <div>
+      <motion.section
+        className="border-t"
+        initial={initialState}
+        whileInView="visible"
+        viewport={REVEAL_VIEWPORT}
+      >
+        <motion.div
+          className="mx-auto flex w-full max-w-screen-2xl flex-col gap-4 px-4 py-10 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8"
+          variants={sectionColumnsVariants}
+        >
+          <motion.div variants={sectionHeaderVariants}>
             <h2 className="text-2xl font-semibold tracking-normal">
               准备挑组件了？
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
               组件页包含预览、Props、基础用法和安装命令。
             </p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
+          </motion.div>
+          <motion.div
+            className="flex flex-col gap-3 sm:flex-row"
+            variants={footerActionsVariants}
+          >
             <Button asChild>
               <Link href="/components">
                 打开组件列表
@@ -602,9 +836,9 @@ export default function QuickStartPage() {
                 <ExternalLinkIcon className="size-4" />
               </Link>
             </Button>
-          </div>
-        </div>
-      </section>
+          </motion.div>
+        </motion.div>
+      </motion.section>
     </div>
   );
 }
