@@ -3,7 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Search, Package, Copy, CheckCircle } from "lucide-react";
-import { motion, stagger, AnimatePresence } from "motion/react";
+import {
+  motion,
+  AnimatePresence,
+  useReducedMotion,
+  type Variants,
+} from "motion/react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,11 +35,102 @@ import {
 import { useClipboard } from "use-clipboard-copy";
 import { toast } from "sonner";
 
+const ENTRANCE_EASE = [0.22, 1, 0.36, 1] as const;
+
+const pageVariants = {
+  hidden: {},
+  show: {
+    transition: {
+      delayChildren: 0.04,
+      staggerChildren: 0.07,
+    },
+  },
+} satisfies Variants;
+
+const sectionVariants = {
+  hidden: {
+    opacity: 0,
+    transform: "translate3d(0, 10px, 0)",
+  },
+  show: {
+    opacity: 1,
+    transform: "translate3d(0, 0, 0)",
+    transition: {
+      duration: 0.38,
+      ease: ENTRANCE_EASE,
+    },
+  },
+} satisfies Variants;
+
+const gridVariants = {
+  hidden: {},
+  show: {
+    transition: {
+      delayChildren: 0.14,
+      staggerChildren: 0.04,
+    },
+  },
+  exit: {
+    transition: {
+      staggerChildren: 0.015,
+      staggerDirection: -1,
+    },
+  },
+} satisfies Variants;
+
+const cardVariants = {
+  hidden: {
+    opacity: 0,
+    transform: "translate3d(0, 12px, 0) scale(0.992)",
+  },
+  show: {
+    opacity: 1,
+    transform: "translate3d(0, 0, 0) scale(1)",
+    transition: {
+      duration: 0.36,
+      ease: ENTRANCE_EASE,
+    },
+  },
+  exit: {
+    opacity: 0,
+    transform: "translate3d(0, -4px, 0) scale(0.995)",
+    transition: {
+      duration: 0.16,
+      ease: ENTRANCE_EASE,
+    },
+  },
+} satisfies Variants;
+
+const emptyStateVariants = {
+  hidden: {
+    opacity: 0,
+    transform: "translate3d(0, 8px, 0)",
+  },
+  show: {
+    opacity: 1,
+    transform: "translate3d(0, 0, 0)",
+    transition: {
+      duration: 0.24,
+      ease: ENTRANCE_EASE,
+    },
+  },
+  exit: {
+    opacity: 0,
+    transform: "translate3d(0, 4px, 0)",
+    transition: {
+      duration: 0.14,
+      ease: ENTRANCE_EASE,
+    },
+  },
+} satisfies Variants;
+
 export default function ComponentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [packageManager, setPackageManager] = useState<"npm" | "pnpm">("pnpm");
+  const prefersReducedMotion = useReducedMotion();
   const clipboard = useClipboard();
+  const initialState = prefersReducedMotion ? "show" : "hidden";
 
   const allComponents = getAllComponents();
   const categories = getCategories();
@@ -71,66 +167,16 @@ export default function ComponentsPage() {
     });
   };
 
-  // 父级网格：先进场，再播放子项；离场时等子项先退场
-  const gridVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        when: "beforeChildren",
-        delayChildren: stagger(0.18),
-        type: "spring",
-        visualDuration: 0.25,
-        bounce: 0.12,
-      },
-    },
-    // 只有在整个网格卸载时才会触发（例如外层条件渲染切换）
-    exit: {
-      opacity: 0,
-      y: 12,
-      transition: {
-        when: "afterChildren", // 先等子项完成 exit
-        duration: 0.2, // 这里用 tween，让离场更可控
-      },
-    },
-  } as const;
-
-  // 子卡片：进入 / 离开动画
-  const cardVariants = {
-    hidden: { opacity: 0, y: 20, scale: 0.98 },
-    show: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        type: "spring",
-        visualDuration: 0.45,
-        bounce: 0.48,
-      },
-    },
-    exit: {
-      opacity: 0,
-      y: -8,
-      scale: 0.98,
-      transition: { duration: 0.2 },
-    },
-  } as const;
-
   return (
-    <div className="@container container mx-auto px-6 py-8">
+    <motion.div
+      className="@container container mx-auto px-6 py-8"
+      variants={pageVariants}
+      initial={initialState}
+      animate="show"
+    >
       {/* Header */}
       <div className="mb-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            type: "spring",
-            stiffness: 120,
-            damping: 40,
-            duration: 0.25,
-          }}
-        >
+        <motion.div variants={sectionVariants}>
           <h1 className="text-4xl font-bold tracking-tight mb-4">QiuYe UI</h1>
           <p className="text-xl text-muted-foreground mb-6">
             精心设计的自定义UI组件，让您的应用更加出色
@@ -154,18 +200,7 @@ export default function ComponentsPage() {
       </div>
 
       {/* Search and Filter */}
-      <motion.div
-        className="mb-8"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          type: "spring",
-          stiffness: 120,
-          damping: 40,
-          duration: 0.45,
-          delay: 0.25,
-        }}
-      >
+      <motion.div className="mb-8" variants={sectionVariants}>
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -178,7 +213,9 @@ export default function ComponentsPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground shrink-0">包管理器:</span>
+            <span className="text-sm text-muted-foreground shrink-0">
+              包管理器:
+            </span>
             <SegmentedControl
               aria-label="包管理器"
               value={packageManager}
@@ -202,22 +239,20 @@ export default function ComponentsPage() {
             items={categoryItems}
             gridColsClass="sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
             triggerClassName="text-xs"
-          >
-          </ResponsiveTabs>
+          />
         </div>
       </motion.div>
 
-      {/* Components Grid / Empty State 切换：带离场 */}
+      {/* Components Grid / Empty State */}
       <AnimatePresence mode="wait">
         {filteredComponents.length === 0 ? (
-          // 空态：等网格离场完再出现
           <motion.div
             key="empty"
             className="text-center py-12"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ type: "tween", duration: 0.25 }}
+            variants={emptyStateVariants}
+            initial={initialState}
+            animate="show"
+            exit={prefersReducedMotion ? undefined : "exit"}
           >
             <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">没有找到匹配的组件</h3>
@@ -226,23 +261,38 @@ export default function ComponentsPage() {
             </p>
           </motion.div>
         ) : (
-          // 网格：父先、子后；移除子项时播放 exit
           <motion.div
             key="grid"
             className="grid grid-cols-1 @xl:grid-cols-2 @4xl:grid-cols-3 gap-6"
             variants={gridVariants}
-            initial="hidden"
+            initial={initialState}
             animate="show"
-            exit="exit"
+            exit={prefersReducedMotion ? undefined : "exit"}
           >
             <AnimatePresence mode="popLayout">
               {filteredComponents.map((component) => (
                 <motion.div
-                  key={component.cliName} // 使用稳定 key，确保正确的出场动画
+                  key={component.cliName}
                   variants={cardVariants}
-                  layout // 位置变化时做流畅过渡
-                  // exit="exit" // 设置 exit 后, 父先子后的 stagger 入场动画就失效了
-                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                  layout={!prefersReducedMotion}
+                  transition={{
+                    layout: {
+                      type: "spring",
+                      duration: 0.3,
+                      bounce: 0.08,
+                    },
+                  }}
+                  whileHover={
+                    prefersReducedMotion
+                      ? undefined
+                      : {
+                          y: -3,
+                          transition: {
+                            duration: 0.16,
+                            ease: ENTRANCE_EASE,
+                          },
+                        }
+                  }
                 >
                   <ComponentCard
                     component={component}
@@ -255,7 +305,7 @@ export default function ComponentsPage() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
 
@@ -265,7 +315,6 @@ interface ComponentCardProps {
   packageManager: "npm" | "pnpm";
 }
 
-// 精简后的子组件：不再包一个 motion.div，动画交给父级
 function ComponentCard({
   component,
   onCopyCommand,
@@ -288,7 +337,7 @@ function ComponentCard({
     <SmoothCorners
       radius={18}
       smoothing={0.68}
-      className="h-full rounded-lg border bg-card text-card-foreground shadow-sm transition-all duration-300 hover:shadow-lg"
+      className="h-full rounded-lg border bg-card text-card-foreground shadow-sm transition-shadow duration-200 hover:shadow-lg"
     >
       <CardHeader>
         <div className="flex items-start justify-between">
