@@ -205,13 +205,21 @@ export interface MatrixFrameContext {
   readonly dpr: number;
 }
 
-/** 把原始 RGBA 采样数据映射到主信号的函数 */
+/**
+ * 把原始 RGBA 采样数据映射到主信号的同步函数
+ *
+ * 回调必须在本次调用中完成写入，不能返回 Promise 或异步持有 frame/context。
+ */
 export type MatrixSignalMapper = (
   frame: MatrixFrame,
   context: MatrixFrameContext,
 ) => void;
 
-/** 原地转换整帧主信号的函数 */
+/**
+ * 原地转换整帧主信号的同步函数
+ *
+ * 回调必须在本次调用中完成转换，不能返回 Promise 或异步持有 frame/context。
+ */
 export type MatrixSignalTransform = (
   frame: MatrixFrame,
   context: MatrixFrameContext,
@@ -283,19 +291,34 @@ export interface MatrixRenderer {
   readonly cellAspectRatio?: number;
   /** Renderer 建议的自动模式目标帧率 */
   readonly preferredFrameRate?: 30 | 60;
-  /** 在 Canvas、网格、DPR 或 Renderer 身份变化后准备缓存 */
+  /**
+   * 在 Canvas、网格、DPR 或 Renderer 身份变化后同步准备缓存
+   *
+   * ctx 指向内部 staging Canvas，并非 MatrixEffectHandle.canvas。回调不能返回
+   * Promise；额外调用的 save()/restore() 必须自行配平。
+   */
   prepare?(
     ctx: CanvasRenderingContext2D,
     frame: MatrixFrame,
     context: MatrixFrameContext,
   ): void;
-  /** 把当前整帧信号绘制到可见 Canvas */
+  /**
+   * 把当前整帧信号同步绘制到内部 staging Canvas
+   *
+   * 完整成功后核心才会提交到可见 Canvas。回调不能返回 Promise 或异步持有
+   * ctx/frame/context；额外调用的 save()/restore() 必须自行配平。
+   */
   render(
     ctx: CanvasRenderingContext2D,
     frame: MatrixFrame,
     context: MatrixFrameContext,
   ): void;
-  /** Renderer 被替换或组件卸载时释放其内部资源 */
+  /**
+   * Renderer 被替换或组件真正卸载时同步释放内部资源
+   *
+   * 同一实例同一时刻只能由一个 MatrixEffect 独占使用；开发环境 Strict Mode
+   * 的立即 cleanup/setup 会由核心合并。实现必须幂等，且不能返回 Promise。
+   */
   dispose?(): void;
 }
 

@@ -1,3 +1,5 @@
+export { MatrixEffect } from "./matrix-effect";
+
 export {
   createInvertTransform,
   createLevelsTransform,
