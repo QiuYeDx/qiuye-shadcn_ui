@@ -2,7 +2,7 @@
 
 - 创建日期：2026-07-22
 - 更新日期：2026-07-22
-- 当前阶段：设计与文档 Review 已定稿，实现未开始
+- 当前阶段：CORE-1 已完成，待启动 SRC-1
 - 对应设计文档：`docs/设计并开发MatrixEffect组件/MatrixEffect组件开发设计文档.md`
 
 ## 使用方式
@@ -35,7 +35,7 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | PRE-0 需求澄清与设计定稿 | 已完成 | 2026-07-22 | `docs/设计并开发MatrixEffect组件/MatrixEffect组件开发设计文档.md` | Markdown 围栏闭合、无尾随空格；commit `5e5a598` 已推送 | 无单独记录（设计会话） | 无 |
 | PRE-1 文档 Review 与契约补全 | 已完成 | 2026-07-22 | 设计文档、本执行计划 | `git diff --check`、Markdown 围栏与尾随空格检查 | 无单独记录（Review 会话） | P3-2/P3-3 属独立仓库维护任务，不阻塞本功能 |
-| CORE-1 公共类型与信号转换算法 | 未开始 | - | `components/qiuye-ui/matrix-effect/types.ts`, `components/qiuye-ui/matrix-effect/transforms.ts`, `components/qiuye-ui/matrix-effect/index.ts` | 待执行 | 待创建 | 无 |
+| CORE-1 公共类型与信号转换算法 | 已完成 | 2026-07-22 | `components/qiuye-ui/matrix-effect/types.ts`, `components/qiuye-ui/matrix-effect/transforms.ts`, `components/qiuye-ui/matrix-effect/index.ts` | pnpm 8.7.0 lint、TypeScript、Prettier、数值与类型断言通过 | `MatrixEffect组件实施记录/2026-07-22_CORE-1_公共类型与信号转换.md` | FE-1 需实现管线末尾统一 finite/clamp |
 | SRC-1 Source 适配与采样底座 | 未开始 | - | `components/qiuye-ui/matrix-effect/sources.ts`, `components/qiuye-ui/matrix-effect/types.ts` | 待执行 | 待创建 | 无 |
 | FE-1 MatrixEffect 静态渲染核心 | 未开始 | - | `components/qiuye-ui/matrix-effect/matrix-effect.tsx`, `components/qiuye-ui/matrix-effect/index.ts` | 待执行 | 待创建 | 无 |
 | FE-2 动态调度、暂停与错误韧性 | 未开始 | - | `components/qiuye-ui/matrix-effect/matrix-effect.tsx`, `components/qiuye-ui/matrix-effect/types.ts` | 待执行 | 待创建 | 无 |
@@ -192,11 +192,11 @@ REG-1 -> QA-1 -> QA-2
 - 创建内部 `columns x rows` 采样 Canvas，并使用 `{ willReadFrequently: true }`。
 - 实现静态单帧管线：Source -> RGBA -> Mapper -> Transform -> clamp -> Renderer。
 - 实现信号/上一帧缓冲复用和尺寸变化重置。
-- 使用 `forwardRef + useImperativeHandle` 暴露稳定的 `MatrixEffectHandle`，ref 不指向根 div。
-- 实现 `MatrixEffectHandle.invalidate()` 的 dirty 标记、重复调用合并和可绘制状态下一次性重绘。
+- 使用 `forwardRef + useImperativeHandle` 暴露稳定的 `MatrixEffectHandle`，ref 不指向根 div；`canvas` 始终读取当前节点，不能永久快照初始 null。
+- 实现 `MatrixEffectHandle.invalidate()` 的 dirty 标记、重复调用合并和可绘制状态下一次性重绘；没有连续播放基准时使用 `deltaTime=0`。
 - 实现静态状态变化、`onReady`、初始错误和 fallback。
 - 管线配置按身份做最小失效；`onStatusChange`、`onReady`、`onError` 使用 latest ref，事件回调身份变化不重建管线。
-- 实现 decorative/role/ariaLabel 语义。
+- 实现 decorative/role/ariaLabel 语义；原生 ARIA 等 rest props 只传给根 div，Canvas 语义只由 decorative/ariaLabel 决定。
 
 非范围：
 
@@ -566,6 +566,6 @@ YYYY-MM-DD_<工作包ID>_<简短标题>.md
 
 ## 下一步建议
 
-下一工作包为 `CORE-1 公共类型与信号转换算法`。
+下一工作包为 `SRC-1 Source 适配与采样底座`。
 
-开始实现前应再次核对设计文档中的 Source、Frame、Renderer 和 Props 类型，先完成稳定类型与纯转换算法，再进入任何 Canvas 生命周期代码。不要同时启动 Demo 或 registry 接入，以免 API 尚未稳定时产生大范围返工。
+开始实现前应读取 CORE-1 实施记录，并以当前 `MatrixSource` 可辨识联合为事实来源。先关闭图片、外部 Canvas、程序化 Source 的适配、资源所有权和过期加载保护；不要提前进入可见 Canvas、rAF、Demo 或 registry 接入。
