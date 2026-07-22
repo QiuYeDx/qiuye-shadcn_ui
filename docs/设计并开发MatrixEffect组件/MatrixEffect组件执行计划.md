@@ -2,7 +2,7 @@
 
 - 创建日期：2026-07-22
 - 更新日期：2026-07-22
-- 当前阶段：设计已定稿，实现未开始
+- 当前阶段：设计与文档 Review 已定稿，实现未开始
 - 对应设计文档：`docs/设计并开发MatrixEffect组件/MatrixEffect组件开发设计文档.md`
 
 ## 使用方式
@@ -34,6 +34,7 @@
 | 工作包 | 状态 | 完成日期 | 关键文件 | 验证 | 实施记录 | 未决事项 |
 | --- | --- | --- | --- | --- | --- | --- |
 | PRE-0 需求澄清与设计定稿 | 已完成 | 2026-07-22 | `docs/设计并开发MatrixEffect组件/MatrixEffect组件开发设计文档.md` | Markdown 围栏闭合、无尾随空格；commit `5e5a598` 已推送 | 无单独记录（设计会话） | 无 |
+| PRE-1 文档 Review 与契约补全 | 已完成 | 2026-07-22 | 设计文档、本执行计划 | `git diff --check`、Markdown 围栏与尾随空格检查 | 无单独记录（Review 会话） | P3-2/P3-3 属独立仓库维护任务，不阻塞本功能 |
 | CORE-1 公共类型与信号转换算法 | 未开始 | - | `components/qiuye-ui/matrix-effect/types.ts`, `components/qiuye-ui/matrix-effect/transforms.ts`, `components/qiuye-ui/matrix-effect/index.ts` | 待执行 | 待创建 | 无 |
 | SRC-1 Source 适配与采样底座 | 未开始 | - | `components/qiuye-ui/matrix-effect/sources.ts`, `components/qiuye-ui/matrix-effect/types.ts` | 待执行 | 待创建 | 无 |
 | FE-1 MatrixEffect 静态渲染核心 | 未开始 | - | `components/qiuye-ui/matrix-effect/matrix-effect.tsx`, `components/qiuye-ui/matrix-effect/index.ts` | 待执行 | 待创建 | 无 |
@@ -51,7 +52,7 @@
 ### M1：渲染引擎基础
 
 ```text
-CORE-1 -> SRC-1 -> FE-1 -> FE-2
+PRE-1 -> CORE-1 -> SRC-1 -> FE-1 -> FE-2
 ```
 
 完成标准：自定义 Source、Mapper、Transform 和 Renderer 能通过 MatrixEffect 完成静态与动态 Canvas 绘制，且具备尺寸、DPR、暂停和错误处理能力。
@@ -98,6 +99,23 @@ REG-1 -> QA-1 -> QA-2
 - 设计文档 commit：`5e5a598 docs: design MatrixEffect component`。
 - 远端分支：`origin/codex/matrix-effect-design`。
 
+### PRE-1：文档 Review 与契约补全
+
+状态：`已完成`
+
+产出：
+
+- 逐项复核 Review 的 P1/P2 建议，补齐 ref/handle、回调身份、预设 grid 合并和亮度权重契约。
+- 补齐 Reduced Motion 运行时切换与监听清理、`invalidate()` dirty 状态机和 `createCellRenderer()` scratch cell 约束。
+- 统一两个预设的 `backgroundColor` API，并增加可复现的自适应 FPS 压力验收方法。
+- 将 Review 结论同步到具体工作包与不可违反约束；P3-2/P3-3 作为独立仓库维护问题留后续处理。
+
+完成证据：
+
+- 基础执行计划 commit `e2169d2 docs: plan MatrixEffect implementation` 已推送。
+- 设计文档和执行计划已同步，不再依赖临时 Review 记录才能实施。
+- 通过 `git diff --check`、Markdown 围栏闭合与尾随空格检查。
+
 ### CORE-1：公共类型与信号转换算法
 
 目标：建立后续模块共同依赖的稳定类型和纯算法，不引入 React 帧循环。
@@ -107,7 +125,7 @@ REG-1 -> QA-1 -> QA-2
 - 创建 `types.ts`，实现设计文档中的 Source、Grid、Frame、Renderer、Error、Handle 和 Props 类型。
 - 创建 `transforms.ts`。
 - 实现并导出：
-  - `createLuminanceMapper()`。
+  - `createLuminanceMapper(options?: LuminanceMapperOptions)`，支持合法 RGB 权重归一化和非法权重回退。
   - `createInvertTransform()`。
   - `createLevelsTransform()`。
   - `createThresholdTransform()`。
@@ -124,11 +142,12 @@ REG-1 -> QA-1 -> QA-2
 
 - 类型与设计文档一致，没有为未来 Pointer/WebGL 提前增加无行为字段。
 - 转换器原地操作 `Float32Array`，不为每个单元格创建长期对象。
+- 默认 Rec.709 结果正确；`[1, 0, 0]`、`[0, 1, 0]`、`[0, 0, 1]` 分别提取对应通道，非法权重确定性回退且不改变 Alpha 语义。
 - 时间平滑使用 `deltaTime` 和 `responseMs`，不使用固定帧系数。
 - `npx -y pnpm@8.7.0 lint` 通过。
 - 创建 `MatrixEffect组件实施记录/<日期>_CORE-1_公共类型与信号转换.md`。
 
-依赖：`PRE-0`。
+依赖：`PRE-1`。
 
 ### SRC-1：Source 适配与采样底座
 
@@ -173,8 +192,10 @@ REG-1 -> QA-1 -> QA-2
 - 创建内部 `columns x rows` 采样 Canvas，并使用 `{ willReadFrequently: true }`。
 - 实现静态单帧管线：Source -> RGBA -> Mapper -> Transform -> clamp -> Renderer。
 - 实现信号/上一帧缓冲复用和尺寸变化重置。
-- 实现 `MatrixEffectHandle.invalidate()`。
+- 使用 `forwardRef + useImperativeHandle` 暴露稳定的 `MatrixEffectHandle`，ref 不指向根 div。
+- 实现 `MatrixEffectHandle.invalidate()` 的 dirty 标记、重复调用合并和可绘制状态下一次性重绘。
 - 实现静态状态变化、`onReady`、初始错误和 fallback。
+- 管线配置按身份做最小失效；`onStatusChange`、`onReady`、`onError` 使用 latest ref，事件回调身份变化不重建管线。
 - 实现 decorative/role/ariaLabel 语义。
 
 非范围：
@@ -186,6 +207,8 @@ REG-1 -> QA-1 -> QA-2
 
 - 2:1、1:1、1:2 容器能得到正确 `columns x rows`。
 - 静态图片只在加载、尺寸、配置或 invalidate 变化时重绘。
+- ref 能稳定读取 Canvas 并触发 invalidate；同一帧重复调用只产生一次绘制。
+- 只改变事件回调身份不会重置 Source、Renderer、成功帧或状态。
 - 零尺寸等待而不报错。
 - 自定义整帧 Renderer 可完成非空绘制。
 - `npx -y pnpm@8.7.0 lint` 与 `npx -y pnpm@8.7.0 build` 通过。
@@ -203,7 +226,8 @@ REG-1 -> QA-1 -> QA-2
 - 实现 `frameRate="auto"`：Renderer FPS 提示、持续超预算降级、稳定窗口升级和冷却。
 - 实现有效播放时间、暂停不累计、恢复基准重置和 deltaTime 上限。
 - 实现 `playing`、document visibility、IntersectionObserver 离屏暂停。
-- 实现 `prefers-reduced-motion` 冻结时间 0 帧及 `ignore` 覆盖。
+- 监听 `prefers-reduced-motion` 的运行时 `change`：初始 reduce 使用 `time=0`，运行中切换冻结当前成功帧，恢复时不累计暂停时间；支持 `ignore` 覆盖。
+- 把 dirty invalidation 接入动态调度：现有循环由下一帧消费且不创建第二条 rAF；`playing=false` 时可见状态重绘一次；页面隐藏、离屏或零尺寸时延迟到恢复首帧。
 - 实现 Observer、事件监听和 rAF 的统一清理。
 - 捕获 Source/Mapper/Transform/Renderer 运行时异常；单次上报并停止错误循环。
 - 已有成功帧时保留最后画面；无成功帧时显示 fallback。
@@ -215,8 +239,9 @@ REG-1 -> QA-1 -> QA-2
 
 完成条件：
 
-- 暂停状态没有活动 rAF。
-- 离屏、后台标签页、`playing=false` 和 Reduced Motion 行为符合设计。
+- 暂停状态没有持续循环 rAF；可见状态下的 dirty invalidation 只允许一次性 rAF，绘制后必须结束。
+- 离屏、后台标签页、`playing=false` 和 Reduced Motion 行为符合设计；运行中切换系统设置能即时冻结/恢复。
+- 暂停或动态运行时重复 invalidate 均被合并，且全程只有一条连续 rAF 链。
 - 恢复播放不会因大 deltaTime 跳跃。
 - 运行时异常不会每帧重复触发 `onError`。
 - React DevTools 不出现每帧 React commit。
@@ -233,9 +258,13 @@ REG-1 -> QA-1 -> QA-2
 
 - 在 `sources.ts` 实现 `createSoftBlobSource()`，使用确定性 seed 和径向渐变。
 - 创建 `renderers.ts`，实现 `createDotRenderer()`。
+- 实现 `createCellRenderer()`，每个实例只复用一个 scratch cell，并把它作为只读瞬时视图传给回调。
 - 单色 Dot 模式批量构建 Path，避免逐点独立 fill。
 - 支持固定色/源图色、radiusRange、opacityRange、源 Alpha 和值曲线。
 - 创建 `presets.tsx`，实现 `DotMatrixEffect`。
+- 使用 `forwardRef` 把 `MatrixEffectHandle` 原样转发给核心。
+- 按 auto/fixed mode 合并调用方局部 grid，保留 Dot 的 `cellAspectRatio=1`、`maxCells=10000` 默认值。
+- 只暴露预设级 `backgroundColor`，内部映射为核心 `clearColor`。
 - 未传 source 时 memoize 默认 soft blob Source。
 - 实现 Luminance -> Invert -> Levels -> additionalTransforms 的固定顺序。
 - 补齐 `index.ts` 真实导出。
@@ -246,6 +275,8 @@ REG-1 -> QA-1 -> QA-2
 - 相同 seed 在时间 0 得到相同画面。
 - radius 不超过单元格可容纳范围，透明区不会因 invert 变为实心圆点。
 - 默认 10000 cells，自动模式首选 60 FPS 并可降到 30。
+- `{ mode: "fixed", columns: 100 }` 保留 100 列并补齐 Dot 宽高比和 maxCells；ref 可调用核心 handle。
+- `createCellRenderer()` 在逐格绘制时不创建新 cell 对象。
 - Reduced Motion 下得到构图完整的静止帧。
 - `npx -y pnpm@8.7.0 lint` 与 `npx -y pnpm@8.7.0 build` 通过。
 - 创建 `MatrixEffect组件实施记录/<日期>_FX-1_Dot预设.md`。
@@ -264,6 +295,7 @@ REG-1 -> QA-1 -> QA-2
 - 字体指标只在 prepare/配置变化时测量，不逐格 `measureText()`。
 - 在 `presets.tsx` 实现 `AsciiEffect`。
 - 默认 cellAspectRatio 约 0.6、maxCells 6000、preferred FPS 30。
+- 使用 `forwardRef` 转发 `MatrixEffectHandle`，并按 auto/fixed mode 合并调用方局部 grid。
 - 保证 `backgroundColor` 是唯一预设清屏入口，不重复暴露 `clearColor`。
 - 补齐 `index.ts` 真实导出。
 
@@ -273,6 +305,7 @@ REG-1 -> QA-1 -> QA-2
 - 字符集为空和只有一个字符时行为确定。
 - `contain` 保留主体，透明边缘不生成反相字符块。
 - 纵横容器中字符单元格不被强制为正方形。
+- `{ mode: "fixed", columns: 100 }` 最终保留 100 列并补齐 `cellAspectRatio=0.6`、`maxCells=6000`；ref 可调用核心 handle。
 - 静态 Source 只绘制一次，动态 Source 默认不超过 30 FPS。
 - `npx -y pnpm@8.7.0 lint` 与 `npx -y pnpm@8.7.0 build` 通过。
 - 创建 `MatrixEffect组件实施记录/<日期>_FX-2_ASCII预设.md`。
@@ -372,7 +405,10 @@ REG-1 -> QA-1 -> QA-2
 - 检查 registry JSON 的 content、导出入口和全部相对 import。
 - 检查静态图片、外部 Canvas、程序化 Source。
 - 检查 Mapper、Transform 顺序、自定义 Renderer 和 invalidate。
+- 检查核心与两个预设的 `MatrixEffectHandle` ref 转发、重复 invalidate 合并和 `playing=false` 可见重绘。
+- 检查事件回调身份变化不重建管线，管线函数身份变化只使对应阶段失效。
 - 检查 Dot 与 ASCII 默认/自定义模式。
+- 检查两个预设在 auto/fixed 下的局部 grid 合并及唯一 `backgroundColor` 入口。
 - 检查 CORS 错误、图片加载失败、空字符集、非法数值和零尺寸。
 - 检查 decorative/ariaLabel/fallback。
 - 检查 Source 快速切换不出现过期结果。
@@ -396,8 +432,12 @@ REG-1 -> QA-1 -> QA-2
 - 1440 x 900、390 x 844 以及横/方/纵容器截图检查。
 - DPR 1、2、大于 2 和 backing-store 像素上限检查。
 - auto/fixed 网格、100 列自动 rows、ASCII 0.6 宽高比检查。
-- Dot 10000 cells 与 ASCII 6000 cells 的实际帧率/降级行为检查。
-- 离屏、后台、playing、Reduced Motion 暂停检查。
+- Dot 10000 cells 与 ASCII 6000 cells 的默认实际帧率检查。
+- 使用 Dot fixed `160 x 100`、`maxCells=16000`、`frameRate="auto"` 执行压力场景；先使用 Chrome CPU throttling 4x，15 秒内未触发持续超预算时改为 6x，并记录实际倍率。
+- 在压力下至少观察 15 秒以确认降到 30，降级后保持压力至少 10 秒以确认不回升；解除限速后观察至少 30 秒，只有冷却后允许一次 30 -> 60 升级，不得反复振荡。
+- 通过仅开发环境指标或测试插桩记录当前目标 FPS、档位切换和网格，不新增公共高频帧回调。
+- 离屏、后台、playing、Reduced Motion 暂停检查；在运行中切换系统 Reduced Motion 设置，验证冻结当前成功帧、恢复时间连续和监听器清理。
+- 检查动态循环、`playing=false`、页面隐藏和离屏四种状态下的 invalidate dirty 消费时机。
 - 恢复时间连续性、运行时异常单次上报检查。
 - 重复挂载/卸载后的 rAF、Observer、事件和 object URL 清理检查。
 - React DevTools 或等价方式确认没有每帧 React commit。
@@ -406,7 +446,7 @@ REG-1 -> QA-1 -> QA-2
 完成条件：
 
 - 视觉截图和 Canvas 像素均通过。
-- 压力下能从 60 稳定降到 30，不在 30/60 之间快速抖动。
+- 规定的 4x/6x 压力步骤能从 60 稳定降到 30，降级后 10 秒不回升；解除限速后的 30 秒观察窗内最多升级一次，不反复振荡。
 - 不可见或暂停时无活动渲染循环。
 - 没有布局重叠、裁切、空白 Canvas 或明显资源泄漏。
 - 如果发现问题，创建 `fix/` 文档并修复后重新执行受影响验收；不能带着已知问题把 QA-2 标记完成。
@@ -422,8 +462,12 @@ REG-1 -> QA-1 -> QA-2
 - Source、Mapper、Transform、Renderer 职责必须保持分离。
 - 自定义 Transform 必须能访问完整网格和上一帧。
 - 动态热路径不得逐格创建 DOM/React 节点，不得每帧 setState。
+- `createCellRenderer()` 每个实例只能复用一个 scratch cell，不得逐格创建对象。
 - 默认保留 maxCells、maxDpr、backing-store 像素上限、自适应 30/60 FPS、离屏暂停和页面隐藏暂停。
-- Reduced Motion 默认冻结动态时间并保留静止视觉结果。
+- Reduced Motion 必须监听运行时变化：初始 reduce 使用 `time=0`，运行中切换冻结当前成功帧，恢复时不累计暂停时间。
+- `invalidate()` 必须始终标记并合并 dirty；动态循环不得创建第二条 rAF，隐藏或离屏时延迟到恢复首帧。
+- 核心和两个预设必须通过 `forwardRef` 暴露同一个 `MatrixEffectHandle`；事件回调身份变化不得重建管线。
+- Dot/ASCII 必须按 mode 合并局部 grid，保留各自 maxCells/宽高比默认值，并只暴露 `backgroundColor` 作为预设清屏入口。
 - 所有公共 API、复杂算法和非显然生命周期逻辑使用简体中文 JSDoc/注释。
 - 不新增 npm 依赖；若实现证明必须新增，先更新设计并取得确认。
 - `pnpm-lock.yaml` 是 lockfile v6。只能显式使用 pnpm 8.x，例如 `npx -y pnpm@8.7.0 ...`，不能直接使用较新的全局 pnpm。
