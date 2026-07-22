@@ -2,7 +2,7 @@
 
 - 创建日期：2026-07-22
 - 更新日期：2026-07-22（文档 Review 后完善）
-- 状态：FE-1 已完成，待启动 FE-2
+- 状态：FE-2 已完成，待启动 FX-1
 - 组件 ID：`matrix-effect`
 - 主要导出：`MatrixEffect`、`DotMatrixEffect`、`AsciiEffect`
 
@@ -1007,27 +1007,44 @@ ResizeObserver 触发时：
 - 恢复到 60 FPS 必须经过更长的稳定窗口和冷却时间，避免在 30/60 之间抖动。
 - 自动模式只调整帧率，不在动画中突然改变网格分辨率，以免画面出现明显跳变。
 
-具体性能采样可以使用渲染耗时的指数移动平均值和 rAF 间隔。阈值属于实现细节，但必须有降级滞后和升级冷却。
+固定和自动模式都使用 rAF timestamp 的 deadline 门控，30/60 FPS 间隔分别为 `1000 / 30` 与 `1000 / 60` ms，并使用 0.5ms 提前容差吸收 59.94/60Hz 浮点抖动。大间隔后只绘制一帧并把 deadline 前推到未来，不补画历史帧。动态运行中的 `invalidate()` 由下一个获准绘制 slot 消费，不能绕过帧率上限；暂停或静态模式的一次性 dirty 重绘不受连续帧 deadline 限制。
+
+自动模式的确定性控制器规则如下：
+
+- `preferredFrameRate=30` 是 auto 上限，不会因负载较低升到 60；只有首选 60 的 Renderer 参与 60/30 切档。
+- 使用时间归一化 EMA，时间常数固定为 1000ms，`alpha = -expm1(-elapsedMs / 1000)`。
+- 完整管线耗时只采样成功提交的连续帧，范围从 Source 绘制到可见 Canvas blit，不含生命周期回调；一次性重绘、loading/idle、错误和 generation 放弃不计入 cost。
+- 单一连续 rAF 链的每次 callback 都采样 miss，原始间隔 `>=25ms` 记为 1，否则记为 0；暂停恢复会清空 rAF 间隔基准。
+- 60 档在 cost EMA `>=12ms` 或 miss EMA `>=0.2` 持续 2000ms 后降到 30。
+- 30 档只有在 cost EMA `<=8ms`、miss EMA `<=0.05` 持续 10000ms，且距最近一次降级至少 20000ms 时才升回 60。
+- 切档后清空压力/稳定窗口并从新档位的下一个 deadline 继续。暂停保留当前档位但清空 miss 基准和窗口；frameRate 模式、Renderer 身份或 FPS 提示变化会重建控制器，其他管线负载变化只清空样本并保留当前档位。
 
 ### 时间语义
 
 - `time` 使用组件有效播放时间，而不是页面绝对时间。
 - 页面隐藏、离屏或手动 `playing=false` 时不累计有效时间。
 - 恢复后的首帧重置时间基准，不允许出现数秒级 `deltaTime` 导致光团跳跃。
-- `deltaTime` 设置最大值，例如 0.1 秒，防止短暂调度阻塞放大物理变化。
+- 连续帧的单次有效增量严格限制为 0.1 秒；`time` 和 `deltaTime` 使用同一个受限增量，避免直接消费绝对 `time` 的程序化 Source 在长阻塞后跳跃。
+- 播放时钟只在完整帧成功提交时与 previousValues/frame/dirty 一起事务推进；loading/idle、错误或旧 generation 尝试都不推进。
+- 新 Source epoch 把 `time` 重置为 0；其他配置变化、暂停和错误恢复保留已提交的有效时间，但清空连续时间基准。
+- 静态 Source、`playing=false` 和 Reduced Motion freeze 下的一次性重绘沿用冻结时间且 `deltaTime=0`，成功后也不建立连续基准。
 
 ### 暂停条件
 
-动态循环在以下任一条件下暂停：
+调度条件分为两层。以下硬阻塞同时禁止连续帧和一次性 dirty 重绘，dirty 保留到恢复：
 
-- `playing=false`。
 - `document.visibilityState !== "visible"`。
 - `pauseWhenOffscreen=true` 且 IntersectionObserver 判断组件离开视口。
-- `prefers-reduced-motion: reduce` 且 `reducedMotion="freeze"`。
 - 组件宽高为 0。
-- 发生未恢复的运行时错误。
+- 发生未恢复的运行时错误、尚未挂载或 Source adapter 不可用。
 
-离屏观测可使用少量 root margin，避免组件刚进入视口时才开始准备。暂停时必须取消连续循环 rAF，而不是继续每帧执行后直接 return；一次性 invalidation 遵循上文 dirty 规则。
+以下条件只停止连续播放；页面可见且尺寸非零时仍允许一次性 dirty 重绘：
+
+- `playing=false`。
+- `prefers-reduced-motion: reduce` 且 `reducedMotion="freeze"`。
+- Source adapter 的 `animated=false`。
+
+初始 `playing=false` 或初始 Reduced Motion 下，动态 Source 仍消费初始 dirty，以 `time=0` 绘制一张静止帧。离屏观测固定使用 `rootMargin="128px 0px"`、threshold 0；支持 IntersectionObserver 时等待首次回调确定可见性，缺少 API 或构造/observe 失败时 fail-open 为可见。暂停时必须取消连续循环 rAF，而不是继续每帧执行后直接 return；一次性 invalidation 遵循上文 dirty 规则。
 
 ## 减少动态效果与可访问性
 
