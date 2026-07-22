@@ -2,7 +2,7 @@
 
 - 创建日期：2026-07-22
 - 更新日期：2026-07-22
-- 当前阶段：CORE-1 已完成，待启动 SRC-1
+- 当前阶段：SRC-1 已完成，待启动 FE-1
 - 对应设计文档：`docs/设计并开发MatrixEffect组件/MatrixEffect组件开发设计文档.md`
 
 ## 使用方式
@@ -36,7 +36,7 @@
 | PRE-0 需求澄清与设计定稿 | 已完成 | 2026-07-22 | `docs/设计并开发MatrixEffect组件/MatrixEffect组件开发设计文档.md` | Markdown 围栏闭合、无尾随空格；commit `5e5a598` 已推送 | 无单独记录（设计会话） | 无 |
 | PRE-1 文档 Review 与契约补全 | 已完成 | 2026-07-22 | 设计文档、本执行计划 | `git diff --check`、Markdown 围栏与尾随空格检查 | 无单独记录（Review 会话） | P3-2/P3-3 属独立仓库维护任务，不阻塞本功能 |
 | CORE-1 公共类型与信号转换算法 | 已完成 | 2026-07-22 | `components/qiuye-ui/matrix-effect/types.ts`, `components/qiuye-ui/matrix-effect/transforms.ts`, `components/qiuye-ui/matrix-effect/index.ts` | pnpm 8.7.0 lint、TypeScript、Prettier、数值与类型断言通过 | `MatrixEffect组件实施记录/2026-07-22_CORE-1_公共类型与信号转换.md` | FE-1 需实现管线末尾统一 finite/clamp |
-| SRC-1 Source 适配与采样底座 | 未开始 | - | `components/qiuye-ui/matrix-effect/sources.ts`, `components/qiuye-ui/matrix-effect/types.ts` | 待执行 | 待创建 | 无 |
+| SRC-1 Source 适配与采样底座 | 已完成 | 2026-07-22 | `components/qiuye-ui/matrix-effect/sources.ts`, `components/qiuye-ui/matrix-effect/types.ts` | pnpm 8.7.0 lint、TypeScript、Prettier、SSR 与行为断言通过 | `MatrixEffect组件实施记录/2026-07-22_SRC-1_Source适配与采样底座.md` | FE-1 必须在安全错误或 Source 切换后重建采样 Canvas |
 | FE-1 MatrixEffect 静态渲染核心 | 未开始 | - | `components/qiuye-ui/matrix-effect/matrix-effect.tsx`, `components/qiuye-ui/matrix-effect/index.ts` | 待执行 | 待创建 | 无 |
 | FE-2 动态调度、暂停与错误韧性 | 未开始 | - | `components/qiuye-ui/matrix-effect/matrix-effect.tsx`, `components/qiuye-ui/matrix-effect/types.ts` | 待执行 | 待创建 | 无 |
 | FX-1 Dot Renderer 与 DotMatrixEffect | 未开始 | - | `components/qiuye-ui/matrix-effect/renderers.ts`, `components/qiuye-ui/matrix-effect/presets.tsx`, `components/qiuye-ui/matrix-effect/sources.ts`, `components/qiuye-ui/matrix-effect/index.ts` | 待执行 | 待创建 | 无 |
@@ -566,6 +566,6 @@ YYYY-MM-DD_<工作包ID>_<简短标题>.md
 
 ## 下一步建议
 
-下一工作包为 `SRC-1 Source 适配与采样底座`。
+下一工作包为 `FE-1 MatrixEffect 静态渲染核心`。
 
-开始实现前应读取 CORE-1 实施记录，并以当前 `MatrixSource` 可辨识联合为事实来源。先关闭图片、外部 Canvas、程序化 Source 的适配、资源所有权和过期加载保护；不要提前进入可见 Canvas、rAF、Demo 或 registry 接入。
+开始实现前应读取 CORE-1 与 SRC-1 实施记录。使用 `createMatrixSourceAdapter()` 关闭内部采样 Canvas、静态单帧管线、响应式网格与 Source 切换清理；在 Source 变化或安全错误后重建采样 Canvas，且不要提前进入连续 rAF、自适应 FPS、Demo 或 registry 接入。

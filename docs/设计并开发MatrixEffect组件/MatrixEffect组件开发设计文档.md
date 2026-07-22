@@ -2,7 +2,7 @@
 
 - 创建日期：2026-07-22
 - 更新日期：2026-07-22（文档 Review 后完善）
-- 状态：CORE-1 已完成，待启动 SRC-1
+- 状态：SRC-1 已完成，待启动 FE-1
 - 组件 ID：`matrix-effect`
 - 主要导出：`MatrixEffect`、`DotMatrixEffect`、`AsciiEffect`
 
@@ -308,6 +308,27 @@ export type MatrixSource =
 - `smoothing` 默认为 `true`。
 - `background` 默认为透明。
 
+### 内部 Source Adapter 契约
+
+`sources.ts` 把公共 Source 描述符规范化为仅供核心管线使用的 adapter。adapter 不进入 `index.ts` 公共导出，统一提供以下能力：
+
+- `animated`：已经应用各 Source 类型默认值的连续绘制标记。
+- `draw(context)`：向现有低分辨率采样上下文绘制，返回 `drawn`、`loading`、`idle` 或携带 `MatrixEffectError` 的 `error` 结构化结果，不把预期中的未就绪状态表示为异常。
+- `dispose()`：幂等释放 adapter 自己创建的图片、object URL 和监听器；外部 Image、ImageBitmap 和 Canvas 始终只借用。
+- 图片加载状态发生变化时通过内部回调请求核心重绘；adapter 已释放后必须忽略排队中的旧加载事件，不能唤醒或覆盖新 Source。
+
+`draw()` 只负责清空/填充采样场并绘制 Source，不负责创建采样 Canvas、调用 `getImageData()`、调度帧或更新 React 状态。`sources.ts` 另提供采样读取异常分类函数，把 `getImageData()` 的 `SecurityError` 确定性映射为 `SOURCE_SECURITY_ERROR`，其他读取异常映射为 `SOURCE_RUNTIME_ERROR`。
+
+图片和 Canvas 的 `cover` / `contain` 都保持源宽高比，position 在目标区域多余空间或溢出范围中对齐；`fill` 直接拉伸到整个采样场且忽略 position。position 的非有限值回退到 `0.5`，有限值限制到 `0..1`。零尺寸 Canvas 和返回 `null` 的 supplier 进入 `idle`，不清空最近一次成功输出，也不忙轮询。
+
+图片使用 `naturalWidth / naturalHeight`，ImageBitmap 和 Canvas 使用 backing store 的 `width / height`，不读取 Canvas CSS 尺寸。`smoothing` 只控制 `imageSmoothingEnabled`，首版不承诺 `imageSmoothingQuality`。background 应为有效 CSS 颜色；无效字符串确定性回退为透明，不继承上一帧 Canvas 状态。
+
+程序化 Source 必须在 `draw()` 调用中同步完成绘制；采样上下文是瞬时借用，不能保存后异步使用。意外返回 Promise 或同步抛错都映射为 `SOURCE_RUNTIME_ERROR`。每次实际绘制前，adapter 使用 identity transform 清空整个采样场，按需填充 background，并用 `save()` / `restore()` 隔离自身设置；程序化回调仍必须配平自己额外调用的 `save()` / `restore()`。
+
+adapter 产生的 Source 错误都标记 `recoverable=true`，表示更换 Source 或相关配置后允许自动恢复；它不表示核心应对同一错误配置进行逐帧忙重试。
+
+采样 Canvas 一旦被跨域输入污染，`clearRect()` 不能恢复 origin-clean。FE-1 在收到 `SOURCE_SECURITY_ERROR` 后必须丢弃该采样 Canvas；Source 变化触发自动重试时也必须创建新的 backing store 和 2D context，不能只复用并清空旧 Canvas。
+
 ### 程序化柔和光团源
 
 `createSoftBlobSource()` 返回 `MatrixProceduralSource`，使用多个低分辨率径向渐变生成连续灰度场，不需要在可见画布上执行大面积 CSS blur。
@@ -336,6 +357,8 @@ export function createSoftBlobSource(
 ### 资源所有权
 
 - 组件内部为字符串 URL 或 Blob 创建的 `Image`、object URL 和监听器由组件清理。
+- `crossOrigin` 只在组件为字符串 URL 创建内部 Image 时设置，并且先于 `src`；外部 `HTMLImageElement` 的 `src` 和 `crossOrigin` 不得修改。
+- 尚未设置 `src` 的外部 HTMLImageElement 保持 `loading` 并继续监听；已有请求源、`complete=true` 且自然尺寸为 0 时才判定加载失败。
 - 调用方传入的 `HTMLImageElement`、`ImageBitmap`、Canvas 不归组件所有；组件卸载时不得调用外部资源的 `close()` 或移除外部节点。
 - Source 变化时使用版本令牌或 AbortController 忽略过期加载结果，避免慢图片覆盖新图片。
 - 开发环境 React Strict Mode 重复挂载时，初始化和清理必须幂等。

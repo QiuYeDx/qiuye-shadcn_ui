@@ -104,7 +104,11 @@ export interface MatrixProceduralContext {
 export interface MatrixProceduralSource {
   /** Source 类型判别字段 */
   type: "procedural";
-  /** 在低分辨率采样画布中绘制当前信号场 */
+  /**
+   * 在低分辨率采样画布中同步绘制当前信号场
+   *
+   * 绘制上下文只在本次调用期间有效，不能返回 Promise 或异步保存后继续使用。
+   */
   draw: (context: MatrixProceduralContext) => void;
   /**
    * 是否需要持续帧循环
