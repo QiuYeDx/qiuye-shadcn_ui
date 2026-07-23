@@ -54,6 +54,16 @@ const MATRIX_EFFECT_SIMPLE_GRID = {
 
 const MATRIX_EFFECT_SIMPLE_RADIUS_RANGE = [0.25, 3] as const;
 const MATRIX_EFFECT_SIMPLE_LEVELS = { contrast: 1.2 } as const;
+const MATRIX_EFFECT_SIMPLE_PALETTES = {
+  light: {
+    dotColor: "#9c9c9c",
+    backgroundColor: "#f6f6f6",
+  },
+  dark: {
+    dotColor: "#f4f4f5",
+    backgroundColor: "#09090b",
+  },
+} as const;
 
 // ResponsiveTabs 简单演示
 export function ResponsiveTabsSimpleDemo() {
@@ -488,19 +498,25 @@ export function TourSimpleDemo() {
 
 // MatrixEffect 简单演示
 export function MatrixEffectSimpleDemo() {
+  const { resolvedTheme } = useTheme();
+  const palette =
+    resolvedTheme === "dark"
+      ? MATRIX_EFFECT_SIMPLE_PALETTES.dark
+      : MATRIX_EFFECT_SIMPLE_PALETTES.light;
+
   return (
     <DotMatrixEffect
-      className="mx-auto aspect-[4/3] min-w-0 w-full max-w-3xl overflow-hidden rounded-md border bg-[#f6f6f6] sm:aspect-video"
+      className="mx-auto aspect-[4/3] min-w-0 w-full max-w-3xl overflow-hidden rounded-md border bg-[#f6f6f6] dark:bg-[#09090b] sm:aspect-video"
       blobOptions={MATRIX_EFFECT_SIMPLE_BLOB_OPTIONS}
       grid={MATRIX_EFFECT_SIMPLE_GRID}
       radiusRange={MATRIX_EFFECT_SIMPLE_RADIUS_RANGE}
       levels={MATRIX_EFFECT_SIMPLE_LEVELS}
-      color="#9c9c9c"
-      backgroundColor="#f6f6f6"
+      color={palette.dotColor}
+      backgroundColor={palette.backgroundColor}
       frameRate={30}
       maxDpr={1.5}
       decorative={false}
-      ariaLabel="缓慢流动的柔和光团圆点矩阵"
+      ariaLabel="随页面主题切换配色的柔和光团圆点矩阵"
     />
   );
 }
