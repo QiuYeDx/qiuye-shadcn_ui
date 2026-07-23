@@ -1,8 +1,8 @@
 # MatrixEffect 组件开发设计文档
 
 - 创建日期：2026-07-22
-- 更新日期：2026-07-22（文档 Review 后完善）
-- 状态：FE-2 已完成，待启动 FX-1
+- 更新日期：2026-07-23（FX-1 完成后同步）
+- 状态：FX-1 已完成，待启动 FX-2
 - 组件 ID：`matrix-effect`
 - 主要导出：`MatrixEffect`、`DotMatrixEffect`、`AsciiEffect`
 

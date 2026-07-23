@@ -1,4 +1,9 @@
 export { MatrixEffect } from "./matrix-effect";
+export { DotMatrixEffect } from "./presets";
+
+export { createCellRenderer, createDotRenderer } from "./renderers";
+
+export { createSoftBlobSource } from "./sources";
 
 export {
   createInvertTransform,
@@ -9,6 +14,10 @@ export {
 } from "./transforms";
 
 export type {
+  CellRendererOptions,
+  DotMatrixEffectProps,
+  DotRendererOptions,
+  DotValueCurve,
   LevelsTransformOptions,
   LuminanceMapperOptions,
   MatrixCanvasSource,
@@ -32,6 +41,7 @@ export type {
   MatrixSignalTransform,
   MatrixSource,
   MatrixSourcePosition,
+  SoftBlobSourceOptions,
   TemporalSmoothingTransformOptions,
   ThresholdTransformOptions,
 } from "./types";

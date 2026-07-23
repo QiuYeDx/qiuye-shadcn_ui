@@ -122,6 +122,40 @@ export interface MatrixProceduralSource {
   background?: string | null;
 }
 
+/** 程序化柔和光团 Source 的配置 */
+export interface SoftBlobSourceOptions {
+  /**
+   * 参与叠加的光团数量，小数向下取整后限制在 1 到 6
+   * @default 3
+   */
+  count?: number;
+  /**
+   * 光团最小半径，相对于采样画布短边的比例，限制在 0.01 到 2
+   * @default 0.2
+   */
+  minRadius?: number;
+  /**
+   * 光团最大半径，相对于采样画布短边的比例，限制在 0.01 到 2
+   * @default 0.45
+   */
+  maxRadius?: number;
+  /**
+   * 光团轨迹的基础相位速度，单位为弧度/秒；限制在 0 到 4，0 表示静态 Source
+   * @default 0.14
+   */
+  speed?: number;
+  /**
+   * 光团之外的基础灰度，最终限制在 0 到 1
+   * @default 0.04
+   */
+  baseValue?: number;
+  /**
+   * 生成光团参数的确定性种子，小数会先截断为 32 位整数
+   * @default 1
+   */
+  seed?: number;
+}
+
 /** MatrixEffect 支持的全部 Source 描述符 */
 export type MatrixSource =
   | MatrixImageSource
@@ -342,9 +376,9 @@ export interface MatrixRenderCell {
   width: number;
   /** 单元格 CSS 高度 */
   height: number;
-  /** 单元格横向归一化坐标 */
+  /** 单元格中心的横向归一化坐标 */
   u: number;
-  /** 单元格纵向归一化坐标 */
+  /** 单元格中心的纵向归一化坐标 */
   v: number;
   /** 当前主信号值 */
   value: number;
@@ -356,6 +390,47 @@ export interface MatrixRenderCell {
   b: number;
   /** 原始采样 Alpha 通道，范围为 0 到 255 */
   a: number;
+}
+
+/** `createCellRenderer` 的 Renderer 提示配置 */
+export interface CellRendererOptions {
+  /** Renderer 建议的单元格宽高比（宽 / 高） */
+  cellAspectRatio?: number;
+  /** Renderer 建议的自动模式目标帧率 */
+  preferredFrameRate?: 30 | 60;
+}
+
+/**
+ * 把 0 到 1 的主信号同步转换为 Dot 视觉强度的纯函数
+ *
+ * 返回值会被重新限制到 0 到 1；不能返回 Promise 或异步持有渲染帧状态。
+ */
+export type DotValueCurve = (value: number) => number;
+
+/** Dot Renderer 的配置 */
+export interface DotRendererOptions {
+  /**
+   * 固定 CSS 颜色，或使用 `"source"` 保留每个采样格的 RGB
+   * @default "#71717a"
+   */
+  color?: string | "source";
+  /**
+   * 主信号从 0 到 1 时对应的半径范围，单位为 CSS px
+   *
+   * 实际半径还会被限制到当前单元格可容纳的范围。
+   * @default [0.35, 4]
+   */
+  radiusRange?: readonly [minimum: number, maximum: number];
+  /**
+   * 主信号从 0 到 1 时对应的不透明度范围
+   * @default [1, 1]
+   */
+  opacityRange?: readonly [minimum: number, maximum: number];
+  /**
+   * 在计算半径和不透明度前同步应用的纯值曲线，不能返回 Promise
+   * @default value => value
+   */
+  valueCurve?: DotValueCurve;
 }
 
 /** MatrixEffect 支持的目标帧率模式 */
@@ -465,4 +540,50 @@ export interface MatrixEffectProps extends Omit<
   onReady?: () => void;
   /** 发生结构化 Source 或管线错误时触发 */
   onError?: (error: MatrixEffectError) => void;
+}
+
+/** DotMatrixEffect 圆点矩阵预设的属性 */
+export interface DotMatrixEffectProps extends Omit<
+  MatrixEffectProps,
+  "source" | "renderer" | "mapper" | "transforms" | "clearColor"
+> {
+  /**
+   * 自定义输入 Source；未传时使用内置柔和光团 Source
+   * @default createSoftBlobSource(blobOptions)
+   */
+  source?: MatrixSource;
+  /** 内置柔和光团 Source 的配置；传入 source 时忽略 */
+  blobOptions?: SoftBlobSourceOptions;
+  /**
+   * 固定 CSS 颜色，或使用 `"source"` 保留每个采样格的 RGB
+   * @default "#71717a"
+   */
+  color?: string | "source";
+  /**
+   * 输出 Canvas 的清屏颜色，null 表示透明
+   * @default null
+   */
+  backgroundColor?: string | null;
+  /**
+   * 主信号从 0 到 1 时对应的半径范围，单位为 CSS px
+   * @default [0.35, 4]
+   */
+  radiusRange?: readonly [minimum: number, maximum: number];
+  /**
+   * 主信号从 0 到 1 时对应的不透明度范围
+   * @default [1, 1]
+   */
+  opacityRange?: readonly [minimum: number, maximum: number];
+  /**
+   * 是否在 Levels 之前反转主信号
+   * @default false
+   */
+  invert?: boolean;
+  /** 可选的输入范围、Gamma、对比度和亮度调整 */
+  levels?: LevelsTransformOptions;
+  /**
+   * 在预设 Invert 和 Levels 之后按顺序执行的额外 Transform
+   * @default []
+   */
+  additionalTransforms?: readonly MatrixSignalTransform[];
 }

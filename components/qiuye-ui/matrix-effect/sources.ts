@@ -2,8 +2,10 @@ import type {
   MatrixEffectError,
   MatrixFit,
   MatrixProceduralContext,
+  MatrixProceduralSource,
   MatrixSource,
   MatrixSourcePosition,
+  SoftBlobSourceOptions,
 } from "./types";
 
 type MatrixRasterSource =
@@ -68,6 +70,198 @@ const IMAGE_BITMAP_BRANDS = ["[object ImageBitmap]"] as const;
 const BLOB_BRANDS = ["[object Blob]", "[object File]"] as const;
 const HTML_CANVAS_BRANDS = ["[object HTMLCanvasElement]"] as const;
 const OFFSCREEN_CANVAS_BRANDS = ["[object OffscreenCanvas]"] as const;
+const DEFAULT_BLOB_COUNT = 3;
+const DEFAULT_BLOB_MIN_RADIUS = 0.2;
+const DEFAULT_BLOB_MAX_RADIUS = 0.45;
+const DEFAULT_BLOB_SPEED = 0.14;
+const DEFAULT_BLOB_BASE_VALUE = 0.04;
+const DEFAULT_BLOB_SEED = 1;
+const MIN_BLOB_COUNT = 1;
+const MAX_BLOB_COUNT = 6;
+const MIN_BLOB_RADIUS = 0.01;
+const MAX_BLOB_RADIUS = 2;
+const MAX_BLOB_SPEED = 4;
+
+interface SoftBlobParameters {
+  readonly innerColor: string;
+  readonly middleColor: string;
+  readonly outerColor: string;
+  readonly phaseX: number;
+  readonly phaseY: number;
+  readonly phaseRadius: number;
+  readonly frequencyX: number;
+  readonly frequencyY: number;
+  readonly secondaryFrequency: number;
+  readonly radiusFrequency: number;
+}
+
+function clamp(value: number, minimum: number, maximum: number): number {
+  return Math.min(maximum, Math.max(minimum, value));
+}
+
+function normalizeFiniteNumber(
+  value: number | undefined,
+  fallback: number,
+): number {
+  return Number.isFinite(value) ? (value as number) : fallback;
+}
+
+function createSeededRandom(seed: number): () => number {
+  let state = Math.trunc(seed) >>> 0;
+
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let value = state;
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+    return ((value ^ (value >>> 14)) >>> 0) / 4_294_967_296;
+  };
+}
+
+function createSoftBlobParameters(
+  count: number,
+  seed: number,
+): readonly SoftBlobParameters[] {
+  const random = createSeededRandom(seed);
+  const blobs: SoftBlobParameters[] = [];
+
+  for (let index = 0; index < count; index += 1) {
+    const phaseX =
+      Math.PI * 2 * ((index + 0.5) / count + ((random() - 0.5) * 0.15) / count);
+    const intensity = 0.58 + random() * 0.28;
+
+    blobs.push({
+      innerColor: `rgba(255, 255, 255, ${intensity})`,
+      middleColor: `rgba(255, 255, 255, ${intensity * 0.62})`,
+      outerColor: `rgba(255, 255, 255, ${intensity * 0.18})`,
+      phaseX,
+      phaseY: phaseX + Math.PI * 2 * (0.2 + random() * 0.6),
+      phaseRadius: random() * Math.PI * 2,
+      frequencyX: 0.72 + random() * 0.46,
+      frequencyY: 0.62 + random() * 0.5,
+      secondaryFrequency: 1.18 + random() * 0.54,
+      radiusFrequency: 0.48 + random() * 0.32,
+    });
+  }
+
+  return blobs;
+}
+
+/**
+ * 创建由多个径向渐变组成的确定性柔和光团 Source
+ *
+ * - 光团参数在工厂创建时由 seed 一次性生成
+ * - 位置和呼吸尺寸只依赖有效播放时间，暂停不会跳变
+ * - 直接在低分辨率采样画布绘制，不使用 CSS blur 或额外帧循环
+ *
+ * @example
+ * ```ts
+ * const source = createSoftBlobSource({ seed: 42, speed: 0.12 });
+ * ```
+ */
+export function createSoftBlobSource(
+  options: SoftBlobSourceOptions = {},
+): MatrixProceduralSource {
+  const count = clamp(
+    Math.floor(normalizeFiniteNumber(options.count, DEFAULT_BLOB_COUNT)),
+    MIN_BLOB_COUNT,
+    MAX_BLOB_COUNT,
+  );
+  const requestedMinimumRadius = clamp(
+    normalizeFiniteNumber(options.minRadius, DEFAULT_BLOB_MIN_RADIUS),
+    MIN_BLOB_RADIUS,
+    MAX_BLOB_RADIUS,
+  );
+  const requestedMaximumRadius = clamp(
+    normalizeFiniteNumber(options.maxRadius, DEFAULT_BLOB_MAX_RADIUS),
+    MIN_BLOB_RADIUS,
+    MAX_BLOB_RADIUS,
+  );
+  const minimumRadius = Math.min(
+    requestedMinimumRadius,
+    requestedMaximumRadius,
+  );
+  const maximumRadius = Math.max(
+    requestedMinimumRadius,
+    requestedMaximumRadius,
+  );
+  const speed = clamp(
+    normalizeFiniteNumber(options.speed, DEFAULT_BLOB_SPEED),
+    0,
+    MAX_BLOB_SPEED,
+  );
+  const baseValue = clamp(
+    normalizeFiniteNumber(options.baseValue, DEFAULT_BLOB_BASE_VALUE),
+    0,
+    1,
+  );
+  const seed = normalizeFiniteNumber(options.seed, DEFAULT_BLOB_SEED);
+  const blobs = createSoftBlobParameters(count, seed);
+  const baseChannel = Math.round(baseValue * 255);
+  const baseColor = `rgb(${baseChannel}, ${baseChannel}, ${baseChannel})`;
+
+  return {
+    type: "procedural",
+    animated: speed > 0,
+    draw({ ctx, width, height, time }) {
+      const shortSide = Math.min(width, height);
+      const effectiveTime = Number.isFinite(time)
+        ? Math.max(0, time) * speed
+        : 0;
+
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = "source-over";
+      ctx.fillStyle = baseColor;
+      ctx.fillRect(0, 0, width, height);
+
+      for (const blob of blobs) {
+        const primaryX = Math.sin(
+          effectiveTime * blob.frequencyX + blob.phaseX,
+        );
+        const secondaryX = Math.sin(
+          effectiveTime * blob.secondaryFrequency + blob.phaseY,
+        );
+        const primaryY = Math.sin(
+          effectiveTime * blob.frequencyY + blob.phaseY,
+        );
+        const secondaryY = Math.sin(
+          effectiveTime * (blob.secondaryFrequency * 0.83) + blob.phaseX,
+        );
+        const centerX = width * (0.5 + primaryX * 0.28 + secondaryX * 0.07);
+        const centerY = height * (0.5 + primaryY * 0.28 + secondaryY * 0.07);
+        const radiusProgress =
+          0.5 +
+          Math.sin(effectiveTime * blob.radiusFrequency + blob.phaseRadius) *
+            0.5;
+        const radius =
+          shortSide *
+          (minimumRadius + (maximumRadius - minimumRadius) * radiusProgress);
+        const gradient = ctx.createRadialGradient(
+          centerX,
+          centerY,
+          0,
+          centerX,
+          centerY,
+          radius,
+        );
+
+        gradient.addColorStop(0, blob.innerColor);
+        gradient.addColorStop(0.42, blob.middleColor);
+        gradient.addColorStop(0.76, blob.outerColor);
+        gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(
+          centerX - radius,
+          centerY - radius,
+          radius * 2,
+          radius * 2,
+        );
+      }
+
+      ctx.globalCompositeOperation = "source-over";
+    },
+  };
+}
 
 function createSourceError(
   code: MatrixEffectError["code"],
