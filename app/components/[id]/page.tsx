@@ -48,6 +48,7 @@ import { MarkdownRendererDemo } from "@/components/qiuye-ui/demos/markdown-rende
 import { ColorPickerDemo } from "@/components/qiuye-ui/demos/color-picker-demo";
 import { SmoothCornersDemo } from "@/components/qiuye-ui/demos/smooth-corners-demo";
 import { TourDemo } from "@/components/qiuye-ui/demos/tour-demo";
+import { MatrixEffectDemo } from "@/components/qiuye-ui/demos/matrix-effect-demo";
 
 // TODO: 新增 qiuye-ui 自定义组件时需要完善 demo 文件
 const demoComponents = {
@@ -64,6 +65,7 @@ const demoComponents = {
   [ComponentId.COLOR_PICKER]: ColorPickerDemo,
   [ComponentId.SMOOTH_CORNERS]: SmoothCornersDemo,
   [ComponentId.TOUR]: TourDemo,
+  [ComponentId.MATRIX_EFFECT]: MatrixEffectDemo,
 };
 
 // 导入简单演示组件
@@ -81,6 +83,7 @@ import {
   ColorPickerSimpleDemo,
   SmoothCornersSimpleDemo,
   TourSimpleDemo,
+  MatrixEffectSimpleDemo,
 } from "./simple-demos";
 
 // 精简的单例演示组件
@@ -98,6 +101,7 @@ const simpleDemoComponents = {
   [ComponentId.COLOR_PICKER]: ColorPickerSimpleDemo,
   [ComponentId.SMOOTH_CORNERS]: SmoothCornersSimpleDemo,
   [ComponentId.TOUR]: TourSimpleDemo,
+  [ComponentId.MATRIX_EFFECT]: MatrixEffectSimpleDemo,
 };
 
 // 简单的演示预览组件
@@ -245,9 +249,7 @@ export default async function ComponentDetailPage({
               {/* 导入代码 */}
               <section className="space-y-3">
                 <h2 className="text-sm font-semibold">导入代码</h2>
-                <SidebarCodeBlock
-                  code={importStatement}
-                />
+                <SidebarCodeBlock code={importStatement} />
               </section>
 
               <div className="h-px bg-border/70" />
@@ -258,7 +260,9 @@ export default async function ComponentDetailPage({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-muted-foreground">版本</span>
-                    <span className="min-w-0 truncate">{component.version}</span>
+                    <span className="min-w-0 truncate">
+                      {component.version}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-muted-foreground">作者</span>
@@ -266,7 +270,9 @@ export default async function ComponentDetailPage({
                   </div>
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-muted-foreground">分类</span>
-                    <span className="min-w-0 truncate">{component.category}</span>
+                    <span className="min-w-0 truncate">
+                      {component.category}
+                    </span>
                   </div>
                 </div>
               </section>
@@ -356,10 +362,7 @@ export default async function ComponentDetailPage({
                                   必需
                                 </Badge>
                               ) : (
-                                <Badge
-                                  variant="secondary"
-                                  className="text-xs"
-                                >
+                                <Badge variant="secondary" className="text-xs">
                                   可选
                                 </Badge>
                               )}
@@ -406,10 +409,7 @@ export default async function ComponentDetailPage({
                           <TableCell>{prop.description}</TableCell>
                           <TableCell>
                             {prop.required ? (
-                              <Badge
-                                variant="destructive"
-                                className="text-xs"
-                              >
+                              <Badge variant="destructive" className="text-xs">
                                 必需
                               </Badge>
                             ) : (

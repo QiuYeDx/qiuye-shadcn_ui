@@ -43,6 +43,99 @@ export interface ComponentRegistry {
   [key: string]: ComponentInfo;
 }
 
+const matrixEffectRuntimeProps: PropDefinition[] = [
+  {
+    name: "playing",
+    type: "boolean",
+    description: "是否允许动态 Source 连续播放",
+    required: false,
+    default: "true",
+  },
+  {
+    name: "frameRate",
+    type: '"auto" | 30 | 60',
+    description: "固定目标帧率，或根据渲染负载在 30/60 FPS 间自适应",
+    required: false,
+    default: '"auto"',
+  },
+  {
+    name: "maxDpr",
+    type: "number",
+    description: "输出 Canvas 使用的最大设备像素比",
+    required: false,
+    default: "2",
+  },
+  {
+    name: "pauseWhenOffscreen",
+    type: "boolean",
+    description: "组件离开视口后是否暂停连续绘制",
+    required: false,
+    default: "true",
+  },
+  {
+    name: "reducedMotion",
+    type: '"freeze" | "ignore"',
+    description: "系统偏好减少动态效果时冻结画面或忽略该偏好",
+    required: false,
+    default: '"freeze"',
+  },
+  {
+    name: "canvasClassName",
+    type: "string",
+    description: "输出 Canvas 的额外类名",
+    required: false,
+  },
+  {
+    name: "decorative",
+    type: "boolean",
+    description: "是否把输出 Canvas 标记为纯装饰内容",
+    required: false,
+    default: "true",
+  },
+  {
+    name: "ariaLabel",
+    type: "string",
+    description: "decorative=false 时描述 Canvas 内容的无障碍标签",
+    required: false,
+  },
+  {
+    name: "fallback",
+    type: "React.ReactNode",
+    description: "尚无成功帧且组件发生错误时显示的替代内容",
+    required: false,
+  },
+  {
+    name: "onStatusChange",
+    type: "(status: MatrixEffectStatus) => void",
+    description: "idle、loading、ready 或 error 生命周期状态变化回调",
+    required: false,
+  },
+  {
+    name: "onReady",
+    type: "() => void",
+    description: "每个 Source 首次成功绘制后的回调",
+    required: false,
+  },
+  {
+    name: "onError",
+    type: "(error: MatrixEffectError) => void",
+    description: "发生结构化 Source 或管线错误时的回调",
+    required: false,
+  },
+  {
+    name: "className",
+    type: "string",
+    description: "根容器的额外类名；应提供明确高度或宽高比",
+    required: false,
+  },
+  {
+    name: "style",
+    type: "React.CSSProperties",
+    description: "根容器的内联样式",
+    required: false,
+  },
+];
+
 // 组件注册表
 export const componentRegistry: ComponentRegistry = {
   [ComponentId.RESPONSIVE_TABS]: {
@@ -218,8 +311,7 @@ export const componentRegistry: ComponentRegistry = {
       {
         name: "size",
         type: '"sm" | "md"',
-        description:
-          "控件尺寸：md 用于局部内容切换，sm 用于紧凑配置项",
+        description: "控件尺寸：md 用于局部内容切换，sm 用于紧凑配置项",
         required: false,
         default: '"md"',
       },
@@ -1136,8 +1228,7 @@ export const componentRegistry: ComponentRegistry = {
           {
             name: "targetDark",
             type: "boolean",
-            description:
-              "切换后的目标主题是否为深色；默认按 !isDark 推导",
+            description: "切换后的目标主题是否为深色；默认按 !isDark 推导",
             required: false,
           },
           {
@@ -1311,7 +1402,7 @@ export const componentRegistry: ComponentRegistry = {
             name: "diff",
             type: "boolean",
             description:
-              "是否启用 Diff 高亮模式，自动识别行首 +/- 标记并以绿色/红色背景高亮显示，搭配 language=\"diff\" 使用效果最佳",
+              '是否启用 Diff 高亮模式，自动识别行首 +/- 标记并以绿色/红色背景高亮显示，搭配 language="diff" 使用效果最佳',
             required: false,
             default: "false",
           },
@@ -1319,7 +1410,7 @@ export const componentRegistry: ComponentRegistry = {
             name: "highlightLines",
             type: "number[] | string",
             description:
-              "需要高亮标记的行号（行号从 1 开始），高亮行以淡蓝色背景显示。支持行号数组如 [1, 3, 5] 或逗号分隔的范围字符串如 \"1,3,5-10\"",
+              '需要高亮标记的行号（行号从 1 开始），高亮行以淡蓝色背景显示。支持行号数组如 [1, 3, 5] 或逗号分隔的范围字符串如 "1,3,5-10"',
             required: false,
           },
           {
@@ -1343,21 +1434,21 @@ export const componentRegistry: ComponentRegistry = {
             name: "language",
             type: "string",
             description:
-              "编程语言标识（当未设置 filename 时，作为 fallback 标签显示语言类型，如 \"TypeScript\"）",
+              '编程语言标识（当未设置 filename 时，作为 fallback 标签显示语言类型，如 "TypeScript"）',
             required: false,
           },
           {
             name: "showLanguageLabel",
             type: "boolean",
-            description:
-              "是否在未设置 filename 时自动显示语言类型标签",
+            description: "是否在未设置 filename 时自动显示语言类型标签",
             required: false,
             default: "true",
           },
           {
             name: "code",
             type: "string",
-            description: "代码文本内容（用于复制按钮功能，不传则不显示复制按钮）",
+            description:
+              "代码文本内容（用于复制按钮功能，不传则不显示复制按钮）",
             required: false,
           },
           {
@@ -1451,8 +1542,7 @@ export const componentRegistry: ComponentRegistry = {
       {
         name: "loop",
         type: "boolean",
-        description:
-          "是否循环轮播，false 时打完最后一段后停止，光标保持闪烁",
+        description: "是否循环轮播，false 时打完最后一段后停止，光标保持闪烁",
         required: false,
         default: "true",
       },
@@ -1474,7 +1564,8 @@ export const componentRegistry: ComponentRegistry = {
       {
         name: "springConfig",
         type: "{ stiffness?: number; damping?: number }",
-        description: "容器宽度弹簧动画配置，控制宽度跟随文本变化时的弹簧物理参数",
+        description:
+          "容器宽度弹簧动画配置，控制宽度跟随文本变化时的弹簧物理参数",
         required: false,
         default: "{ stiffness: 300, damping: 30 }",
       },
@@ -1546,8 +1637,7 @@ export const componentRegistry: ComponentRegistry = {
           {
             name: "codeBlockDisplayMode",
             type: '"collapse" | "scroll" | "auto-height"',
-            description:
-              "博客预设代码块的溢出处理策略，透传给 CodeBlock",
+            description: "博客预设代码块的溢出处理策略，透传给 CodeBlock",
             required: false,
           },
           {
@@ -1626,7 +1716,8 @@ export const componentRegistry: ComponentRegistry = {
           {
             name: "widgetRegistry",
             type: "MarkdownWidgetRegistry",
-            description: "Widget 注册表；不传时使用内置 tool-call / artifact / reference-card",
+            description:
+              "Widget 注册表；不传时使用内置 tool-call / artifact / reference-card",
             required: false,
           },
           {
@@ -1711,8 +1802,7 @@ export const componentRegistry: ComponentRegistry = {
       {
         name: "presetColors",
         type: "string[] | false",
-        description:
-          "自定义预设色卡数组，传入 false 可隐藏预设区域",
+        description: "自定义预设色卡数组，传入 false 可隐藏预设区域",
         required: false,
         default: "DEFAULT_PRESET_COLORS",
       },
@@ -1862,8 +1952,7 @@ export const componentRegistry: ComponentRegistry = {
       {
         name: "asChild",
         type: "boolean",
-        description:
-          "是否把效果应用到唯一子元素本身，而不是额外包一层 div",
+        description: "是否把效果应用到唯一子元素本身，而不是额外包一层 div",
         required: false,
         default: "false",
       },
@@ -2065,6 +2154,250 @@ export const componentRegistry: ComponentRegistry = {
     ],
     cliName: "tour",
     basicUsage: basicUsageExamples[ComponentId.TOUR],
+  },
+
+  [ComponentId.MATRIX_EFFECT]: {
+    name: "Matrix Effect",
+    description:
+      "通用 Canvas 矩阵视觉效果组件：将图片、外部 Canvas 或程序化信号场按响应式网格采样，通过可组合的 Mapper、Transform 与 Renderer 管线生成圆点矩阵、ASCII 艺术和自定义效果，并内置自适应帧率、DPR 限制、离屏暂停与 Reduced Motion 支持。",
+    category: "特效",
+    dependencies: [],
+    files: {
+      component: "components/qiuye-ui/matrix-effect/index.ts",
+      demo: "components/qiuye-ui/demos/matrix-effect-demo.tsx",
+      types: "components/qiuye-ui/matrix-effect/types.ts",
+    },
+    propsInfo: [
+      {
+        componentName: "MatrixEffect",
+        props: [
+          {
+            name: "source",
+            type: "MatrixSource",
+            description: "必填的图片、外部 Canvas 或程序化输入 Source",
+            required: true,
+          },
+          {
+            name: "renderer",
+            type: "MatrixRenderer",
+            description: "把最终主信号场绘制到输出 Canvas 的 Renderer",
+            required: true,
+          },
+          {
+            name: "mapper",
+            type: "MatrixSignalMapper",
+            description: "把采样 RGBA 数据写入主信号场的同步 Mapper",
+            required: false,
+            default: "createLuminanceMapper()",
+          },
+          {
+            name: "transforms",
+            type: "readonly MatrixSignalTransform[]",
+            description: "按数组顺序执行的整帧信号转换链",
+            required: false,
+            default: "[]",
+          },
+          {
+            name: "grid",
+            type: "MatrixGridConfig",
+            description: "按容器比例计算 columns x rows 的响应式或固定网格配置",
+            required: false,
+            default: '{ mode: "auto", cellSize: 10, maxCells: 10000 }',
+          },
+          {
+            name: "clearColor",
+            type: "string | null",
+            description: "Renderer 执行前的输出 Canvas 清屏颜色，null 表示透明",
+            required: false,
+            default: "null",
+          },
+          ...matrixEffectRuntimeProps,
+        ],
+      },
+      {
+        componentName: "DotMatrixEffect",
+        props: [
+          {
+            name: "source",
+            type: "MatrixSource",
+            description: "自定义输入 Source；未传时使用内置柔和光团",
+            required: false,
+            default: "createSoftBlobSource(blobOptions)",
+          },
+          {
+            name: "blobOptions",
+            type: "SoftBlobSourceOptions",
+            description: "内置柔和光团的数量、半径、速度、基础灰度和 seed 配置",
+            required: false,
+          },
+          {
+            name: "color",
+            type: 'string | "source"',
+            description: "圆点固定 CSS 颜色，或保留每个采样格的 Source RGB",
+            required: false,
+            default: '"#71717a"',
+          },
+          {
+            name: "backgroundColor",
+            type: "string | null",
+            description: "输出 Canvas 的清屏颜色，null 表示透明",
+            required: false,
+            default: "null",
+          },
+          {
+            name: "radiusRange",
+            type: "readonly [minimum: number, maximum: number]",
+            description: "主信号从 0 到 1 时对应的圆点半径范围，单位为 CSS px",
+            required: false,
+            default: "[0.35, 4]",
+          },
+          {
+            name: "opacityRange",
+            type: "readonly [minimum: number, maximum: number]",
+            description: "主信号从 0 到 1 时对应的不透明度范围",
+            required: false,
+            default: "[1, 1]",
+          },
+          {
+            name: "invert",
+            type: "boolean",
+            description: "是否在 Levels 之前反转主信号",
+            required: false,
+            default: "false",
+          },
+          {
+            name: "levels",
+            type: "LevelsTransformOptions",
+            description: "可选的输入范围、Gamma、对比度和亮度调整",
+            required: false,
+          },
+          {
+            name: "additionalTransforms",
+            type: "readonly MatrixSignalTransform[]",
+            description: "在预设 Invert 和 Levels 之后执行的额外 Transform",
+            required: false,
+            default: "[]",
+          },
+          {
+            name: "grid",
+            type: "MatrixGridConfig",
+            description: "按 auto/fixed 模式与 Dot 默认值合并的网格配置",
+            required: false,
+            default:
+              '{ mode: "auto", cellSize: 10, cellAspectRatio: 1, maxCells: 10000 }',
+          },
+          ...matrixEffectRuntimeProps,
+        ],
+      },
+      {
+        componentName: "AsciiEffect",
+        props: [
+          {
+            name: "source",
+            type: "MatrixSource",
+            description: "必填的图片、外部 Canvas 或程序化输入 Source",
+            required: true,
+          },
+          {
+            name: "grid",
+            type: "MatrixGridConfig",
+            description: "按 auto/fixed 模式与 ASCII 默认值合并的网格配置",
+            required: false,
+            default:
+              '{ mode: "auto", cellSize: 10, cellAspectRatio: 0.6, maxCells: 6000 }',
+          },
+          {
+            name: "characters",
+            type: "string | readonly string[]",
+            description: "从低视觉密度到高视觉密度排列的字符集",
+            required: false,
+            default: '" .:-=+*#%@"',
+          },
+          {
+            name: "colorMode",
+            type: '"fixed" | "source"',
+            description: "使用统一固定色，或保留每个采样格的 Source RGB",
+            required: false,
+            default: '"fixed"',
+          },
+          {
+            name: "color",
+            type: "string",
+            description: "固定色模式下的 CSS 颜色",
+            required: false,
+            default: '"#71717a"',
+          },
+          {
+            name: "backgroundColor",
+            type: "string | null",
+            description: "输出 Canvas 的清屏颜色，null 表示透明",
+            required: false,
+            default: "null",
+          },
+          {
+            name: "fontFamily",
+            type: "string",
+            description: "Canvas 文本使用的字体族",
+            required: false,
+            default:
+              "\"ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace\"",
+          },
+          {
+            name: "fontWeight",
+            type: "number | string",
+            description: "Canvas 文本使用的字重",
+            required: false,
+            default: "400",
+          },
+          {
+            name: "fontScale",
+            type: "number",
+            description: "字号相对于单元格高度的比例",
+            required: false,
+            default: "1",
+          },
+          {
+            name: "invert",
+            type: "boolean",
+            description: "是否在 Levels 之前反转主信号",
+            required: false,
+            default: "false",
+          },
+          {
+            name: "levels",
+            type: "LevelsTransformOptions",
+            description: "可选的输入范围、Gamma、对比度和亮度调整",
+            required: false,
+          },
+          {
+            name: "additionalTransforms",
+            type: "readonly MatrixSignalTransform[]",
+            description: "在预设 Invert 和 Levels 之后执行的额外 Transform",
+            required: false,
+            default: "[]",
+          },
+          ...matrixEffectRuntimeProps,
+        ],
+      },
+    ],
+    version: "1.0.0",
+    author: "QiuYeDx",
+    tags: [
+      "canvas",
+      "matrix",
+      "grid",
+      "visual-effect",
+      "animation",
+      "dots",
+      "ascii",
+      "image",
+      "procedural",
+      "sampling",
+      "generative",
+      "responsive",
+    ],
+    cliName: "matrix-effect",
+    basicUsage: basicUsageExamples[ComponentId.MATRIX_EFFECT],
   },
 };
 

@@ -21,6 +21,7 @@ import { MarkdownRenderer } from "@/components/qiuye-ui/markdown-renderer";
 import { ColorPicker } from "@/components/qiuye-ui/color-picker";
 import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
 import { Tour, type TourStep } from "@/components/qiuye-ui/tour";
+import { DotMatrixEffect } from "@/components/qiuye-ui/matrix-effect";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "next-themes";
@@ -35,6 +36,24 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const MATRIX_EFFECT_SIMPLE_BLOB_OPTIONS = {
+  count: 3,
+  minRadius: 0.18,
+  maxRadius: 0.48,
+  speed: 0.14,
+  baseValue: 0.025,
+  seed: 17,
+} as const;
+
+const MATRIX_EFFECT_SIMPLE_GRID = {
+  mode: "auto",
+  cellSize: 12,
+  maxCells: 3_500,
+} as const;
+
+const MATRIX_EFFECT_SIMPLE_RADIUS_RANGE = [0.25, 4] as const;
+const MATRIX_EFFECT_SIMPLE_LEVELS = { contrast: 1.2 } as const;
 
 // ResponsiveTabs 简单演示
 export function ResponsiveTabsSimpleDemo() {
@@ -328,7 +347,7 @@ export function MarkdownRendererSimpleDemo() {
     "| 长文 | Blog |",
     "| 会话 | Chat |",
     "",
-    "```tsx title=\"demo.tsx\" {2}",
+    '```tsx title="demo.tsx" {2}',
     "export function Demo() {",
     "  return <MarkdownRenderer content={content} />;",
     "}",
@@ -386,7 +405,7 @@ export function SmoothCornersSimpleDemo() {
           smoothing={item.smoothing}
           className={cn(
             "flex aspect-[4/3] min-h-24 flex-col justify-between p-4 shadow-sm",
-            item.className
+            item.className,
           )}
         >
           <span className="text-sm font-medium">smoothing</span>
@@ -415,7 +434,7 @@ export function TourSimpleDemo() {
         placement: "top",
       },
     ],
-    []
+    [],
   );
 
   return (
@@ -464,5 +483,24 @@ export function TourSimpleDemo() {
 
       <Tour open={open} onOpenChange={setOpen} steps={steps} />
     </div>
+  );
+}
+
+// MatrixEffect 简单演示
+export function MatrixEffectSimpleDemo() {
+  return (
+    <DotMatrixEffect
+      className="mx-auto aspect-[4/3] min-w-0 w-full max-w-3xl overflow-hidden rounded-md border bg-[#09090b] sm:aspect-video"
+      blobOptions={MATRIX_EFFECT_SIMPLE_BLOB_OPTIONS}
+      grid={MATRIX_EFFECT_SIMPLE_GRID}
+      radiusRange={MATRIX_EFFECT_SIMPLE_RADIUS_RANGE}
+      levels={MATRIX_EFFECT_SIMPLE_LEVELS}
+      color="#f4f4f5"
+      backgroundColor="#09090b"
+      frameRate={30}
+      maxDpr={1.5}
+      decorative={false}
+      ariaLabel="缓慢流动的柔和光团圆点矩阵"
+    />
   );
 }

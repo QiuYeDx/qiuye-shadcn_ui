@@ -19,6 +19,7 @@ export enum ComponentId {
   COLOR_PICKER = "color-picker",
   SMOOTH_CORNERS = "smooth-corners",
   TOUR = "tour",
+  MATRIX_EFFECT = "matrix-effect",
 }
 
 // 组件 ID 数组，方便遍历
@@ -243,11 +244,15 @@ return (
   </>
 );`,
   },
+  [ComponentId.MATRIX_EFFECT]: {
+    import: `import { DotMatrixEffect } from "@/components/qiuye-ui/matrix-effect";`,
+    usage: `<DotMatrixEffect className="aspect-video w-full" />`,
+  },
 };
 
 // 获取基础使用示例的辅助函数
 export function getBasicUsageExample(
-  componentId: string
+  componentId: string,
 ): BasicUsageExample | null {
   return basicUsageExamples[componentId as ComponentId] || null;
 }

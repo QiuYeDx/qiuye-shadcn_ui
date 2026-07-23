@@ -433,7 +433,7 @@ function DotGlassPreview() {
 
       event.preventDefault();
     },
-    [updateSplitFromClientX]
+    [updateSplitFromClientX],
   );
 
   const handlePointerMove = React.useCallback(
@@ -442,7 +442,7 @@ function DotGlassPreview() {
       updateSplitFromClientX(event.clientX);
       event.preventDefault();
     },
-    [updateSplitFromClientX]
+    [updateSplitFromClientX],
   );
 
   const handlePointerEnd = React.useCallback(
@@ -457,7 +457,7 @@ function DotGlassPreview() {
 
       event.preventDefault();
     },
-    []
+    [],
   );
 
   const handleLostPointerCapture = React.useCallback(() => {
@@ -488,7 +488,7 @@ function DotGlassPreview() {
         event.preventDefault();
       }
     },
-    []
+    [],
   );
 
   return (
@@ -755,8 +755,8 @@ const homeMarkdownPreviewContent = [
   "",
   "## 代码示例",
   "",
-  "```tsx title=\"preview.tsx\" {4}",
-  "import { MarkdownRenderer } from \"@/components/qiuye-ui/markdown-renderer\";",
+  '```tsx title="preview.tsx" {4}',
+  'import { MarkdownRenderer } from "@/components/qiuye-ui/markdown-renderer";',
   "",
   "export function Preview({ content }: { content: string }) {",
   "  return <MarkdownRenderer content={content} />;",
@@ -876,10 +876,7 @@ function MarkdownRendererPreview() {
                   {codeLines.map((width, index) => (
                     <div
                       key={index}
-                      className={cn(
-                        "h-2 rounded-full bg-foreground/14",
-                        width,
-                      )}
+                      className={cn("h-2 rounded-full bg-foreground/14", width)}
                     />
                   ))}
                 </div>
@@ -1090,10 +1087,12 @@ function TourPreview() {
 
   return (
     <div className="group/tour-preview relative -m-4 flex h-[calc(100%+2rem)] min-h-[260px] w-[calc(100%+2rem)] items-center justify-center overflow-hidden p-5 sm:p-6">
-      <div className={cn(
-        "relative z-0 h-full min-h-[210px] w-full max-w-2xl overflow-hidden rounded-lg border bg-background p-3 transition-[filter,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none group-hover/tour-preview:saturate-[0.88] group-hover/tour-preview:opacity-90 group-hover/tour-preview:duration-300 sm:p-4",
-        !canHover && !open && "saturate-[0.92] opacity-[0.94]",
-      )}>
+      <div
+        className={cn(
+          "relative z-0 h-full min-h-[210px] w-full max-w-2xl overflow-hidden rounded-lg border bg-background p-3 transition-[filter,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none group-hover/tour-preview:saturate-[0.88] group-hover/tour-preview:opacity-90 group-hover/tour-preview:duration-300 sm:p-4",
+          !canHover && !open && "saturate-[0.92] opacity-[0.94]",
+        )}
+      >
         <div className="flex h-full min-h-0 flex-col gap-3">
           <div
             ref={toolbarRef}
@@ -1150,9 +1149,7 @@ function TourPreview() {
           "hover:bg-background/20 hover:backdrop-blur-[0.75px] hover:duration-300 focus-visible:bg-background/20 focus-visible:backdrop-blur-[0.75px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/45 focus-visible:ring-inset",
           "[&:focus-visible_.tour-preview-glow]:scale-100 [&:focus-visible_.tour-preview-glow]:opacity-100 [&:focus-visible_.tour-preview-glow]:duration-500",
           "[&:hover_.tour-preview-glow]:scale-100 [&:hover_.tour-preview-glow]:opacity-100 [&:hover_.tour-preview-glow]:duration-500",
-          open
-            ? "pointer-events-none"
-            : "cursor-pointer",
+          open ? "pointer-events-none" : "cursor-pointer",
         )}
       >
         <span
@@ -1225,7 +1222,7 @@ function SmoothCornersPreview() {
           smoothing={item.smoothing}
           className={cn(
             "flex h-28 w-[72px] shrink-0 flex-col justify-between p-3 text-xs shadow-sm",
-            item.className
+            item.className,
           )}
         >
           <span className="font-medium">s</span>
@@ -1236,7 +1233,9 @@ function SmoothCornersPreview() {
   );
 }
 
-export const homePreviewComponents = {
+export const homePreviewComponents: Partial<
+  Record<ComponentId, React.ComponentType>
+> = {
   [ComponentId.RESPONSIVE_TABS]: ResponsiveTabsPreview,
   [ComponentId.SEGMENTED_CONTROL]: SegmentedControlPreview,
   [ComponentId.SCROLLABLE_DIALOG]: ScrollableDialogPreview,
@@ -1250,4 +1249,4 @@ export const homePreviewComponents = {
   [ComponentId.COLOR_PICKER]: ColorPickerPreview,
   [ComponentId.SMOOTH_CORNERS]: SmoothCornersPreview,
   [ComponentId.TOUR]: TourPreview,
-} satisfies Record<ComponentId, React.ComponentType>;
+};
