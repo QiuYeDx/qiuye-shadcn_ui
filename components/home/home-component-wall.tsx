@@ -9,7 +9,11 @@ import {
   homePreviewConfigs,
   type HomePreviewConfig,
 } from "@/lib/home-component-preview-config";
-import { getAllComponents, getComponent, type ComponentInfo } from "@/lib/registry";
+import {
+  getAllComponents,
+  getComponent,
+  type ComponentInfo,
+} from "@/lib/registry";
 import { ComponentId } from "@/lib/component-constants";
 
 type PreviewItem = {
@@ -138,14 +142,12 @@ export function HomeComponentWall() {
             <p className="text-sm font-medium text-muted-foreground">
               Component previews
             </p>
-            <h2 className="mt-1 text-2xl font-semibold">
-              真实组件，轻量展示
-            </h2>
+            <h2 className="mt-1 text-2xl font-semibold">真实组件，轻量展示</h2>
           </div>
         </motion.div>
 
         <motion.div
-          className="grid auto-rows-[minmax(240px,auto)] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          className="grid auto-rows-[minmax(240px,auto)] grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
           variants={wallGridVariants}
         >
           {items.map(({ component, config, Preview }) => (
