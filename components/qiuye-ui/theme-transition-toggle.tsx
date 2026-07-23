@@ -18,7 +18,9 @@ type ViewTransitionLike = {
 };
 
 type DocumentWithViewTransition = Document & {
-  startViewTransition?: (callback: () => void | Promise<void>) => ViewTransitionLike;
+  startViewTransition?: (
+    callback: () => void | Promise<void>,
+  ) => ViewTransitionLike;
 };
 
 type ThemeTransitionLayer = "new" | "old";
@@ -146,8 +148,10 @@ export interface ThemeTransitionOptions {
 }
 
 /** useThemeTransition Hook 的配置 */
-export interface UseThemeTransitionOptions
-  extends Omit<ThemeTransitionOptions, "updateTheme" | "origin"> {
+export interface UseThemeTransitionOptions extends Omit<
+  ThemeTransitionOptions,
+  "updateTheme" | "origin"
+> {
   /** 触发主题切换的 DOM 更新函数 */
   updateTheme: () => void;
   /**
@@ -159,7 +163,8 @@ export interface UseThemeTransitionOptions
 
 /** ThemeTransitionToggle 组件的属性 */
 export interface ThemeTransitionToggleProps
-  extends Omit<
+  extends
+    Omit<
       DualStateToggleProps,
       | "active"
       | "onToggle"
@@ -214,9 +219,7 @@ function shouldReduceMotion() {
   );
 }
 
-function getRefCurrent(
-  origin: ThemeTransitionOrigin,
-): HTMLElement | undefined {
+function getRefCurrent(origin: ThemeTransitionOrigin): HTMLElement | undefined {
   if (
     typeof origin === "object" &&
     "current" in origin &&
@@ -300,6 +303,24 @@ function getViewportSize() {
   };
 }
 
+/**
+ * 把布局视口中的 CSS 像素换算为裁剪参考框百分比。
+ *
+ * View Transition 快照的合成层与页面布局视口可能使用不同的设备像素比例；
+ * 使用相对坐标可让圆心与半径始终跟随伪元素的实际参考框缩放。
+ */
+function toClipPercentage(value: number, reference: number) {
+  if (
+    !Number.isFinite(value) ||
+    !Number.isFinite(reference) ||
+    reference <= 0
+  ) {
+    return 0;
+  }
+
+  return (value / reference) * 100;
+}
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
@@ -336,11 +357,13 @@ function getNearestViewportCorner(
   return `${vertical}-${horizontal}` as ViewportCorner;
 }
 
-function getCircleCoverRadius(x: number, y: number, extraRadius: number) {
-  if (typeof window === "undefined") return extraRadius;
-
-  const { width, height } = getViewportSize();
-
+function getCircleCoverRadius(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  extraRadius: number,
+) {
   return (
     Math.max(
       Math.hypot(x, y),
@@ -351,12 +374,13 @@ function getCircleCoverRadius(x: number, y: number, extraRadius: number) {
   );
 }
 
-function getEllipseCoverRadii(x: number, y: number, extraRadius: number) {
-  if (typeof window === "undefined") {
-    return { radiusX: extraRadius, radiusY: extraRadius };
-  }
-
-  const { width, height } = getViewportSize();
+function getEllipseCoverRadii(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  extraRadius: number,
+) {
   const requiredRadiusX = Math.max(
     Math.hypot(x, y / ELLIPSE_Y_RATIO),
     Math.hypot(width - x, y / ELLIPSE_Y_RATIO),
@@ -371,7 +395,9 @@ function getEllipseCoverRadii(x: number, y: number, extraRadius: number) {
   };
 }
 
-function isPolygonShape(shape: ThemeTransitionShape): shape is PolygonTransitionShape {
+function isPolygonShape(
+  shape: ThemeTransitionShape,
+): shape is PolygonTransitionShape {
   return shape === "star" || shape === "diamond" || shape === "hexagon";
 }
 
@@ -399,10 +425,7 @@ function getPolygonPoints(shape: PolygonTransitionShape) {
   });
 }
 
-function getPolygonCoverRadii(
-  shape: PolygonTransitionShape,
-  radius: number,
-) {
+function getPolygonCoverRadii(shape: PolygonTransitionShape, radius: number) {
   const coverRadius = radius * POLYGON_COVER_MULTIPLIERS[shape];
 
   return {
@@ -416,36 +439,42 @@ function getClipPathValue({
   y,
   radiusX,
   radiusY,
+  width,
+  height,
   shape,
 }: {
   x: number;
   y: number;
   radiusX: number;
   radiusY: number;
+  width: number;
+  height: number;
   shape: ThemeTransitionShape;
 }) {
+  const centerX = toClipPercentage(x, width);
+  const centerY = toClipPercentage(y, height);
+
   if (shape === "ellipse") {
-    return `ellipse(${radiusX}px ${radiusY}px at ${x}px ${y}px)`;
+    return `ellipse(${toClipPercentage(radiusX, width)}% ${toClipPercentage(radiusY, height)}% at ${centerX}% ${centerY}%)`;
   }
 
   if (isPolygonShape(shape)) {
     const points = getPolygonPoints(shape)
       .map(([pointX, pointY]) => {
-        return `${x + pointX * radiusX}px ${y + pointY * radiusY}px`;
+        return `${toClipPercentage(x + pointX * radiusX, width)}% ${toClipPercentage(y + pointY * radiusY, height)}%`;
       })
       .join(", ");
 
     return `polygon(${points})`;
   }
 
-  return `circle(${radiusX}px at ${x}px ${y}px)`;
+  const circleReferenceRadius = Math.hypot(width, height) / Math.SQRT2;
+
+  return `circle(${toClipPercentage(radiusX, circleReferenceRadius)}% at ${centerX}% ${centerY}%)`;
 }
 
 function waitForNextPaint() {
-  if (
-    typeof window === "undefined" ||
-    document.visibilityState === "hidden"
-  ) {
+  if (typeof window === "undefined" || document.visibilityState === "hidden") {
     return Promise.resolve();
   }
 
@@ -494,11 +523,16 @@ function getClipPathKeyframes({
     hidden = hiddenInsets[edge];
     visible = "inset(0% 0% 0% 0%)";
   } else if (transitionEffect === "split") {
+    const leftInset = toClipPercentage(pointX, width);
+    const rightInset = toClipPercentage(width - pointX, width);
+    const topInset = toClipPercentage(pointY, height);
+    const bottomInset = toClipPercentage(height - pointY, height);
+
     hidden =
       edge === "left" || edge === "right"
-        ? `inset(0px ${width - pointX}px 0px ${pointX}px)`
-        : `inset(${pointY}px 0px ${height - pointY}px 0px)`;
-    visible = "inset(0px 0px 0px 0px)";
+        ? `inset(0% ${rightInset}% 0% ${leftInset}%)`
+        : `inset(${topInset}% 0% ${bottomInset}% 0%)`;
+    visible = "inset(0% 0% 0% 0%)";
   } else if (transitionEffect === "diagonal") {
     const corner = getNearestViewportCorner(x, y, width, height);
     const diagonalPaths: Record<
@@ -530,9 +564,19 @@ function getClipPathKeyframes({
       y,
       radiusX: 0,
       radiusY: 0,
+      width,
+      height,
       shape,
     });
-    visible = getClipPathValue({ x, y, radiusX, radiusY, shape });
+    visible = getClipPathValue({
+      x,
+      y,
+      radiusX,
+      radiusY,
+      width,
+      height,
+      shape,
+    });
   }
 
   return layer === "old"
@@ -657,13 +701,13 @@ export async function runThemeViewTransition({
 
   const { x, y } = getPointFromOrigin(origin);
   const { width, height } = getViewportSize();
-  const circleRadius = getCircleCoverRadius(x, y, extraRadius);
+  const circleRadius = getCircleCoverRadius(x, y, width, height, extraRadius);
   const { radiusX, radiusY } =
     shape === "ellipse"
-      ? getEllipseCoverRadii(x, y, extraRadius)
+      ? getEllipseCoverRadii(x, y, width, height, extraRadius)
       : isPolygonShape(shape)
         ? getPolygonCoverRadii(shape, circleRadius)
-      : { radiusX: circleRadius, radiusY: circleRadius };
+        : { radiusX: circleRadius, radiusY: circleRadius };
   const layer = getTransitionLayer(direction, isDark);
   const keyframes = getClipPathKeyframes({
     x,
@@ -725,10 +769,7 @@ export async function runThemeViewTransition({
     });
     activeThemeClipPathAnimation = clipPathAnimation;
 
-    await Promise.allSettled([
-      transition.finished,
-      clipPathAnimation.finished,
-    ]);
+    await Promise.allSettled([transition.finished, clipPathAnimation.finished]);
   } catch {
     await transition.updateCallbackDone.catch(() => undefined);
   } finally {
@@ -970,10 +1011,7 @@ export const ThemeTransitionToggle = React.forwardRef<
       disabled={disabled || isTransitioning}
       aria-label={isDark ? darkLabel : lightLabel}
       aria-pressed={isDark}
-      className={cn(
-        "overflow-hidden",
-        className,
-      )}
+      className={cn("overflow-hidden", className)}
       {...buttonProps}
       onClick={handleClick}
     />
