@@ -4,9 +4,11 @@ import * as React from "react";
 import {
   CaseUpperIcon,
   CircleDotIcon,
+  PaletteIcon,
   SlidersHorizontalIcon,
 } from "lucide-react";
 
+import { ColorPicker } from "@/components/qiuye-ui/color-picker";
 import {
   AsciiEffect,
   createCellRenderer,
@@ -27,6 +29,13 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -64,6 +73,65 @@ const CUSTOM_RENDERER_ITEMS: SegmentedControlItem[] = [
   { value: "bars", label: "柱形" },
 ];
 
+const DOT_COLOR_PRESETS = [
+  {
+    id: "graphite",
+    label: "墨夜",
+    backgroundColor: "#09090B",
+    dotColor: "#F4F4F5",
+  },
+  {
+    id: "mist",
+    label: "雾灰",
+    backgroundColor: "#F6F6F6",
+    dotColor: "#9C9C9C",
+  },
+  {
+    id: "seafoam",
+    label: "海盐",
+    backgroundColor: "#ECFDF5",
+    dotColor: "#0F766E",
+  },
+  {
+    id: "coral",
+    label: "珊瑚",
+    backgroundColor: "#FFF1F2",
+    dotColor: "#E11D48",
+  },
+] as const;
+
+const DOT_PICKER_PRESET_COLORS = [
+  "#09090B",
+  "#F4F4F5",
+  "#F6F6F6",
+  "#9C9C9C",
+  "#ECFDF5",
+  "#0F766E",
+  "#FFF1F2",
+  "#E11D48",
+];
+
+function DotPaletteSwatch({
+  backgroundColor,
+  dotColor,
+}: {
+  backgroundColor: string;
+  dotColor: string;
+}) {
+  return (
+    <span
+      className="relative size-5 shrink-0 overflow-hidden rounded-sm border"
+      style={{ backgroundColor }}
+      aria-hidden="true"
+    >
+      <span
+        className="absolute left-1/2 top-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-black/10"
+        style={{ backgroundColor: dotColor }}
+      />
+    </span>
+  );
+}
+
 function PreviewFallback() {
   return (
     <div className="flex h-full items-center justify-center bg-[#09090b] px-6 text-center text-sm text-zinc-400">
@@ -86,6 +154,23 @@ function DotScene() {
   const [speed, setSpeed] = React.useState(0.4);
   const [contrast, setContrast] = React.useState(1.25);
   const [invert, setInvert] = React.useState(false);
+  const [dotColor, setDotColor] = React.useState("#F4F4F5");
+  const [backgroundColor, setBackgroundColor] = React.useState("#09090B");
+
+  const activeDotColorPreset = DOT_COLOR_PRESETS.find(
+    (preset) =>
+      preset.dotColor === dotColor &&
+      preset.backgroundColor === backgroundColor,
+  );
+
+  const handleDotColorPresetChange = (presetId: string) => {
+    const preset = DOT_COLOR_PRESETS.find((item) => item.id === presetId);
+
+    if (!preset) return;
+
+    setDotColor(preset.dotColor);
+    setBackgroundColor(preset.backgroundColor);
+  };
 
   const blobOptions = React.useMemo(
     () => ({
@@ -110,7 +195,10 @@ function DotScene() {
 
   return (
     <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start">
-      <div className="aspect-[4/3] min-w-0 overflow-hidden rounded-md border bg-[#09090b] sm:aspect-video">
+      <div
+        className="aspect-[4/3] min-w-0 overflow-hidden rounded-md border sm:aspect-video"
+        style={{ backgroundColor }}
+      >
         <DotMatrixEffect
           className="h-full w-full"
           blobOptions={blobOptions}
@@ -118,14 +206,87 @@ function DotScene() {
           levels={levels}
           grid={grid}
           invert={invert}
-          color="#f4f4f5"
-          backgroundColor="#09090b"
+          color={dotColor}
+          backgroundColor={backgroundColor}
           decorative={false}
           ariaLabel="缓慢流动的柔和光团圆点矩阵"
         />
       </div>
 
       <div className="min-w-0 space-y-5 lg:border-l lg:pl-5">
+        <div className="space-y-2.5">
+          <Label htmlFor="matrix-dot-palette">配色预设</Label>
+          <Select
+            value={activeDotColorPreset?.id ?? "custom"}
+            onValueChange={handleDotColorPresetChange}
+          >
+            <SelectTrigger
+              id="matrix-dot-palette"
+              className="w-full"
+              aria-label="圆点矩阵配色预设"
+            >
+              <SelectValue placeholder="选择配色" />
+            </SelectTrigger>
+            <SelectContent>
+              {DOT_COLOR_PRESETS.map((preset) => (
+                <SelectItem key={preset.id} value={preset.id}>
+                  <DotPaletteSwatch
+                    backgroundColor={preset.backgroundColor}
+                    dotColor={preset.dotColor}
+                  />
+                  {preset.label}
+                </SelectItem>
+              ))}
+              <SelectItem value="custom">
+                <PaletteIcon />
+                自定义
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div
+            className="min-w-0 space-y-2"
+            role="group"
+            aria-labelledby="matrix-dot-color-label"
+          >
+            <Label id="matrix-dot-color-label">圆点颜色</Label>
+            <div className="flex min-w-0 items-center gap-2">
+              <ColorPicker
+                value={dotColor}
+                onChange={setDotColor}
+                presetColors={DOT_PICKER_PRESET_COLORS}
+                showRecent={false}
+                triggerSize="sm"
+              />
+              <span className="text-muted-foreground truncate font-mono text-[11px]">
+                {dotColor}
+              </span>
+            </div>
+          </div>
+
+          <div
+            className="min-w-0 space-y-2"
+            role="group"
+            aria-labelledby="matrix-background-color-label"
+          >
+            <Label id="matrix-background-color-label">背景颜色</Label>
+            <div className="flex min-w-0 items-center gap-2">
+              <ColorPicker
+                value={backgroundColor}
+                onChange={setBackgroundColor}
+                presetColors={DOT_PICKER_PRESET_COLORS}
+                showRecent={false}
+                triggerSize="sm"
+              />
+              <span className="text-muted-foreground truncate font-mono text-[11px]">
+                {backgroundColor}
+              </span>
+            </div>
+          </div>
+        </div>
+
         <div className="space-y-2.5">
           <div className="flex items-center justify-between gap-3">
             <Label>单元格尺寸</Label>

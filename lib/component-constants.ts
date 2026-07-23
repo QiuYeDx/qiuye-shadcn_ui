@@ -246,7 +246,27 @@ return (
   },
   [ComponentId.MATRIX_EFFECT]: {
     import: `import { DotMatrixEffect } from "@/components/qiuye-ui/matrix-effect";`,
-    usage: `<DotMatrixEffect className="aspect-video w-full" />`,
+    usage: `<DotMatrixEffect
+  className="aspect-video w-full overflow-hidden rounded-md"
+  color="#9C9C9C"
+  backgroundColor="#F6F6F6"
+  grid={{ mode: "auto", cellSize: 10, maxCells: 7_000 }}
+  radiusRange={[0.25, 3]}
+  blobOptions={{
+    count: 4,
+    minRadius: 0.18,
+    maxRadius: 0.48,
+    speed: 0.4,
+    baseValue: 0.025,
+    seed: 17,
+  }}
+  levels={{ contrast: 1.25 }}
+  frameRate="auto"
+  maxDpr={2}
+  pauseWhenOffscreen
+  decorative={false}
+  ariaLabel="流动的柔和光团圆点矩阵"
+/>`,
   },
 };
 

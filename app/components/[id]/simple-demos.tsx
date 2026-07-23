@@ -490,13 +490,13 @@ export function TourSimpleDemo() {
 export function MatrixEffectSimpleDemo() {
   return (
     <DotMatrixEffect
-      className="mx-auto aspect-[4/3] min-w-0 w-full max-w-3xl overflow-hidden rounded-md border bg-[#09090b] sm:aspect-video"
+      className="mx-auto aspect-[4/3] min-w-0 w-full max-w-3xl overflow-hidden rounded-md border bg-[#f6f6f6] sm:aspect-video"
       blobOptions={MATRIX_EFFECT_SIMPLE_BLOB_OPTIONS}
       grid={MATRIX_EFFECT_SIMPLE_GRID}
       radiusRange={MATRIX_EFFECT_SIMPLE_RADIUS_RANGE}
       levels={MATRIX_EFFECT_SIMPLE_LEVELS}
-      color="#f4f4f5"
-      backgroundColor="#09090b"
+      color="#9c9c9c"
+      backgroundColor="#f6f6f6"
       frameRate={30}
       maxDpr={1.5}
       decorative={false}
