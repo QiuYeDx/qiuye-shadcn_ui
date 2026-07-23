@@ -10,6 +10,11 @@ export interface HomePreviewConfig {
 
 export const homePreviewConfigs: HomePreviewConfig[] = [
   {
+    id: ComponentId.MATRIX_EFFECT,
+    size: "wide",
+    featured: true,
+  },
+  {
     id: ComponentId.DOT_GLASS,
     size: "wide",
     featured: true,

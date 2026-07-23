@@ -29,6 +29,11 @@ import { ColorPicker } from "@/components/qiuye-ui/color-picker";
 import { DotGlass } from "@/components/qiuye-ui/dot-glass";
 import { DualStateToggle } from "@/components/qiuye-ui/dual-state-toggle";
 import { MarkdownRenderer } from "@/components/qiuye-ui/markdown-renderer";
+import {
+  AsciiEffect,
+  createSoftBlobSource,
+  DotMatrixEffect,
+} from "@/components/qiuye-ui/matrix-effect";
 import { ThemeTransitionToggle } from "@/components/qiuye-ui/theme-transition-toggle";
 import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
 import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
@@ -401,6 +406,104 @@ function DotGlassMarqueeStrip({
             ))}
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+const MATRIX_EFFECT_HOME_SOURCE = createSoftBlobSource({
+  count: 4,
+  minRadius: 0.18,
+  maxRadius: 0.48,
+  speed: 0.4,
+  baseValue: 0.025,
+  seed: 17,
+});
+const MATRIX_EFFECT_HOME_GRID = {
+  mode: "auto",
+  cellSize: 9,
+  maxCells: 3_200,
+} as const;
+const MATRIX_EFFECT_HOME_LEVELS = { contrast: 1.2 } as const;
+const MATRIX_EFFECT_HOME_PALETTES = {
+  light: {
+    backgroundColor: "#F6F6F6",
+    dotColor: "#9C9C9C",
+    asciiColor: "#52525B",
+  },
+  dark: {
+    backgroundColor: "#09090B",
+    dotColor: "#F4F4F5",
+    asciiColor: "#D4D4D8",
+  },
+} as const;
+
+function MatrixEffectPreview() {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const palette =
+    mounted && resolvedTheme === "dark"
+      ? MATRIX_EFFECT_HOME_PALETTES.dark
+      : MATRIX_EFFECT_HOME_PALETTES.light;
+
+  return (
+    <div className="grid w-full gap-3 sm:h-[230px] sm:grid-cols-2">
+      <div
+        className="relative aspect-video min-h-[168px] overflow-hidden rounded-md border sm:aspect-auto sm:h-full sm:min-h-0"
+        style={{ backgroundColor: palette.backgroundColor }}
+      >
+        <span
+          aria-hidden="true"
+          className="absolute top-3 left-3 z-10 rounded-sm border border-foreground/10 bg-background/85 px-2 py-1 font-mono text-[10px] font-medium text-foreground shadow-sm backdrop-blur-sm"
+        >
+          DOT
+        </span>
+        <DotMatrixEffect
+          className="h-full w-full"
+          source={MATRIX_EFFECT_HOME_SOURCE}
+          grid={MATRIX_EFFECT_HOME_GRID}
+          radiusRange={[0.2, 2.7]}
+          levels={MATRIX_EFFECT_HOME_LEVELS}
+          color={palette.dotColor}
+          backgroundColor={palette.backgroundColor}
+          frameRate={30}
+          maxDpr={1.5}
+          pauseWhenOffscreen
+          decorative={false}
+          ariaLabel="随页面主题切换配色的流动光团圆点矩阵"
+        />
+      </div>
+
+      <div
+        className="relative aspect-video min-h-[168px] overflow-hidden rounded-md border sm:aspect-auto sm:h-full sm:min-h-0"
+        style={{ backgroundColor: palette.backgroundColor }}
+      >
+        <span
+          aria-hidden="true"
+          className="absolute top-3 left-3 z-10 rounded-sm border border-foreground/10 bg-background/85 px-2 py-1 font-mono text-[10px] font-medium text-foreground shadow-sm backdrop-blur-sm"
+        >
+          ASCII
+        </span>
+        <AsciiEffect
+          className="h-full w-full"
+          source={MATRIX_EFFECT_HOME_SOURCE}
+          grid={MATRIX_EFFECT_HOME_GRID}
+          levels={MATRIX_EFFECT_HOME_LEVELS}
+          colorMode="fixed"
+          color={palette.asciiColor}
+          backgroundColor={palette.backgroundColor}
+          fontScale={0.82}
+          frameRate={30}
+          maxDpr={1.5}
+          pauseWhenOffscreen
+          decorative={false}
+          ariaLabel="随页面主题切换配色的流动光团 ASCII 字符矩阵"
+        />
       </div>
     </div>
   );
@@ -1236,6 +1339,7 @@ function SmoothCornersPreview() {
 export const homePreviewComponents: Partial<
   Record<ComponentId, React.ComponentType>
 > = {
+  [ComponentId.MATRIX_EFFECT]: MatrixEffectPreview,
   [ComponentId.RESPONSIVE_TABS]: ResponsiveTabsPreview,
   [ComponentId.SEGMENTED_CONTROL]: SegmentedControlPreview,
   [ComponentId.SCROLLABLE_DIALOG]: ScrollableDialogPreview,

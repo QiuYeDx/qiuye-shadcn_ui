@@ -44,6 +44,7 @@
 | DEMO-1 完整 Demo 与同源示例资产       | 已完成 | 2026-07-23 | `components/qiuye-ui/demos/matrix-effect-demo.tsx`, `public/examples/matrix-effect/*`                                                                                                                                                         | pnpm 8.7.0 lint、TypeScript、Prettier、build、桌面/390px 浏览器验收通过                               | `MatrixEffect组件实施记录/2026-07-23_DEMO-1_完整演示.md`                  | 无                                                 |
 | DEMO-2 ASCII 与自定义演示输入增强     | 已完成 | 2026-07-23 | `components/qiuye-ui/demos/matrix-effect-demo.tsx`, `components/qiuye-ui/demos/matrix-effect-demo-sources.ts`, 设计文档、feat 与 ASCII 比例 fix 文档                                                                                          | Registry、lint、TypeScript、Prettier、build、动态 Source、上传、ASCII 配色与 390px 浏览器验收通过     | `MatrixEffect组件实施记录/2026-07-23_DEMO-2_ASCII与自定义演示输入增强.md` | 无                                                 |
 | SITE-1 详情页、快速预览与站点元数据   | 已完成 | 2026-07-23 | `app/components/[id]/simple-demos.tsx`, `app/components/[id]/page.tsx`, `components/home/home-component-previews.tsx`, `lib/component-constants.ts`, `lib/registry.ts`                                                                        | pnpm 8.7.0 lint、TypeScript、Prettier、build、桌面/390px 浏览器验收通过                               | `MatrixEffect组件实施记录/2026-07-23_SITE-1_站点接入.md`                  | 无                                                 |
+| SITE-2 首页双效果主题预览增强         | 已完成 | 2026-07-23 | `components/home/home-component-previews.tsx`, `lib/home-component-preview-config.ts`, 设计、feat 与实施记录                                                                                                                                  | Registry、lint、TypeScript、Prettier、build、双主题与 390px 浏览器验收通过                            | `MatrixEffect组件实施记录/2026-07-23_SITE-2_首页双效果预览增强.md`        | 无                                                 |
 | REG-1 Registry、MCP 与项目清单同步    | 已完成 | 2026-07-23 | `public/registry/matrix-effect.json`, `public/registry/registry.json`, `packages/qiuye-ui-cli/bin/qiuye-ui-mcp.mjs`, `README.md`, `AGENT.md`                                                                                                  | pnpm 8.7.0 Registry 生成/dry、结构/清单断言、lint、TypeScript、build 通过                             | `MatrixEffect组件实施记录/2026-07-23_REG-1_Registry与项目清单.md`         | 无                                                 |
 | QA-1 构建、Registry 与功能验收        | 已完成 | 2026-07-23 | 全部 MatrixEffect 交付文件；`components/qiuye-ui/matrix-effect/*`、`public/registry/matrix-effect.json`、QA-1 记录与 Source 身份 fix 文档                                                                                                     | pnpm 8.7.0 Registry 真实安装/dry、lint、TypeScript、Prettier、build、浏览器功能与 Canvas 像素断言通过 | `MatrixEffect组件实施记录/2026-07-23_QA-1_构建与功能验收.md`              | QA-2 仍需关闭视觉、性能、暂停、清理与多视口风险    |
 | QA-2 视觉、响应式、性能与生命周期验收 | 进行中 | -          | 以上全部实现文件；必要时新增 `fix/` 文档                                                                                                                                                                                                      | 执行中                                                                                                | 待创建                                                                    | 无                                                 |
@@ -401,6 +402,33 @@ REG-1 -> QA-1 -> QA-2
 - 创建 `MatrixEffect组件实施记录/<日期>_SITE-1_站点接入.md`。
 
 依赖：`DEMO-1`。
+
+### SITE-2：首页双效果主题预览增强
+
+目标：让 Matrix Effect 在首页前排大卡中同时呈现两个最具代表性的动态预设。
+
+范围：
+
+- 在 `homePreviewComponents` 注册 Matrix Effect 首页预览，并在优先配置中使用 `wide` + `featured`。
+- 同一预览内并列展示 `DotMatrixEffect` 与 `AsciiEffect`，两者共享稳定柔和光团 Source。
+- 圆点、ASCII 字符和背景色跟随 `resolvedTheme` 切换，SSR 与首次水合保持一致。
+- 桌面并排、窄屏上下排列；保持稳定容器尺寸与无横向溢出。
+- 首页两个 Canvas 固定 30 FPS、`maxDpr=1.5`、离屏暂停与有界网格。
+
+非范围：
+
+- 修改 MatrixEffect 公共 API、Registry item、组件默认参数或依赖。
+- 重构首页组件墙布局基础设施或其他组件预览。
+
+完成条件：
+
+- Matrix Effect 位于首页组件墙第一个优先位，尺寸与 Dot Glass 同为 `wide`。
+- 圆点与 ASCII Canvas 均非空白、持续变化，且深/浅主题下均可辨认。
+- 1440px 与 390px 视口下无重叠、裁切或横向溢出。
+- Registry dry-run、lint、TypeScript、Prettier、build 与浏览器控制台检查通过。
+- 创建 `MatrixEffect组件实施记录/<日期>_SITE-2_首页双效果预览增强.md`。
+
+依赖：`SITE-1`。
 
 ### REG-1：Registry、MCP 与项目清单同步
 
