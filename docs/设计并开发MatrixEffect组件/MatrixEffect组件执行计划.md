@@ -2,7 +2,7 @@
 
 - 创建日期：2026-07-22
 - 更新日期：2026-07-23
-- 当前阶段：QA-1 已完成，待启动 QA-2
+- 当前阶段：QA-2 进行中
 - 对应设计文档：`docs/设计并开发MatrixEffect组件/MatrixEffect组件开发设计文档.md`
 
 ## 使用方式
@@ -45,7 +45,7 @@
 | SITE-1 详情页、快速预览与站点元数据   | 已完成 | 2026-07-23 | `app/components/[id]/simple-demos.tsx`, `app/components/[id]/page.tsx`, `components/home/home-component-previews.tsx`, `lib/component-constants.ts`, `lib/registry.ts`                                                                        | pnpm 8.7.0 lint、TypeScript、Prettier、build、桌面/390px 浏览器验收通过                               | `MatrixEffect组件实施记录/2026-07-23_SITE-1_站点接入.md`            | 无                                                 |
 | REG-1 Registry、MCP 与项目清单同步    | 已完成 | 2026-07-23 | `public/registry/matrix-effect.json`, `public/registry/registry.json`, `packages/qiuye-ui-cli/bin/qiuye-ui-mcp.mjs`, `README.md`, `AGENT.md`                                                                                                  | pnpm 8.7.0 Registry 生成/dry、结构/清单断言、lint、TypeScript、build 通过                             | `MatrixEffect组件实施记录/2026-07-23_REG-1_Registry与项目清单.md`   | 无                                                 |
 | QA-1 构建、Registry 与功能验收        | 已完成 | 2026-07-23 | 全部 MatrixEffect 交付文件；`components/qiuye-ui/matrix-effect/*`、`public/registry/matrix-effect.json`、QA-1 记录与 Source 身份 fix 文档                                                                                                     | pnpm 8.7.0 Registry 真实安装/dry、lint、TypeScript、Prettier、build、浏览器功能与 Canvas 像素断言通过 | `MatrixEffect组件实施记录/2026-07-23_QA-1_构建与功能验收.md`        | QA-2 仍需关闭视觉、性能、暂停、清理与多视口风险    |
-| QA-2 视觉、响应式、性能与生命周期验收 | 未开始 | -          | 以上全部实现文件；必要时新增 `fix/` 文档                                                                                                                                                                                                      | 待执行                                                                                                | 待创建                                                              | 无                                                 |
+| QA-2 视觉、响应式、性能与生命周期验收 | 进行中 | -          | 以上全部实现文件；必要时新增 `fix/` 文档                                                                                                                                                                                                      | 执行中                                                                                                | 待创建                                                              | 无                                                 |
 
 ## 里程碑与依赖顺序
 
