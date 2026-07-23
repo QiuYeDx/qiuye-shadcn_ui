@@ -14,6 +14,7 @@
 当前可用自定义组件以 `lib/component-constants.ts`、`lib/registry.ts` 和 `public/registry/registry.json` 为准。目前包括：
 
 - `responsive-tabs`
+- `segmented-control`
 - `scrollable-dialog`
 - `dot-glass`
 - `image-viewer`
@@ -25,6 +26,7 @@
 - `color-picker`
 - `smooth-corners`
 - `tour`
+- `matrix-effect`
 
 ## 核心目录
 

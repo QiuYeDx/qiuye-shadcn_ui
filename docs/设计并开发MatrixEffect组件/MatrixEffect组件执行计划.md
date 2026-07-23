@@ -2,7 +2,7 @@
 
 - 创建日期：2026-07-22
 - 更新日期：2026-07-23
-- 当前阶段：SITE-1 已完成，待启动 REG-1
+- 当前阶段：REG-1 已完成，待启动 QA-1
 - 对应设计文档：`docs/设计并开发MatrixEffect组件/MatrixEffect组件开发设计文档.md`
 
 ## 使用方式
@@ -43,7 +43,7 @@
 | FX-2 ASCII Renderer 与 AsciiEffect    | 已完成 | 2026-07-23 | `components/qiuye-ui/matrix-effect/renderers.ts`, `components/qiuye-ui/matrix-effect/presets.tsx`, `components/qiuye-ui/matrix-effect/types.ts`, `components/qiuye-ui/matrix-effect/index.ts`                                                 | pnpm 8.7.0 lint、TypeScript、Prettier、build、算法/类型/SSR/浏览器断言通过 | `MatrixEffect组件实施记录/2026-07-23_FX-2_ASCII预设.md`             | 无                                                 |
 | DEMO-1 完整 Demo 与同源示例资产       | 已完成 | 2026-07-23 | `components/qiuye-ui/demos/matrix-effect-demo.tsx`, `public/examples/matrix-effect/*`                                                                                                                                                         | pnpm 8.7.0 lint、TypeScript、Prettier、build、桌面/390px 浏览器验收通过    | `MatrixEffect组件实施记录/2026-07-23_DEMO-1_完整演示.md`            | 无                                                 |
 | SITE-1 详情页、快速预览与站点元数据   | 已完成 | 2026-07-23 | `app/components/[id]/simple-demos.tsx`, `app/components/[id]/page.tsx`, `components/home/home-component-previews.tsx`, `lib/component-constants.ts`, `lib/registry.ts`                                                                        | pnpm 8.7.0 lint、TypeScript、Prettier、build、桌面/390px 浏览器验收通过    | `MatrixEffect组件实施记录/2026-07-23_SITE-1_站点接入.md`            | 无                                                 |
-| REG-1 Registry、MCP 与项目清单同步    | 未开始 | -          | `public/registry/matrix-effect.json`, `public/registry/registry.json`, `packages/qiuye-ui-cli/bin/qiuye-ui-mcp.mjs`, `README.md`, `AGENT.md`                                                                                                  | 待执行                                                                     | 待创建                                                              | 无                                                 |
+| REG-1 Registry、MCP 与项目清单同步    | 已完成 | 2026-07-23 | `public/registry/matrix-effect.json`, `public/registry/registry.json`, `packages/qiuye-ui-cli/bin/qiuye-ui-mcp.mjs`, `README.md`, `AGENT.md`                                                                                                  | pnpm 8.7.0 Registry 生成/dry、结构/清单断言、lint、TypeScript、build 通过  | `MatrixEffect组件实施记录/2026-07-23_REG-1_Registry与项目清单.md`   | 无                                                 |
 | QA-1 构建、Registry 与功能验收        | 未开始 | -          | 以上全部实现文件                                                                                                                                                                                                                              | 待执行                                                                     | 待创建                                                              | 无                                                 |
 | QA-2 视觉、响应式、性能与生命周期验收 | 未开始 | -          | 以上全部实现文件；必要时新增 `fix/` 文档                                                                                                                                                                                                      | 待执行                                                                     | 待创建                                                              | 无                                                 |
 
@@ -566,6 +566,6 @@ YYYY-MM-DD_<工作包ID>_<简短标题>.md
 
 ## 下一步建议
 
-下一工作包为 `REG-1 Registry、MCP 与项目清单同步`。
+下一工作包为 `QA-1 构建、Registry 与功能验收`。
 
-开始实现前应读取 SITE-1 实施记录，创建包含七个交付源码文件的 `public/registry/matrix-effect.json`，再使用 pnpm 8.7.0 运行 Registry 生成与 dry-run 校验。同步更新 MCP fallback、README 与 AGENT 项目清单，但不要手工编辑 `public/registry/registry.json`，也不要把站点 Demo 或示例资产加入组件 Registry item。
+开始验收前应读取 REG-1 实施记录，从真实安装产物和用户使用路径核对七个分发源码文件、公共导出、自定义 Source/Renderer、静态导出路由与 Canvas 非空绘制。继续使用 pnpm 8.7.0，并保持 QA-2 的性能、暂停、清理和多视口长时验证边界不提前混入本工作包。

@@ -25,6 +25,7 @@ const DEFAULT_COMPONENT_NAMES = [
   "color-picker",
   "smooth-corners",
   "tour",
+  "matrix-effect",
 ];
 
 function parseArgs(argv) {

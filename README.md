@@ -114,6 +114,7 @@ export default function App() {
 | 组件 | CLI 名称 | 分类 | 简介 |
 | --- | --- | --- | --- |
 | Responsive Tabs | `responsive-tabs` | 导航 | 小屏横向滚动、大屏网格布局，支持图标、徽标、禁用态、滚动按钮、渐变遮罩与选中态动画。 |
+| Segmented Control | `segmented-control` | 交互 | ChatGPT 风格的分段单选控件：使用 Motion layoutId 与 spring 弹性滑块过渡，提供内嵌与悬浮两种风格及中、小两档尺寸，并支持受控/非受控状态、键盘导航、禁用项与表单提交。 |
 | Scrollable Dialog | `scrollable-dialog` | 弹窗 | 头部和底部固定、内容区域滚动的对话框，适合展示大量内容。 |
 | Dot Glass | `dot-glass` | 特效 | 点阵开孔毛玻璃效果，只在点阵孔洞中露出背景模糊，适合 Header / Navbar 等视觉场景。 |
 | Image Viewer | `image-viewer` | 媒体 | 带灯箱预览的图片查看器，支持点击放大、滚轮 / 触控缩放、拖拽平移和加载过渡。 |
@@ -125,6 +126,7 @@ export default function App() {
 | Color Picker | `color-picker` | 表单 | HSV 取色器，支持 Alpha、触屏拖拽、十六进制输入、预设色卡、最近颜色和 Popover / Inline 模式。 |
 | Smooth Corners | `smooth-corners` | 特效 | Figma / iOS 风格平滑圆角组件，基于 `corner-shape` 渐进增强并自动回退到标准 `border-radius`。 |
 | Tour | `tour` | 导航 | 产品引导组件，支持目标元素高亮、遮罩聚焦、步骤 Popover、进度、跳过和自动滚动定位。 |
+| Matrix Effect | `matrix-effect` | 特效 | 通用 Canvas 矩阵视觉效果组件：将图片、外部 Canvas 或程序化信号场按响应式网格采样，通过可组合的 Mapper、Transform 与 Renderer 管线生成圆点矩阵、ASCII 艺术和自定义效果，并内置自适应帧率、DPR 限制、离屏暂停与 Reduced Motion 支持。 |
 
 安装任意组件：
 

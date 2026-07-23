@@ -235,6 +235,44 @@
       ]
     },
     {
+      "name": "matrix-effect",
+      "type": "registry:component",
+      "title": "MatrixEffect",
+      "author": "QiuYeDx <me@qiuyedx.com>",
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/matrix-effect/index.ts"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/matrix-effect/matrix-effect.tsx"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/matrix-effect/sources.ts"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/matrix-effect/transforms.ts"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/matrix-effect/renderers.ts"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/matrix-effect/presets.tsx"
+        },
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/matrix-effect/types.ts"
+        }
+      ]
+    },
+    {
       "name": "responsive-tabs",
       "type": "registry:component",
       "title": "ResponsiveTabs",
