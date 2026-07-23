@@ -26,7 +26,7 @@ const DEFAULT_DOT_MAX_CELLS = 10_000;
 const DEFAULT_DOT_RADIUS_RANGE = [0.35, 4] as const;
 const DEFAULT_DOT_OPACITY_RANGE = [1, 1] as const;
 const DEFAULT_ASCII_CELL_SIZE = 10;
-const DEFAULT_ASCII_CELL_ASPECT_RATIO = 0.6;
+const DEFAULT_ASCII_CELL_ASPECT_RATIO = 1;
 const DEFAULT_ASCII_MAX_CELLS = 6_000;
 const EMPTY_TRANSFORMS: readonly MatrixSignalTransform[] = [];
 const PRESET_LUMINANCE_MAPPER = createLuminanceMapper();
@@ -322,7 +322,7 @@ DotMatrixEffect.displayName = "DotMatrixEffect";
  *
  * - 接收图片、Canvas 或程序化 Source，并保留透明覆盖率
  * - 支持固定色或 Source RGB、字符集和等宽字体配置
- * - 按 auto/fixed mode 合并 0.6 宽高比与 6000 cells 默认网格
+ * - 按 auto/fixed mode 合并 1:1 方形采样格与 6000 cells 默认网格
  * - 固定执行 Luminance -> Invert -> Levels -> 额外 Transform 顺序
  * - 把 backgroundColor 映射为核心清屏，并原样转发 MatrixEffectHandle
  *

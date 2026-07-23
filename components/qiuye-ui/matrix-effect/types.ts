@@ -647,7 +647,7 @@ export interface AsciiEffectProps extends Omit<
   source: MatrixSource;
   /**
    * 响应式或固定网格配置
-   * @default { mode: "auto", cellSize: 10, cellAspectRatio: 0.6, maxCells: 6000 }
+   * @default { mode: "auto", cellSize: 10, cellAspectRatio: 1, maxCells: 6000 }
    */
   grid?: MatrixGridConfig;
   /**

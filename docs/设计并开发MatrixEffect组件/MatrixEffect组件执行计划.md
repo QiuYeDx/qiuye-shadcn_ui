@@ -42,7 +42,7 @@
 | FX-1 Dot Renderer 与 DotMatrixEffect  | 已完成 | 2026-07-23 | `components/qiuye-ui/matrix-effect/renderers.ts`, `components/qiuye-ui/matrix-effect/presets.tsx`, `components/qiuye-ui/matrix-effect/sources.ts`, `components/qiuye-ui/matrix-effect/types.ts`, `components/qiuye-ui/matrix-effect/index.ts` | pnpm 8.7.0 lint、TypeScript、Prettier、build、算法/类型/浏览器断言通过                                | `MatrixEffect组件实施记录/2026-07-23_FX-1_Dot预设.md`                     | 无                                                 |
 | FX-2 ASCII Renderer 与 AsciiEffect    | 已完成 | 2026-07-23 | `components/qiuye-ui/matrix-effect/renderers.ts`, `components/qiuye-ui/matrix-effect/presets.tsx`, `components/qiuye-ui/matrix-effect/types.ts`, `components/qiuye-ui/matrix-effect/index.ts`                                                 | pnpm 8.7.0 lint、TypeScript、Prettier、build、算法/类型/SSR/浏览器断言通过                            | `MatrixEffect组件实施记录/2026-07-23_FX-2_ASCII预设.md`                   | 无                                                 |
 | DEMO-1 完整 Demo 与同源示例资产       | 已完成 | 2026-07-23 | `components/qiuye-ui/demos/matrix-effect-demo.tsx`, `public/examples/matrix-effect/*`                                                                                                                                                         | pnpm 8.7.0 lint、TypeScript、Prettier、build、桌面/390px 浏览器验收通过                               | `MatrixEffect组件实施记录/2026-07-23_DEMO-1_完整演示.md`                  | 无                                                 |
-| DEMO-2 ASCII 与自定义演示输入增强     | 进行中 | -          | `components/qiuye-ui/demos/matrix-effect-demo.tsx`, `components/qiuye-ui/demos/matrix-effect-demo-sources.ts`, 设计文档与 feat 文档                                                                                                           | Registry、lint、TypeScript、Prettier、build 通过；真实浏览器待补                                      | `MatrixEffect组件实施记录/2026-07-23_DEMO-2_ASCII与自定义演示输入增强.md` | 不改变公共组件 API；待补 Canvas 与 390px 验收      |
+| DEMO-2 ASCII 与自定义演示输入增强     | 已完成 | 2026-07-23 | `components/qiuye-ui/demos/matrix-effect-demo.tsx`, `components/qiuye-ui/demos/matrix-effect-demo-sources.ts`, 设计文档、feat 与 ASCII 比例 fix 文档                                                                                          | Registry、lint、TypeScript、Prettier、build、四种动态 Source、暂停/恢复、上传与 390px 浏览器验收通过  | `MatrixEffect组件实施记录/2026-07-23_DEMO-2_ASCII与自定义演示输入增强.md` | 无                                                 |
 | SITE-1 详情页、快速预览与站点元数据   | 已完成 | 2026-07-23 | `app/components/[id]/simple-demos.tsx`, `app/components/[id]/page.tsx`, `components/home/home-component-previews.tsx`, `lib/component-constants.ts`, `lib/registry.ts`                                                                        | pnpm 8.7.0 lint、TypeScript、Prettier、build、桌面/390px 浏览器验收通过                               | `MatrixEffect组件实施记录/2026-07-23_SITE-1_站点接入.md`                  | 无                                                 |
 | REG-1 Registry、MCP 与项目清单同步    | 已完成 | 2026-07-23 | `public/registry/matrix-effect.json`, `public/registry/registry.json`, `packages/qiuye-ui-cli/bin/qiuye-ui-mcp.mjs`, `README.md`, `AGENT.md`                                                                                                  | pnpm 8.7.0 Registry 生成/dry、结构/清单断言、lint、TypeScript、build 通过                             | `MatrixEffect组件实施记录/2026-07-23_REG-1_Registry与项目清单.md`         | 无                                                 |
 | QA-1 构建、Registry 与功能验收        | 已完成 | 2026-07-23 | 全部 MatrixEffect 交付文件；`components/qiuye-ui/matrix-effect/*`、`public/registry/matrix-effect.json`、QA-1 记录与 Source 身份 fix 文档                                                                                                     | pnpm 8.7.0 Registry 真实安装/dry、lint、TypeScript、Prettier、build、浏览器功能与 Canvas 像素断言通过 | `MatrixEffect组件实施记录/2026-07-23_QA-1_构建与功能验收.md`              | QA-2 仍需关闭视觉、性能、暂停、清理与多视口风险    |
@@ -295,7 +295,7 @@ REG-1 -> QA-1 -> QA-2
 - 字符按低密度到高密度映射；全透明格和映射为空白 glyph 的格子跳过。
 - 字体指标只在 prepare/配置变化时测量，不逐格 `measureText()`。
 - 在 `presets.tsx` 实现 `AsciiEffect`。
-- 默认 cellAspectRatio 约 0.6、maxCells 6000、preferred FPS 30。
+- 默认 cellAspectRatio 为 1、maxCells 6000、preferred FPS 30；字符字面保持字体自身比例并在方形采样格中居中。
 - 使用 `forwardRef` 转发 `MatrixEffectHandle`，并按 auto/fixed mode 合并调用方局部 grid。
 - 保证 `backgroundColor` 是唯一预设清屏入口，不重复暴露 `clearColor`。
 - 补齐 `index.ts` 真实导出。
@@ -305,8 +305,8 @@ REG-1 -> QA-1 -> QA-2
 - 静态图片正确映射为可辨认字符图形。
 - 字符集为空和只有一个字符时行为确定。
 - `contain` 保留主体，透明边缘不生成反相字符块。
-- 纵横容器中字符单元格不被强制为正方形。
-- `{ mode: "fixed", columns: 100 }` 最终保留 100 列并补齐 `cellAspectRatio=0.6`、`maxCells=6000`；ref 可调用核心 handle。
+- 纵横容器中默认字符采样单元格保持 1:1，输入主体不发生横向压缩。
+- `{ mode: "fixed", columns: 100 }` 最终保留 100 列并补齐 `cellAspectRatio=1`、`maxCells=6000`；ref 可调用核心 handle。
 - 静态 Source 只绘制一次，动态 Source 默认不超过 30 FPS。
 - `npx -y pnpm@8.7.0 lint` 与 `npx -y pnpm@8.7.0 build` 通过。
 - 创建 `MatrixEffect组件实施记录/<日期>_FX-2_ASCII预设.md`。
@@ -350,7 +350,7 @@ REG-1 -> QA-1 -> QA-2
 范围：
 
 - ASCII 字符集输入默认使用组件默认值，并提供多套 Demo 级字符密度预设；用户仍可直接编辑任意字符串。
-- ASCII 与自定义场景共享输入源控制模型，提供同源静态图片、至少三种程序化动态场和本地图片上传。
+- ASCII 与自定义场景共享输入源控制模型，提供同源静态图片、至少四种程序化动态场（包含旋转星旋）和本地图片上传。
 - 动态 Source 由 `MatrixProceduralSource` 驱动，播放开关只透传核心 `playing`，不得在 Demo 内创建第二条 rAF。
 - 上传图片直接使用 `File` Source，仅保存在页面状态，不上传、不持久化、不自行持有 object URL。
 - 新增复杂程序化 Source 时拆分为 Demo 专用模块，保持组件源码、公共 API 和 Registry item 不变。
@@ -365,7 +365,7 @@ REG-1 -> QA-1 -> QA-2
 完成条件：
 
 - ASCII 初始字符集与 `createAsciiRenderer()` 默认值一致，四类预设与自定义编辑均可生效。
-- ASCII 与自定义场景的三个动态 Source 均产生非空且随时间变化的 Canvas；暂停后画面稳定，恢复后继续。
+- ASCII 与自定义场景的四个动态 Source 均产生非空且随时间变化的 Canvas；暂停后画面稳定，恢复后继续。
 - 静态示例与本地上传图片均可切换，上传文件名可识别且不发生对象 URL 泄漏。
 - 桌面与 390px 移动视口下控件不溢出、不重叠，切换场景后只有活动 Canvas 挂载。
 - Registry dry-run、lint、TypeScript、Prettier、build、浏览器控制台与 Canvas 像素验证通过。
@@ -462,7 +462,7 @@ REG-1 -> QA-1 -> QA-2
 
 - 1440 x 900、390 x 844 以及横/方/纵容器截图检查。
 - DPR 1、2、大于 2 和 backing-store 像素上限检查。
-- auto/fixed 网格、100 列自动 rows、ASCII 0.6 宽高比检查。
+- auto/fixed 网格、100 列自动 rows、ASCII 1:1 方形采样格与输入主体比例检查。
 - Dot 10000 cells 与 ASCII 6000 cells 的默认实际帧率检查。
 - 使用 Dot fixed `160 x 100`、`maxCells=16000`、`frameRate="auto"` 执行压力场景；先使用 Chrome CPU throttling 4x，15 秒内未触发持续超预算时改为 6x，并记录实际倍率。
 - 在压力下至少观察 15 秒以确认降到 30，降级后保持压力至少 10 秒以确认不回升；解除限速后观察至少 30 秒，只有冷却后允许一次 30 -> 60 升级，不得反复振荡。

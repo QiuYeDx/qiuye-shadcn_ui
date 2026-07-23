@@ -471,7 +471,7 @@ export function createDotRenderer(
  * - 字符按从低到高密度排列，并使用 round(value * (count - 1)) 选取
  * - 支持固定色或 Source RGB，Source Alpha 作为最终覆盖率
  * - 字体指标只在 prepare() 中测量一次，逐格热路径不创建对象或测量文本
- * - 字号和坐标使用 CSS px，默认提示 0.6 单元格宽高比与 30 FPS
+ * - 字号和坐标使用 CSS px，默认提示 1:1 方形采样格与 30 FPS
  *
  * @example
  * ```ts
@@ -497,7 +497,7 @@ export function createAsciiRenderer(
   let preparedBaselineOffset = 0;
 
   return {
-    cellAspectRatio: 0.6,
+    cellAspectRatio: 1,
     preferredFrameRate: 30,
     prepare(ctx, _frame, context) {
       const requestedFontSize = context.cellHeight * fontScale;

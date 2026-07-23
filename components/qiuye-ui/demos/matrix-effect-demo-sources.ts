@@ -5,7 +5,12 @@ import {
   type MatrixSource,
 } from "@/components/qiuye-ui/matrix-effect";
 
-export type MatrixDemoPresetSourceId = "blobs" | "rings" | "waves" | "image";
+export type MatrixDemoPresetSourceId =
+  | "swirl"
+  | "blobs"
+  | "rings"
+  | "waves"
+  | "image";
 export type MatrixDemoSourceId = MatrixDemoPresetSourceId | "upload";
 
 export interface MatrixDemoSourcePreset {
@@ -18,6 +23,7 @@ const TAU = Math.PI * 2;
 const SOURCE_BACKGROUND = "#030712";
 
 export const MATRIX_DEMO_SOURCE_PRESETS = [
+  { id: "swirl", label: "旋转星旋", animated: true },
   { id: "blobs", label: "流动光团", animated: true },
   { id: "rings", label: "呼吸圆环", animated: true },
   { id: "waves", label: "流动波浪", animated: true },
@@ -50,6 +56,114 @@ function fillSourceBackground(
   ctx.fillStyle = SOURCE_BACKGROUND;
   ctx.fillRect(0, 0, width, height);
 }
+
+function appendSpiralArm(
+  ctx: CanvasRenderingContext2D,
+  centerX: number,
+  centerY: number,
+  shortSide: number,
+  rotation: number,
+  armIndex: number,
+  armCount: number,
+) {
+  const steps = Math.max(52, Math.min(128, Math.round(shortSide * 1.7)));
+  const armOffset = (armIndex / armCount) * TAU;
+
+  ctx.beginPath();
+
+  for (let index = 0; index <= steps; index += 1) {
+    const progress = index / steps;
+    const radius = shortSide * (0.025 + progress * 0.5);
+    const angle =
+      rotation +
+      armOffset +
+      progress * TAU * 1.24 +
+      Math.sin(progress * Math.PI) * 0.12;
+    const x = centerX + Math.cos(angle) * radius;
+    const y = centerY + Math.sin(angle) * radius;
+
+    if (index === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  }
+}
+
+const MATRIX_DEMO_SWIRL_SOURCE = {
+  type: "procedural",
+  animated: true,
+  draw({ ctx, width, height, time }) {
+    fillSourceBackground(ctx, width, height);
+
+    const shortSide = Math.min(width, height);
+    const centerX = width * 0.5;
+    const centerY = height * 0.5;
+    const rotation = time * 0.46;
+    const armColors = [
+      "rgb(94, 234, 212)",
+      "rgb(125, 211, 252)",
+      "rgb(251, 113, 133)",
+      "rgb(253, 186, 116)",
+      "rgb(244, 244, 245)",
+    ] as const;
+
+    ctx.globalCompositeOperation = "lighter";
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    armColors.forEach((color, armIndex) => {
+      appendSpiralArm(
+        ctx,
+        centerX,
+        centerY,
+        shortSide,
+        rotation,
+        armIndex,
+        armColors.length,
+      );
+      ctx.globalAlpha = 0.14;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = Math.max(2, shortSide * 0.065);
+      ctx.stroke();
+
+      appendSpiralArm(
+        ctx,
+        centerX,
+        centerY,
+        shortSide,
+        rotation,
+        armIndex,
+        armColors.length,
+      );
+      ctx.globalAlpha = 0.82;
+      ctx.lineWidth = Math.max(1, shortSide * 0.018);
+      ctx.stroke();
+    });
+
+    ctx.globalAlpha = 1;
+    const coreRadius = shortSide * 0.18;
+    const core = ctx.createRadialGradient(
+      centerX,
+      centerY,
+      0,
+      centerX,
+      centerY,
+      coreRadius,
+    );
+    core.addColorStop(0, "rgba(255, 255, 255, 1)");
+    core.addColorStop(0.2, "rgba(240, 253, 250, 0.92)");
+    core.addColorStop(0.5, "rgba(94, 234, 212, 0.42)");
+    core.addColorStop(1, "rgba(94, 234, 212, 0)");
+    ctx.fillStyle = core;
+    ctx.fillRect(
+      centerX - coreRadius,
+      centerY - coreRadius,
+      coreRadius * 2,
+      coreRadius * 2,
+    );
+  },
+} satisfies MatrixProceduralSource;
 
 const MATRIX_DEMO_RING_SOURCE = {
   type: "procedural",
@@ -156,6 +270,7 @@ const MATRIX_DEMO_PRESET_SOURCES: Record<
   MatrixDemoPresetSourceId,
   MatrixSource
 > = {
+  swirl: MATRIX_DEMO_SWIRL_SOURCE,
   blobs: MATRIX_DEMO_BLOB_SOURCE,
   rings: MATRIX_DEMO_RING_SOURCE,
   waves: MATRIX_DEMO_WAVE_SOURCE,

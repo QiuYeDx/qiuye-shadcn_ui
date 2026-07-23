@@ -232,7 +232,7 @@ function DemoSourceControls({
       <div className="min-w-0 space-y-2">
         <Input
           id={fileInputId}
-          className="sr-only"
+          className="sr-only !size-px"
           type="file"
           accept="image/*"
           onChange={onUploadChange}
@@ -562,7 +562,7 @@ function AsciiScene() {
     setPlaying,
     handleSourceChange,
     handleUploadChange,
-  } = useMatrixDemoSource("blobs");
+  } = useMatrixDemoSource("swirl");
 
   const activeCharacterPreset = ASCII_CHARACTER_PRESETS.find(
     (preset) => preset.characters === characters,

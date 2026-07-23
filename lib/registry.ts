@@ -2304,7 +2304,7 @@ export const componentRegistry: ComponentRegistry = {
             description: "按 auto/fixed 模式与 ASCII 默认值合并的网格配置",
             required: false,
             default:
-              '{ mode: "auto", cellSize: 10, cellAspectRatio: 0.6, maxCells: 6000 }',
+              '{ mode: "auto", cellSize: 10, cellAspectRatio: 1, maxCells: 6000 }',
           },
           {
             name: "characters",
