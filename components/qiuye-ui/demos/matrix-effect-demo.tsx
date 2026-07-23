@@ -4,8 +4,10 @@ import * as React from "react";
 import {
   CaseUpperIcon,
   CircleDotIcon,
+  ImageIcon,
   PaletteIcon,
   SlidersHorizontalIcon,
+  UploadIcon,
 } from "lucide-react";
 
 import { ColorPicker } from "@/components/qiuye-ui/color-picker";
@@ -18,14 +20,23 @@ import {
   DotMatrixEffect,
   MatrixEffect,
   type MatrixGridConfig,
-  type MatrixImageSource,
   type MatrixRenderCell,
+  type MatrixSource,
   type MatrixSignalTransform,
 } from "@/components/qiuye-ui/matrix-effect";
+import {
+  createMatrixDemoUploadSource,
+  getMatrixDemoPresetSource,
+  getMatrixDemoSourcePreset,
+  MATRIX_DEMO_SOURCE_PRESETS,
+  type MatrixDemoPresetSourceId,
+  type MatrixDemoSourceId,
+} from "@/components/qiuye-ui/demos/matrix-effect-demo-sources";
 import {
   SegmentedControl,
   type SegmentedControlItem,
 } from "@/components/qiuye-ui/segmented-control";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,12 +56,7 @@ type AsciiColorMode = "fixed" | "source";
 type CustomTransformMode = "continuous" | "threshold";
 type CustomRendererMode = "tiles" | "bars";
 
-const ASCII_IMAGE_SOURCE = {
-  type: "image",
-  src: "/examples/matrix-effect/source.webp",
-  fit: "contain",
-  background: null,
-} satisfies MatrixImageSource;
+const DEFAULT_ASCII_CHARACTERS = " .:-=+*#%@";
 
 const CUSTOM_LUMINANCE_MAPPER = createLuminanceMapper();
 const CUSTOM_LEVELS_TRANSFORM = createLevelsTransform({
@@ -72,6 +78,29 @@ const CUSTOM_RENDERER_ITEMS: SegmentedControlItem[] = [
   { value: "tiles", label: "方块" },
   { value: "bars", label: "柱形" },
 ];
+
+const ASCII_CHARACTER_PRESETS = [
+  {
+    id: "default",
+    label: "组件默认",
+    characters: DEFAULT_ASCII_CHARACTERS,
+  },
+  {
+    id: "detailed",
+    label: "精细层次",
+    characters: " .,:;i1tfLCG08@",
+  },
+  {
+    id: "blocks",
+    label: "块元素",
+    characters: " ░▒▓█",
+  },
+  {
+    id: "dots",
+    label: "圆点",
+    characters: " ·•●",
+  },
+] as const;
 
 const DOT_COLOR_PRESETS = [
   {
@@ -146,6 +175,165 @@ function ControlValue({ children }: { children: React.ReactNode }) {
       {children}
     </span>
   );
+}
+
+interface DemoSourceControlsProps {
+  controlId: string;
+  sourceId: MatrixDemoSourceId;
+  sourceIsAnimated: boolean;
+  uploadedFileName: string | null;
+  playing: boolean;
+  onSourceChange: (sourceId: string) => void;
+  onUploadChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onPlayingChange: (playing: boolean) => void;
+}
+
+function DemoSourceControls({
+  controlId,
+  sourceId,
+  sourceIsAnimated,
+  uploadedFileName,
+  playing,
+  onSourceChange,
+  onUploadChange,
+  onPlayingChange,
+}: DemoSourceControlsProps) {
+  const fileInputId = `${controlId}-upload`;
+  const playingId = `${controlId}-playing`;
+
+  return (
+    <>
+      <div className="space-y-2.5">
+        <Label htmlFor={`${controlId}-source`}>输入源</Label>
+        <Select value={sourceId} onValueChange={onSourceChange}>
+          <SelectTrigger
+            id={`${controlId}-source`}
+            className="w-full"
+            aria-label="矩阵效果输入源"
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {MATRIX_DEMO_SOURCE_PRESETS.map((preset) => (
+              <SelectItem key={preset.id} value={preset.id}>
+                {preset.label}
+              </SelectItem>
+            ))}
+            {uploadedFileName ? (
+              <SelectItem value="upload">
+                <ImageIcon />
+                本地图片
+              </SelectItem>
+            ) : null}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="min-w-0 space-y-2">
+        <Input
+          id={fileInputId}
+          className="sr-only"
+          type="file"
+          accept="image/*"
+          onChange={onUploadChange}
+        />
+        <Button
+          className="w-full justify-start"
+          variant="outline"
+          size="sm"
+          asChild
+        >
+          <Label className="cursor-pointer" htmlFor={fileInputId}>
+            <UploadIcon />
+            {uploadedFileName ? "更换图片" : "上传图片"}
+          </Label>
+        </Button>
+        {uploadedFileName ? (
+          <p
+            className="text-muted-foreground truncate text-xs"
+            title={uploadedFileName}
+          >
+            {uploadedFileName}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="flex items-center justify-between gap-3">
+        <Label htmlFor={playingId}>播放动态</Label>
+        <Switch
+          id={playingId}
+          checked={sourceIsAnimated && playing}
+          disabled={!sourceIsAnimated}
+          onCheckedChange={onPlayingChange}
+        />
+      </div>
+    </>
+  );
+}
+
+function useMatrixDemoSource(initialSourceId: MatrixDemoPresetSourceId) {
+  const [sourceId, setSourceId] =
+    React.useState<MatrixDemoSourceId>(initialSourceId);
+  const [uploadedFile, setUploadedFile] = React.useState<File | null>(null);
+  const [playing, setPlaying] = React.useState(true);
+
+  const source = React.useMemo<MatrixSource>(() => {
+    if (sourceId === "upload" && uploadedFile !== null) {
+      return createMatrixDemoUploadSource(uploadedFile);
+    }
+
+    const presetId = sourceId === "upload" ? initialSourceId : sourceId;
+    return getMatrixDemoPresetSource(presetId);
+  }, [initialSourceId, sourceId, uploadedFile]);
+
+  const sourceIsAnimated =
+    sourceId === "upload"
+      ? false
+      : getMatrixDemoSourcePreset(sourceId).animated;
+
+  const handleSourceChange = React.useCallback(
+    (nextSourceId: string) => {
+      if (nextSourceId === "upload") {
+        if (uploadedFile !== null) {
+          setSourceId("upload");
+        }
+        return;
+      }
+
+      const preset = MATRIX_DEMO_SOURCE_PRESETS.find(
+        (item) => item.id === nextSourceId,
+      );
+
+      if (preset) {
+        setSourceId(preset.id);
+      }
+    },
+    [uploadedFile],
+  );
+
+  const handleUploadChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.currentTarget.files?.[0];
+      event.currentTarget.value = "";
+
+      if (!file || !file.type.startsWith("image/")) return;
+
+      setUploadedFile(file);
+      setSourceId("upload");
+    },
+    [],
+  );
+
+  return {
+    source,
+    sourceId,
+    sourceIsAnimated,
+    uploadedFileName: uploadedFile?.name ?? null,
+    playing,
+    setPlaying,
+    handleSourceChange,
+    handleUploadChange,
+  };
 }
 
 function DotScene() {
@@ -362,9 +550,31 @@ function DotScene() {
 
 function AsciiScene() {
   const [cellSize, setCellSize] = React.useState(10);
-  const [characters, setCharacters] = React.useState(" .,:;i1tfLCG08@");
+  const [characters, setCharacters] = React.useState(DEFAULT_ASCII_CHARACTERS);
   const [invert, setInvert] = React.useState(false);
   const [colorMode, setColorMode] = React.useState<AsciiColorMode>("source");
+  const {
+    source,
+    sourceId,
+    sourceIsAnimated,
+    uploadedFileName,
+    playing,
+    setPlaying,
+    handleSourceChange,
+    handleUploadChange,
+  } = useMatrixDemoSource("blobs");
+
+  const activeCharacterPreset = ASCII_CHARACTER_PRESETS.find(
+    (preset) => preset.characters === characters,
+  );
+
+  const handleCharacterPresetChange = (presetId: string) => {
+    const preset = ASCII_CHARACTER_PRESETS.find((item) => item.id === presetId);
+
+    if (preset) {
+      setCharacters(preset.characters);
+    }
+  };
 
   const grid = React.useMemo<MatrixGridConfig>(
     () => ({ mode: "auto", cellSize, maxCells: 6_000 }),
@@ -376,22 +586,60 @@ function AsciiScene() {
       <div className="aspect-[4/3] min-w-0 overflow-hidden rounded-md border bg-[#09090b] sm:aspect-video">
         <AsciiEffect
           className="h-full w-full"
-          source={ASCII_IMAGE_SOURCE}
+          source={source}
           characters={characters}
           colorMode={colorMode}
           color="#fb7185"
           backgroundColor="#09090b"
           grid={grid}
           invert={invert}
+          playing={playing}
           decorative={false}
-          ariaLabel="由彩色示例图像转换得到的 ASCII 字符图形"
+          ariaLabel="由当前输入源转换得到的 ASCII 字符图形"
           fallback={<PreviewFallback />}
         />
       </div>
 
       <div className="min-w-0 space-y-5 lg:border-l lg:pl-5">
+        <DemoSourceControls
+          controlId="matrix-ascii"
+          sourceId={sourceId}
+          sourceIsAnimated={sourceIsAnimated}
+          uploadedFileName={uploadedFileName}
+          playing={playing}
+          onSourceChange={handleSourceChange}
+          onUploadChange={handleUploadChange}
+          onPlayingChange={setPlaying}
+        />
+
         <div className="space-y-2.5">
-          <Label htmlFor="matrix-ascii-characters">字符集</Label>
+          <Label htmlFor="matrix-ascii-character-preset">字符集预设</Label>
+          <Select
+            value={activeCharacterPreset?.id ?? "custom"}
+            onValueChange={handleCharacterPresetChange}
+          >
+            <SelectTrigger
+              id="matrix-ascii-character-preset"
+              className="w-full"
+              aria-label="ASCII 字符集预设"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {ASCII_CHARACTER_PRESETS.map((preset) => (
+                <SelectItem key={preset.id} value={preset.id}>
+                  {preset.label}
+                </SelectItem>
+              ))}
+              {activeCharacterPreset ? null : (
+                <SelectItem value="custom">自定义</SelectItem>
+              )}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2.5">
+          <Label htmlFor="matrix-ascii-characters">字符集内容</Label>
           <Input
             id="matrix-ascii-characters"
             className="font-mono"
@@ -449,6 +697,16 @@ function CustomScene() {
     React.useState<CustomTransformMode>("continuous");
   const [rendererMode, setRendererMode] =
     React.useState<CustomRendererMode>("tiles");
+  const {
+    source,
+    sourceId,
+    sourceIsAnimated,
+    uploadedFileName,
+    playing,
+    setPlaying,
+    handleSourceChange,
+    handleUploadChange,
+  } = useMatrixDemoSource("rings");
 
   const thresholdTransform = React.useMemo(
     () => createThresholdTransform({ threshold, softness: 0.06 }),
@@ -513,12 +771,13 @@ function CustomScene() {
       <div className="aspect-[4/3] min-w-0 overflow-hidden rounded-md border bg-[#09090b] sm:aspect-video">
         <MatrixEffect
           className="h-full w-full"
-          source={ASCII_IMAGE_SOURCE}
+          source={source}
           mapper={CUSTOM_LUMINANCE_MAPPER}
           transforms={transforms}
           renderer={renderer}
           grid={grid}
           clearColor="#09090b"
+          playing={playing}
           decorative={false}
           ariaLabel="使用自定义信号转换与逐格绘制器生成的矩阵图形"
           fallback={<PreviewFallback />}
@@ -526,6 +785,17 @@ function CustomScene() {
       </div>
 
       <div className="min-w-0 space-y-5 lg:border-l lg:pl-5">
+        <DemoSourceControls
+          controlId="matrix-custom"
+          sourceId={sourceId}
+          sourceIsAnimated={sourceIsAnimated}
+          uploadedFileName={uploadedFileName}
+          playing={playing}
+          onSourceChange={handleSourceChange}
+          onUploadChange={handleUploadChange}
+          onPlayingChange={setPlaying}
+        />
+
         <div className="space-y-2.5">
           <Label>转换模式</Label>
           <SegmentedControl
