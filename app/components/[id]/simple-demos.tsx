@@ -41,18 +41,18 @@ const MATRIX_EFFECT_SIMPLE_BLOB_OPTIONS = {
   count: 3,
   minRadius: 0.18,
   maxRadius: 0.48,
-  speed: 0.14,
+  speed: 0.4,
   baseValue: 0.025,
   seed: 17,
 } as const;
 
 const MATRIX_EFFECT_SIMPLE_GRID = {
   mode: "auto",
-  cellSize: 12,
+  cellSize: 10,
   maxCells: 3_500,
 } as const;
 
-const MATRIX_EFFECT_SIMPLE_RADIUS_RANGE = [0.25, 4] as const;
+const MATRIX_EFFECT_SIMPLE_RADIUS_RANGE = [0.25, 3] as const;
 const MATRIX_EFFECT_SIMPLE_LEVELS = { contrast: 1.2 } as const;
 
 // ResponsiveTabs 简单演示

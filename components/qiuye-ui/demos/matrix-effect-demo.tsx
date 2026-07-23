@@ -82,8 +82,8 @@ function ControlValue({ children }: { children: React.ReactNode }) {
 
 function DotScene() {
   const [cellSize, setCellSize] = React.useState(10);
-  const [maximumRadius, setMaximumRadius] = React.useState(4.5);
-  const [speed, setSpeed] = React.useState(0.24);
+  const [maximumRadius, setMaximumRadius] = React.useState(3);
+  const [speed, setSpeed] = React.useState(0.4);
   const [contrast, setContrast] = React.useState(1.25);
   const [invert, setInvert] = React.useState(false);
 
@@ -152,7 +152,7 @@ function DotScene() {
             min={1}
             max={8}
             step={0.5}
-            onValueChange={(value) => setMaximumRadius(value[0] ?? 4.5)}
+            onValueChange={(value) => setMaximumRadius(value[0] ?? 3)}
           />
         </div>
 
@@ -167,7 +167,7 @@ function DotScene() {
             min={0}
             max={0.8}
             step={0.02}
-            onValueChange={(value) => setSpeed(value[0] ?? 0.24)}
+            onValueChange={(value) => setSpeed(value[0] ?? 0.4)}
           />
         </div>
 
