@@ -433,6 +433,51 @@ export interface DotRendererOptions {
   valueCurve?: DotValueCurve;
 }
 
+/** ASCII Renderer 的配置 */
+export interface AsciiRendererOptions {
+  /**
+   * 从低视觉密度到高视觉密度排列的字符集
+   *
+   * 字符串按 Unicode code point 拆分；数组中的每个成员视为一个完整 glyph。
+   * 空字符串或空数组回退默认字符集。
+   * @default " .:-=+*#%@"
+   */
+  characters?: string | readonly string[];
+  /**
+   * 使用统一固定色，或保留每个采样格的 Source RGB
+   * @default "fixed"
+   */
+  colorMode?: "fixed" | "source";
+  /**
+   * 固定色模式下的 CSS 颜色
+   * @default "#71717a"
+   */
+  color?: string;
+  /**
+   * Renderer 绘制字符前填充的背景色，null 表示不额外填充
+   *
+   * 该背景在 MatrixEffect 的 clearColor 之后使用 source-over 绘制：
+   * 不透明色会覆盖 clearColor，半透明色会与其叠加。
+   * @default null
+   */
+  backgroundColor?: string | null;
+  /**
+   * Canvas 文本使用的字体族
+   * @default "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace"
+   */
+  fontFamily?: string;
+  /**
+   * Canvas 文本使用的字重
+   * @default 400
+   */
+  fontWeight?: number | string;
+  /**
+   * 字号相对于单元格高度的比例；非有限或小于等于 0 时回退默认值
+   * @default 1
+   */
+  fontScale?: number;
+}
+
 /** MatrixEffect 支持的目标帧率模式 */
 export type MatrixFrameRate = "auto" | 30 | 60;
 
@@ -574,6 +619,70 @@ export interface DotMatrixEffectProps extends Omit<
    * @default [1, 1]
    */
   opacityRange?: readonly [minimum: number, maximum: number];
+  /**
+   * 是否在 Levels 之前反转主信号
+   * @default false
+   */
+  invert?: boolean;
+  /** 可选的输入范围、Gamma、对比度和亮度调整 */
+  levels?: LevelsTransformOptions;
+  /**
+   * 在预设 Invert 和 Levels 之后按顺序执行的额外 Transform
+   * @default []
+   */
+  additionalTransforms?: readonly MatrixSignalTransform[];
+}
+
+/** AsciiEffect 字符艺术预设的属性 */
+export interface AsciiEffectProps extends Omit<
+  MatrixEffectProps,
+  "source" | "renderer" | "mapper" | "transforms" | "clearColor" | "grid"
+> {
+  /** 必填的图片、外部 Canvas 或程序化输入 Source */
+  source: MatrixSource;
+  /**
+   * 响应式或固定网格配置
+   * @default { mode: "auto", cellSize: 10, cellAspectRatio: 0.6, maxCells: 6000 }
+   */
+  grid?: MatrixGridConfig;
+  /**
+   * 从低视觉密度到高视觉密度排列的字符集
+   *
+   * 字符串按 Unicode code point 拆分；数组中的每个成员视为一个完整 glyph。
+   * 空字符串或空数组回退默认字符集。
+   * @default " .:-=+*#%@"
+   */
+  characters?: string | readonly string[];
+  /**
+   * 使用统一固定色，或保留每个采样格的 Source RGB
+   * @default "fixed"
+   */
+  colorMode?: "fixed" | "source";
+  /**
+   * 固定色模式下的 CSS 颜色
+   * @default "#71717a"
+   */
+  color?: string;
+  /**
+   * 输出 Canvas 的清屏颜色，null 表示透明
+   * @default null
+   */
+  backgroundColor?: string | null;
+  /**
+   * Canvas 文本使用的字体族
+   * @default "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace"
+   */
+  fontFamily?: string;
+  /**
+   * Canvas 文本使用的字重
+   * @default 400
+   */
+  fontWeight?: number | string;
+  /**
+   * 字号相对于单元格高度的比例；非有限或小于等于 0 时回退默认值
+   * @default 1
+   */
+  fontScale?: number;
   /**
    * 是否在 Levels 之前反转主信号
    * @default false

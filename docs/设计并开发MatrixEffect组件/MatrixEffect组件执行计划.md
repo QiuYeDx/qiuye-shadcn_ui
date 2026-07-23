@@ -2,7 +2,7 @@
 
 - 创建日期：2026-07-22
 - 更新日期：2026-07-23
-- 当前阶段：FX-1 已完成，待启动 FX-2
+- 当前阶段：FX-2 已完成，待启动 DEMO-1
 - 对应设计文档：`docs/设计并开发MatrixEffect组件/MatrixEffect组件开发设计文档.md`
 
 ## 使用方式
@@ -40,7 +40,7 @@
 | FE-1 MatrixEffect 静态渲染核心        | 已完成 | 2026-07-22 | `components/qiuye-ui/matrix-effect/matrix-effect.tsx`, `components/qiuye-ui/matrix-effect/index.ts`, `components/qiuye-ui/matrix-effect/types.ts`                                                                                             | pnpm 8.7.0 lint、TypeScript、build、SSR/纯函数及 23 项真实浏览器断言通过   | `MatrixEffect组件实施记录/2026-07-22_FE-1_静态渲染核心.md`          | FE-2 复用唯一 rAF、dirty generation 与错误锁       |
 | FE-2 动态调度、暂停与错误韧性         | 已完成 | 2026-07-22 | `components/qiuye-ui/matrix-effect/matrix-effect.tsx`                                                                                                                                                                                         | pnpm 8.7.0 lint、TypeScript、Prettier、build、纯算法断言与临时路由编译通过 | `MatrixEffect组件实施记录/2026-07-22_FE-2_动态调度与错误韧性.md`    | FX-1 复用调度器验证动态 Dot 主路径                 |
 | FX-1 Dot Renderer 与 DotMatrixEffect  | 已完成 | 2026-07-23 | `components/qiuye-ui/matrix-effect/renderers.ts`, `components/qiuye-ui/matrix-effect/presets.tsx`, `components/qiuye-ui/matrix-effect/sources.ts`, `components/qiuye-ui/matrix-effect/types.ts`, `components/qiuye-ui/matrix-effect/index.ts` | pnpm 8.7.0 lint、TypeScript、Prettier、build、算法/类型/浏览器断言通过     | `MatrixEffect组件实施记录/2026-07-23_FX-1_Dot预设.md`               | 无                                                 |
-| FX-2 ASCII Renderer 与 AsciiEffect    | 未开始 | -          | `components/qiuye-ui/matrix-effect/renderers.ts`, `components/qiuye-ui/matrix-effect/presets.tsx`, `components/qiuye-ui/matrix-effect/index.ts`                                                                                               | 待执行                                                                     | 待创建                                                              | 无                                                 |
+| FX-2 ASCII Renderer 与 AsciiEffect    | 已完成 | 2026-07-23 | `components/qiuye-ui/matrix-effect/renderers.ts`, `components/qiuye-ui/matrix-effect/presets.tsx`, `components/qiuye-ui/matrix-effect/types.ts`, `components/qiuye-ui/matrix-effect/index.ts`                                                 | pnpm 8.7.0 lint、TypeScript、Prettier、build、算法/类型/SSR/浏览器断言通过 | `MatrixEffect组件实施记录/2026-07-23_FX-2_ASCII预设.md`             | 无                                                 |
 | DEMO-1 完整 Demo 与同源示例资产       | 未开始 | -          | `components/qiuye-ui/demos/matrix-effect-demo.tsx`, `public/examples/matrix-effect/*`                                                                                                                                                         | 待执行                                                                     | 待创建                                                              | 示例资产需同源且许可明确，不使用临时剪贴板路径     |
 | SITE-1 详情页、快速预览与站点元数据   | 未开始 | -          | `app/components/[id]/simple-demos.tsx`, `app/components/[id]/page.tsx`, `lib/component-constants.ts`, `lib/registry.ts`                                                                                                                       | 待执行                                                                     | 待创建                                                              | 无                                                 |
 | REG-1 Registry、MCP 与项目清单同步    | 未开始 | -          | `public/registry/matrix-effect.json`, `public/registry/registry.json`, `packages/qiuye-ui-cli/bin/qiuye-ui-mcp.mjs`, `README.md`, `AGENT.md`                                                                                                  | 待执行                                                                     | 待创建                                                              | 无                                                 |
@@ -291,7 +291,7 @@ REG-1 -> QA-1 -> QA-2
 
 - 在 `renderers.ts` 实现 `createAsciiRenderer()`。
 - 支持字符串/字符数组、固定色/源图色、字体、字重、fontScale、背景色。
-- 字符按低密度到高密度映射；空字符和低 Alpha 单元格跳过。
+- 字符按低密度到高密度映射；全透明格和映射为空白 glyph 的格子跳过。
 - 字体指标只在 prepare/配置变化时测量，不逐格 `measureText()`。
 - 在 `presets.tsx` 实现 `AsciiEffect`。
 - 默认 cellAspectRatio 约 0.6、maxCells 6000、preferred FPS 30。
@@ -566,6 +566,6 @@ YYYY-MM-DD_<工作包ID>_<简短标题>.md
 
 ## 下一步建议
 
-下一工作包为 `FX-2 ASCII Renderer 与 AsciiEffect`。
+下一工作包为 `DEMO-1 完整 Demo 与同源示例资产`。
 
-开始实现前应读取 FX-1 实施记录，复用现有 Renderer 边界隔离、Source Alpha 覆盖率、预设 primitive memo 和按 mode 合并 grid 的契约，实现 ASCII Renderer 与 `AsciiEffect`。字符测量只能发生在 prepare/配置变化时，默认保持 6000 cells、30 FPS 和约 0.6 单元格宽高比；Demo、站点接入和 registry 仍属于后续工作包。
+开始实现前应读取 FX-1、FX-2 实施记录，复用已经验证的 Dot/ASCII 预设和稳定配置 memo。创建包含柔和光团 Dot、同源静态图片 ASCII、同一 Source 更换 Transform/自定义 Renderer 的三场景 Demo，并加入许可明确的同源位图资产；优先验证 390px 移动端布局和控件触发的精确重绘。站点接入与 registry 仍分别属于后续 SITE-1、REG-1 工作包。

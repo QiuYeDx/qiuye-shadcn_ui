@@ -1,4 +1,5 @@
 import type {
+  AsciiRendererOptions,
   CellRendererOptions,
   DotRendererOptions,
   MatrixFrameContext,
@@ -9,8 +10,29 @@ import type {
 const DEFAULT_DOT_COLOR = "#71717a";
 const DEFAULT_DOT_RADIUS_RANGE = [0.35, 4] as const;
 const DEFAULT_DOT_OPACITY_RANGE = [1, 1] as const;
+const DEFAULT_ASCII_CHARACTERS = " .:-=+*#%@";
+const DEFAULT_ASCII_COLOR = "#71717a";
+const DEFAULT_ASCII_FONT_FAMILY =
+  'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace';
+const DEFAULT_ASCII_FONT_WEIGHT = "400";
+const DEFAULT_ASCII_FONT_SCALE = 1;
+const DEFAULT_ASCII_FALLBACK_FONT = `400 10px ${DEFAULT_ASCII_FONT_FAMILY}`;
 const FULL_CIRCLE = Math.PI * 2;
 const NOOP = () => {};
+const warnedIssues = new Set<string>();
+
+function warnOnce(issue: string, message: string) {
+  if (
+    typeof process === "undefined" ||
+    process.env.NODE_ENV !== "development" ||
+    warnedIssues.has(issue)
+  ) {
+    return;
+  }
+
+  warnedIssues.add(issue);
+  console.warn(`[MatrixEffect] ${message}`);
+}
 
 function clamp(value: number, minimum: number, maximum: number): number {
   return Math.min(maximum, Math.max(minimum, value));
@@ -100,6 +122,67 @@ function resolveDotRadius(
   maximumCellRadius: number,
 ): number {
   return Math.min(maximumCellRadius, minimumRadius + radiusSpan * value);
+}
+
+interface NormalizedAsciiCharacters {
+  readonly glyphs: readonly string[];
+  readonly drawable: readonly boolean[];
+}
+
+function normalizeAsciiCharacters(
+  characters: AsciiRendererOptions["characters"],
+): NormalizedAsciiCharacters {
+  let glyphs: string[];
+
+  if (typeof characters === "string") {
+    glyphs = Array.from(characters);
+  } else if (characters !== undefined) {
+    glyphs = Array.from(characters, (glyph) =>
+      typeof glyph === "string" ? glyph : "",
+    );
+  } else {
+    glyphs = [];
+  }
+
+  if (glyphs.length === 0) {
+    if (characters !== undefined) {
+      warnOnce(
+        "ascii-empty-characters",
+        "ASCII 字符集不能为空；已回退到默认字符集。",
+      );
+    }
+
+    glyphs = Array.from(DEFAULT_ASCII_CHARACTERS);
+  }
+
+  return {
+    glyphs,
+    drawable: glyphs.map((glyph) => glyph.trim().length > 0),
+  };
+}
+
+function normalizeAsciiFontScale(value: number | undefined): number {
+  return Number.isFinite(value) && (value as number) > 0
+    ? (value as number)
+    : DEFAULT_ASCII_FONT_SCALE;
+}
+
+function normalizeAsciiFontWeight(value: number | string | undefined): string {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? String(value) : DEFAULT_ASCII_FONT_WEIGHT;
+  }
+
+  if (typeof value === "string" && value.trim().length > 0) {
+    return value.trim();
+  }
+
+  return DEFAULT_ASCII_FONT_WEIGHT;
+}
+
+function normalizeAsciiFontFamily(value: string | undefined): string {
+  return typeof value === "string" && value.trim().length > 0
+    ? value.trim()
+    : DEFAULT_ASCII_FONT_FAMILY;
 }
 
 /**
@@ -370,6 +453,167 @@ export function createDotRenderer(
 
           ctx.globalAlpha = opacity * (alpha / 255);
           fillCircle(ctx, centerX, centerY, radius);
+        }
+      } finally {
+        try {
+          ctx.beginPath();
+        } finally {
+          ctx.restore();
+        }
+      }
+    },
+  };
+}
+
+/**
+ * 创建把主信号映射为字符密度的 ASCII Renderer
+ *
+ * - 字符按从低到高密度排列，并使用 round(value * (count - 1)) 选取
+ * - 支持固定色或 Source RGB，Source Alpha 作为最终覆盖率
+ * - 字体指标只在 prepare() 中测量一次，逐格热路径不创建对象或测量文本
+ * - 字号和坐标使用 CSS px，默认提示 0.6 单元格宽高比与 30 FPS
+ *
+ * @example
+ * ```ts
+ * const renderer = createAsciiRenderer({
+ *   characters: " .:-=+*#%@",
+ *   colorMode: "source",
+ *   fontScale: 0.9,
+ * });
+ * ```
+ */
+export function createAsciiRenderer(
+  options: AsciiRendererOptions = {},
+): MatrixRenderer {
+  const { glyphs, drawable } = normalizeAsciiCharacters(options.characters);
+  const colorMode = options.colorMode === "source" ? "source" : "fixed";
+  const color = options.color ?? DEFAULT_ASCII_COLOR;
+  const backgroundColor = options.backgroundColor ?? null;
+  const fontFamily = normalizeAsciiFontFamily(options.fontFamily);
+  const fontWeight = normalizeAsciiFontWeight(options.fontWeight);
+  const fontScale = normalizeAsciiFontScale(options.fontScale);
+  let preparedFont = DEFAULT_ASCII_FALLBACK_FONT;
+  let preparedBaseline: CanvasTextBaseline = "middle";
+  let preparedBaselineOffset = 0;
+
+  return {
+    cellAspectRatio: 0.6,
+    preferredFrameRate: 30,
+    prepare(ctx, _frame, context) {
+      const requestedFontSize = context.cellHeight * fontScale;
+      const fontSize =
+        Number.isFinite(requestedFontSize) && requestedFontSize > 0
+          ? requestedFontSize
+          : 10;
+
+      ctx.save();
+
+      try {
+        ctx.font = DEFAULT_ASCII_FALLBACK_FONT;
+        ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+        preparedFont = ctx.font;
+
+        const metrics = ctx.measureText("M");
+        const ascent = metrics.actualBoundingBoxAscent;
+        const descent = metrics.actualBoundingBoxDescent;
+        const hasBoundingBox =
+          Number.isFinite(ascent) &&
+          Number.isFinite(descent) &&
+          ascent >= 0 &&
+          descent >= 0 &&
+          ascent + descent > 0;
+
+        preparedBaseline = hasBoundingBox ? "alphabetic" : "middle";
+        preparedBaselineOffset = hasBoundingBox ? (ascent - descent) / 2 : 0;
+      } finally {
+        ctx.restore();
+      }
+    },
+    render(ctx, frame, context) {
+      const { columns, rows, rgba, values } = frame;
+      const { cellWidth, cellHeight, cssWidth, cssHeight } = context;
+      const totalCells = Math.min(values.length, columns * rows);
+
+      if (
+        totalCells <= 0 ||
+        glyphs.length === 0 ||
+        cellWidth <= 0 ||
+        cellHeight <= 0
+      ) {
+        return;
+      }
+
+      ctx.save();
+
+      try {
+        ctx.beginPath();
+        ctx.globalCompositeOperation = "source-over";
+        ctx.globalAlpha = 1;
+
+        if (backgroundColor !== null) {
+          ctx.fillStyle = "rgba(0, 0, 0, 0)";
+          ctx.fillStyle = backgroundColor;
+          ctx.fillRect(0, 0, cssWidth, cssHeight);
+        }
+
+        ctx.font = preparedFont;
+        ctx.textAlign = "center";
+        ctx.textBaseline = preparedBaseline;
+
+        if (colorMode === "fixed") {
+          ctx.fillStyle = DEFAULT_ASCII_COLOR;
+          ctx.fillStyle = color;
+        }
+
+        let previousAlpha = -1;
+        let previousSourceColor = -1;
+
+        for (let row = 0; row < rows; row += 1) {
+          const rowOffset = row * columns;
+
+          if (rowOffset >= totalCells) {
+            break;
+          }
+
+          const columnsInRow = Math.min(columns, totalCells - rowOffset);
+          const centerY = (row + 0.5) * cellHeight + preparedBaselineOffset;
+
+          for (let column = 0; column < columnsInRow; column += 1) {
+            const index = rowOffset + column;
+            const rgbaIndex = index * 4;
+            const alpha = rgba[rgbaIndex + 3];
+
+            if (alpha <= 0) {
+              continue;
+            }
+
+            const value = clampUnit(values[index]);
+            const glyphIndex = Math.round(value * (glyphs.length - 1));
+
+            if (!drawable[glyphIndex]) {
+              continue;
+            }
+
+            if (alpha !== previousAlpha) {
+              ctx.globalAlpha = alpha / 255;
+              previousAlpha = alpha;
+            }
+
+            if (colorMode === "source") {
+              const red = rgba[rgbaIndex];
+              const green = rgba[rgbaIndex + 1];
+              const blue = rgba[rgbaIndex + 2];
+              const sourceColor = (red << 16) | (green << 8) | blue;
+
+              if (sourceColor !== previousSourceColor) {
+                ctx.fillStyle = `rgb(${red} ${green} ${blue})`;
+                previousSourceColor = sourceColor;
+              }
+            }
+
+            const centerX = (column + 0.5) * cellWidth;
+            ctx.fillText(glyphs[glyphIndex], centerX, centerY, cellWidth);
+          }
         }
       } finally {
         try {

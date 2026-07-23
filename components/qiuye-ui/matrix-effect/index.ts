@@ -1,7 +1,11 @@
 export { MatrixEffect } from "./matrix-effect";
-export { DotMatrixEffect } from "./presets";
+export { AsciiEffect, DotMatrixEffect } from "./presets";
 
-export { createCellRenderer, createDotRenderer } from "./renderers";
+export {
+  createAsciiRenderer,
+  createCellRenderer,
+  createDotRenderer,
+} from "./renderers";
 
 export { createSoftBlobSource } from "./sources";
 
@@ -14,6 +18,8 @@ export {
 } from "./transforms";
 
 export type {
+  AsciiEffectProps,
+  AsciiRendererOptions,
   CellRendererOptions,
   DotMatrixEffectProps,
   DotRendererOptions,

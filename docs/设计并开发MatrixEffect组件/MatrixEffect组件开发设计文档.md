@@ -1,8 +1,8 @@
 # MatrixEffect 组件开发设计文档
 
 - 创建日期：2026-07-22
-- 更新日期：2026-07-23（FX-1 完成后同步）
-- 状态：FX-1 已完成，待启动 FX-2
+- 更新日期：2026-07-23（FX-2 完成后同步）
+- 状态：FX-2 已完成，待启动 DEMO-1
 - 组件 ID：`matrix-effect`
 - 主要导出：`MatrixEffect`、`DotMatrixEffect`、`AsciiEffect`
 
@@ -685,6 +685,22 @@ export function createCellRenderer(
 
 ### ASCII Renderer
 
+```tsx
+export interface AsciiRendererOptions {
+  characters?: string | readonly string[];
+  colorMode?: "fixed" | "source";
+  color?: string;
+  backgroundColor?: string | null;
+  fontFamily?: string;
+  fontWeight?: number | string;
+  fontScale?: number;
+}
+
+export function createAsciiRenderer(
+  options?: AsciiRendererOptions,
+): MatrixRenderer;
+```
+
 `createAsciiRenderer()` 支持：
 
 - 自定义字符字符串或字符数组。
@@ -692,7 +708,7 @@ export function createCellRenderer(
 - 固定颜色或源图颜色。
 - 自定义等宽字体、字重和字号缩放比例。
 - 可选输出背景色。
-- 透明/低值单元格跳过绘制。
+- 全透明单元格与映射为空白 glyph 的单元格跳过绘制。
 
 默认字符集：
 
@@ -706,7 +722,18 @@ export function createCellRenderer(
 glyphIndex = round(value * (glyphCount - 1))
 ```
 
-默认使用跨平台等宽字体栈。ASCII 的默认 `cellAspectRatio` 为约 `0.6`，允许调用方覆盖。首版不依赖 DOM 文本测量；Renderer 可以在 `prepare()` 中通过 `measureText("M")` 修正内部对齐，但不能在每个单元格重复测量。
+默认使用固定色 `#71717a`、字重 `400`、`fontScale=1` 和跨平台等宽字体栈 `ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`。`fontScale` 表示 `fontSize = cellHeight * fontScale`，非有限或小于等于 0 时回退 1。ASCII 的默认 `cellAspectRatio` 为 `0.6`，允许调用方覆盖。
+
+字符输入按以下规则规范化：
+
+- 字符串使用 `Array.from()` 按 Unicode code point 拆分，不能 trim 掉默认字符集有意义的前导空格。
+- 字符数组的每个成员视为一个完整 glyph token，并在工厂创建时复制快照；可用多 code point 字符表达组合 glyph。
+- 显式空字符串或空数组回退默认字符集；`[""]` 或只含空白的非空字符集是合法输入，并确定性地不绘制对应 glyph。
+- 只有一个 glyph 时，所有非透明单元格都映射到该 glyph，包括主信号值为 0 的格子。
+
+Renderer 不引入额外的低值或 Alpha 阈值。`a=0` 的格子跳过，`0<a<255` 时以 `a/255` 作为最终覆盖率；空字符串或纯空白 glyph 跳过 `fillText()`。这样透明区域即使经过 invert 也不会生成字符块，同时字符密度仍严格服从上面的索引公式。
+
+首版不依赖 DOM 文本测量。Renderer 只在 `prepare()` 中设置候选字体并调用一次 `measureText("M")` 缓存垂直对齐指标；`render()` 每帧在循环外重新应用缓存字体和文本状态，不逐格测量。核心已经应用 DPR transform，因此字号、坐标和可选 Renderer 背景填充都使用 CSS px；背景范围为 `context.cssWidth x context.cssHeight`。
 
 单色 ASCII 可以缓存字体、字符索引和必要的字形资源。动态源色 ASCII 属于高成本模式，默认受 6000 单元格和 30 FPS 限制。
 
@@ -873,9 +900,10 @@ Luminance -> optional Invert -> optional Levels -> additionalTransforms
 ```tsx
 export interface AsciiEffectProps extends Omit<
   MatrixEffectProps,
-  "source" | "renderer" | "mapper" | "transforms" | "clearColor"
+  "source" | "renderer" | "mapper" | "transforms" | "clearColor" | "grid"
 > {
   source: MatrixSource;
+  grid?: MatrixGridConfig;
   characters?: string | readonly string[];
   colorMode?: "fixed" | "source";
   color?: string;
