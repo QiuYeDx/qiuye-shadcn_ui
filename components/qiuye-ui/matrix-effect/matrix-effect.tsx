@@ -950,6 +950,11 @@ function clearCanvasPixels(
  *
  * @example
  * ```tsx
+ * const source = {
+ *   type: "image",
+ *   src: "/example.webp",
+ * } as const;
+ *
  * const renderer = {
  *   render(ctx, frame, context) {
  *     ctx.fillStyle = "#18181b";
@@ -959,7 +964,7 @@ function clearCanvasPixels(
  *
  * <MatrixEffect
  *   className="aspect-video w-full"
- *   source={{ type: "image", src: "/example.webp" }}
+ *   source={source}
  *   renderer={renderer}
  * />;
  * ```

@@ -519,7 +519,12 @@ export interface MatrixEffectProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children" | "dangerouslySetInnerHTML" | "onError"
 > {
-  /** 输入图片、外部 Canvas 或程序化信号场 */
+  /**
+   * 输入图片、外部 Canvas 或程序化信号场
+   *
+   * Source descriptor 按对象身份作为切换边界，并视为不可变配置。请使用模块常量
+   * 或 `useMemo` 保持稳定身份；需要更新时创建新的 descriptor。
+   */
   source: MatrixSource;
   /** 把最终主信号绘制到输出 Canvas 的 Renderer */
   renderer: MatrixRenderer;

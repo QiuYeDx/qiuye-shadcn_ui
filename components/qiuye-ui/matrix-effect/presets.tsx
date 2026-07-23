@@ -328,8 +328,14 @@ DotMatrixEffect.displayName = "DotMatrixEffect";
  *
  * @example
  * ```tsx
+ * const source = {
+ *   type: "image",
+ *   src: "/source.webp",
+ *   fit: "contain",
+ * } as const;
+ *
  * <AsciiEffect
- *   source={{ type: "image", src: "/source.webp", fit: "contain" }}
+ *   source={source}
  *   characters=" .:-=+*#%@"
  *   className="aspect-video w-full"
  * />
