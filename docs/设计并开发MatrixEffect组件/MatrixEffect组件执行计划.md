@@ -2,7 +2,7 @@
 
 - 创建日期：2026-07-22
 - 更新日期：2026-07-23
-- 当前阶段：FX-2 已完成，待启动 DEMO-1
+- 当前阶段：DEMO-1 已完成，待启动 SITE-1
 - 对应设计文档：`docs/设计并开发MatrixEffect组件/MatrixEffect组件开发设计文档.md`
 
 ## 使用方式
@@ -41,7 +41,7 @@
 | FE-2 动态调度、暂停与错误韧性         | 已完成 | 2026-07-22 | `components/qiuye-ui/matrix-effect/matrix-effect.tsx`                                                                                                                                                                                         | pnpm 8.7.0 lint、TypeScript、Prettier、build、纯算法断言与临时路由编译通过 | `MatrixEffect组件实施记录/2026-07-22_FE-2_动态调度与错误韧性.md`    | FX-1 复用调度器验证动态 Dot 主路径                 |
 | FX-1 Dot Renderer 与 DotMatrixEffect  | 已完成 | 2026-07-23 | `components/qiuye-ui/matrix-effect/renderers.ts`, `components/qiuye-ui/matrix-effect/presets.tsx`, `components/qiuye-ui/matrix-effect/sources.ts`, `components/qiuye-ui/matrix-effect/types.ts`, `components/qiuye-ui/matrix-effect/index.ts` | pnpm 8.7.0 lint、TypeScript、Prettier、build、算法/类型/浏览器断言通过     | `MatrixEffect组件实施记录/2026-07-23_FX-1_Dot预设.md`               | 无                                                 |
 | FX-2 ASCII Renderer 与 AsciiEffect    | 已完成 | 2026-07-23 | `components/qiuye-ui/matrix-effect/renderers.ts`, `components/qiuye-ui/matrix-effect/presets.tsx`, `components/qiuye-ui/matrix-effect/types.ts`, `components/qiuye-ui/matrix-effect/index.ts`                                                 | pnpm 8.7.0 lint、TypeScript、Prettier、build、算法/类型/SSR/浏览器断言通过 | `MatrixEffect组件实施记录/2026-07-23_FX-2_ASCII预设.md`             | 无                                                 |
-| DEMO-1 完整 Demo 与同源示例资产       | 未开始 | -          | `components/qiuye-ui/demos/matrix-effect-demo.tsx`, `public/examples/matrix-effect/*`                                                                                                                                                         | 待执行                                                                     | 待创建                                                              | 示例资产需同源且许可明确，不使用临时剪贴板路径     |
+| DEMO-1 完整 Demo 与同源示例资产       | 已完成 | 2026-07-23 | `components/qiuye-ui/demos/matrix-effect-demo.tsx`, `public/examples/matrix-effect/*`                                                                                                                                                         | pnpm 8.7.0 lint、TypeScript、Prettier、build、桌面/390px 浏览器验收通过    | `MatrixEffect组件实施记录/2026-07-23_DEMO-1_完整演示.md`            | 无                                                 |
 | SITE-1 详情页、快速预览与站点元数据   | 未开始 | -          | `app/components/[id]/simple-demos.tsx`, `app/components/[id]/page.tsx`, `lib/component-constants.ts`, `lib/registry.ts`                                                                                                                       | 待执行                                                                     | 待创建                                                              | 无                                                 |
 | REG-1 Registry、MCP 与项目清单同步    | 未开始 | -          | `public/registry/matrix-effect.json`, `public/registry/registry.json`, `packages/qiuye-ui-cli/bin/qiuye-ui-mcp.mjs`, `README.md`, `AGENT.md`                                                                                                  | 待执行                                                                     | 待创建                                                              | 无                                                 |
 | QA-1 构建、Registry 与功能验收        | 未开始 | -          | 以上全部实现文件                                                                                                                                                                                                                              | 待执行                                                                     | 待创建                                                              | 无                                                 |
@@ -566,6 +566,6 @@ YYYY-MM-DD_<工作包ID>_<简短标题>.md
 
 ## 下一步建议
 
-下一工作包为 `DEMO-1 完整 Demo 与同源示例资产`。
+下一工作包为 `SITE-1 详情页、快速预览与站点元数据`。
 
-开始实现前应读取 FX-1、FX-2 实施记录，复用已经验证的 Dot/ASCII 预设和稳定配置 memo。创建包含柔和光团 Dot、同源静态图片 ASCII、同一 Source 更换 Transform/自定义 Renderer 的三场景 Demo，并加入许可明确的同源位图资产；优先验证 390px 移动端布局和控件触发的精确重绘。站点接入与 registry 仍分别属于后续 SITE-1、REG-1 工作包。
+开始实现前应读取 DEMO-1 实施记录，把 `MatrixEffectDemo` 接入组件详情页并新增无网络的 `MatrixEffectSimpleDemo`。同步补齐 `ComponentId`、基础用法和 `lib/registry.ts` 元数据，但 Registry item、MCP fallback 与项目清单更新仍保留给后续 REG-1；不要提前执行 `update-registry`。
