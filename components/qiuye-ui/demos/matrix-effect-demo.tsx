@@ -102,6 +102,63 @@ const ASCII_CHARACTER_PRESETS = [
   },
 ] as const;
 
+const ASCII_COLOR_PRESETS = [
+  {
+    id: "source-night",
+    label: "源色夜幕",
+    colorMode: "source",
+    characterColor: "#FB7185",
+    backgroundColor: "#09090B",
+  },
+  {
+    id: "terminal",
+    label: "荧光终端",
+    colorMode: "fixed",
+    characterColor: "#86EFAC",
+    backgroundColor: "#07120D",
+  },
+  {
+    id: "amber",
+    label: "琥珀终端",
+    colorMode: "fixed",
+    characterColor: "#FBBF24",
+    backgroundColor: "#17120A",
+  },
+  {
+    id: "mist",
+    label: "雾灰",
+    colorMode: "fixed",
+    characterColor: "#52525B",
+    backgroundColor: "#F6F6F6",
+  },
+  {
+    id: "blueprint",
+    label: "蓝图",
+    colorMode: "fixed",
+    characterColor: "#2563EB",
+    backgroundColor: "#EFF6FF",
+  },
+] as const satisfies readonly {
+  id: string;
+  label: string;
+  colorMode: AsciiColorMode;
+  characterColor: string;
+  backgroundColor: string;
+}[];
+
+const ASCII_PICKER_PRESET_COLORS = [
+  "#09090B",
+  "#FB7185",
+  "#07120D",
+  "#86EFAC",
+  "#17120A",
+  "#FBBF24",
+  "#F6F6F6",
+  "#52525B",
+  "#EFF6FF",
+  "#2563EB",
+];
+
 const DOT_COLOR_PRESETS = [
   {
     id: "graphite",
@@ -157,6 +214,24 @@ function DotPaletteSwatch({
         className="absolute left-1/2 top-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-black/10"
         style={{ backgroundColor: dotColor }}
       />
+    </span>
+  );
+}
+
+function AsciiPaletteSwatch({
+  backgroundColor,
+  characterColor,
+}: {
+  backgroundColor: string;
+  characterColor: string;
+}) {
+  return (
+    <span
+      className="flex size-5 shrink-0 items-center justify-center overflow-hidden rounded-sm border font-mono text-xs font-semibold leading-none"
+      style={{ backgroundColor, color: characterColor }}
+      aria-hidden="true"
+    >
+      @
     </span>
   );
 }
@@ -553,6 +628,8 @@ function AsciiScene() {
   const [characters, setCharacters] = React.useState(DEFAULT_ASCII_CHARACTERS);
   const [invert, setInvert] = React.useState(false);
   const [colorMode, setColorMode] = React.useState<AsciiColorMode>("source");
+  const [characterColor, setCharacterColor] = React.useState("#FB7185");
+  const [backgroundColor, setBackgroundColor] = React.useState("#09090B");
   const {
     source,
     sourceId,
@@ -567,6 +644,12 @@ function AsciiScene() {
   const activeCharacterPreset = ASCII_CHARACTER_PRESETS.find(
     (preset) => preset.characters === characters,
   );
+  const activeColorPreset = ASCII_COLOR_PRESETS.find(
+    (preset) =>
+      preset.colorMode === colorMode &&
+      preset.backgroundColor === backgroundColor &&
+      (colorMode === "source" || preset.characterColor === characterColor),
+  );
 
   const handleCharacterPresetChange = (presetId: string) => {
     const preset = ASCII_CHARACTER_PRESETS.find((item) => item.id === presetId);
@@ -576,6 +659,16 @@ function AsciiScene() {
     }
   };
 
+  const handleColorPresetChange = (presetId: string) => {
+    const preset = ASCII_COLOR_PRESETS.find((item) => item.id === presetId);
+
+    if (!preset) return;
+
+    setColorMode(preset.colorMode);
+    setCharacterColor(preset.characterColor);
+    setBackgroundColor(preset.backgroundColor);
+  };
+
   const grid = React.useMemo<MatrixGridConfig>(
     () => ({ mode: "auto", cellSize, maxCells: 6_000 }),
     [cellSize],
@@ -583,14 +676,17 @@ function AsciiScene() {
 
   return (
     <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start">
-      <div className="aspect-[4/3] min-w-0 overflow-hidden rounded-md border bg-[#09090b] sm:aspect-video">
+      <div
+        className="aspect-[4/3] min-w-0 overflow-hidden rounded-md border sm:aspect-video"
+        style={{ backgroundColor }}
+      >
         <AsciiEffect
           className="h-full w-full"
           source={source}
           characters={characters}
           colorMode={colorMode}
-          color="#fb7185"
-          backgroundColor="#09090b"
+          color={characterColor}
+          backgroundColor={backgroundColor}
           grid={grid}
           invert={invert}
           playing={playing}
@@ -675,6 +771,80 @@ function AsciiScene() {
             items={ASCII_COLOR_MODE_ITEMS}
             onValueChange={(value) => setColorMode(value as AsciiColorMode)}
           />
+        </div>
+
+        <div className="space-y-2.5">
+          <Label htmlFor="matrix-ascii-palette">配色预设</Label>
+          <Select
+            value={activeColorPreset?.id ?? "custom"}
+            onValueChange={handleColorPresetChange}
+          >
+            <SelectTrigger
+              id="matrix-ascii-palette"
+              className="w-full"
+              aria-label="ASCII 配色预设"
+            >
+              <SelectValue placeholder="选择配色" />
+            </SelectTrigger>
+            <SelectContent>
+              {ASCII_COLOR_PRESETS.map((preset) => (
+                <SelectItem key={preset.id} value={preset.id}>
+                  <AsciiPaletteSwatch
+                    backgroundColor={preset.backgroundColor}
+                    characterColor={preset.characterColor}
+                  />
+                  {preset.label}
+                </SelectItem>
+              ))}
+              <SelectItem value="custom">
+                <PaletteIcon />
+                自定义
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div
+            className="min-w-0 space-y-2"
+            role="group"
+            aria-labelledby="matrix-ascii-character-color-label"
+          >
+            <Label id="matrix-ascii-character-color-label">字符颜色</Label>
+            <div className="flex min-w-0 items-center gap-2">
+              <ColorPicker
+                value={characterColor}
+                onChange={setCharacterColor}
+                presetColors={ASCII_PICKER_PRESET_COLORS}
+                showRecent={false}
+                triggerSize="sm"
+                disabled={colorMode === "source"}
+              />
+              <span className="text-muted-foreground truncate font-mono text-[11px]">
+                {characterColor}
+              </span>
+            </div>
+          </div>
+
+          <div
+            className="min-w-0 space-y-2"
+            role="group"
+            aria-labelledby="matrix-ascii-background-color-label"
+          >
+            <Label id="matrix-ascii-background-color-label">背景颜色</Label>
+            <div className="flex min-w-0 items-center gap-2">
+              <ColorPicker
+                value={backgroundColor}
+                onChange={setBackgroundColor}
+                presetColors={ASCII_PICKER_PRESET_COLORS}
+                showRecent={false}
+                triggerSize="sm"
+              />
+              <span className="text-muted-foreground truncate font-mono text-[11px]">
+                {backgroundColor}
+              </span>
+            </div>
+          </div>
         </div>
 
         <div className="flex items-center justify-between gap-3">

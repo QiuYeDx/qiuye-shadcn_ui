@@ -42,7 +42,7 @@
 | FX-1 Dot Renderer 与 DotMatrixEffect  | 已完成 | 2026-07-23 | `components/qiuye-ui/matrix-effect/renderers.ts`, `components/qiuye-ui/matrix-effect/presets.tsx`, `components/qiuye-ui/matrix-effect/sources.ts`, `components/qiuye-ui/matrix-effect/types.ts`, `components/qiuye-ui/matrix-effect/index.ts` | pnpm 8.7.0 lint、TypeScript、Prettier、build、算法/类型/浏览器断言通过                                | `MatrixEffect组件实施记录/2026-07-23_FX-1_Dot预设.md`                     | 无                                                 |
 | FX-2 ASCII Renderer 与 AsciiEffect    | 已完成 | 2026-07-23 | `components/qiuye-ui/matrix-effect/renderers.ts`, `components/qiuye-ui/matrix-effect/presets.tsx`, `components/qiuye-ui/matrix-effect/types.ts`, `components/qiuye-ui/matrix-effect/index.ts`                                                 | pnpm 8.7.0 lint、TypeScript、Prettier、build、算法/类型/SSR/浏览器断言通过                            | `MatrixEffect组件实施记录/2026-07-23_FX-2_ASCII预设.md`                   | 无                                                 |
 | DEMO-1 完整 Demo 与同源示例资产       | 已完成 | 2026-07-23 | `components/qiuye-ui/demos/matrix-effect-demo.tsx`, `public/examples/matrix-effect/*`                                                                                                                                                         | pnpm 8.7.0 lint、TypeScript、Prettier、build、桌面/390px 浏览器验收通过                               | `MatrixEffect组件实施记录/2026-07-23_DEMO-1_完整演示.md`                  | 无                                                 |
-| DEMO-2 ASCII 与自定义演示输入增强     | 已完成 | 2026-07-23 | `components/qiuye-ui/demos/matrix-effect-demo.tsx`, `components/qiuye-ui/demos/matrix-effect-demo-sources.ts`, 设计文档、feat 与 ASCII 比例 fix 文档                                                                                          | Registry、lint、TypeScript、Prettier、build、四种动态 Source、暂停/恢复、上传与 390px 浏览器验收通过  | `MatrixEffect组件实施记录/2026-07-23_DEMO-2_ASCII与自定义演示输入增强.md` | 无                                                 |
+| DEMO-2 ASCII 与自定义演示输入增强     | 已完成 | 2026-07-23 | `components/qiuye-ui/demos/matrix-effect-demo.tsx`, `components/qiuye-ui/demos/matrix-effect-demo-sources.ts`, 设计文档、feat 与 ASCII 比例 fix 文档                                                                                          | Registry、lint、TypeScript、Prettier、build、动态 Source、上传、ASCII 配色与 390px 浏览器验收通过     | `MatrixEffect组件实施记录/2026-07-23_DEMO-2_ASCII与自定义演示输入增强.md` | 无                                                 |
 | SITE-1 详情页、快速预览与站点元数据   | 已完成 | 2026-07-23 | `app/components/[id]/simple-demos.tsx`, `app/components/[id]/page.tsx`, `components/home/home-component-previews.tsx`, `lib/component-constants.ts`, `lib/registry.ts`                                                                        | pnpm 8.7.0 lint、TypeScript、Prettier、build、桌面/390px 浏览器验收通过                               | `MatrixEffect组件实施记录/2026-07-23_SITE-1_站点接入.md`                  | 无                                                 |
 | REG-1 Registry、MCP 与项目清单同步    | 已完成 | 2026-07-23 | `public/registry/matrix-effect.json`, `public/registry/registry.json`, `packages/qiuye-ui-cli/bin/qiuye-ui-mcp.mjs`, `README.md`, `AGENT.md`                                                                                                  | pnpm 8.7.0 Registry 生成/dry、结构/清单断言、lint、TypeScript、build 通过                             | `MatrixEffect组件实施记录/2026-07-23_REG-1_Registry与项目清单.md`         | 无                                                 |
 | QA-1 构建、Registry 与功能验收        | 已完成 | 2026-07-23 | 全部 MatrixEffect 交付文件；`components/qiuye-ui/matrix-effect/*`、`public/registry/matrix-effect.json`、QA-1 记录与 Source 身份 fix 文档                                                                                                     | pnpm 8.7.0 Registry 真实安装/dry、lint、TypeScript、Prettier、build、浏览器功能与 Canvas 像素断言通过 | `MatrixEffect组件实施记录/2026-07-23_QA-1_构建与功能验收.md`              | QA-2 仍需关闭视觉、性能、暂停、清理与多视口风险    |
@@ -350,6 +350,7 @@ REG-1 -> QA-1 -> QA-2
 范围：
 
 - ASCII 字符集输入默认使用组件默认值，并提供多套 Demo 级字符密度预设；用户仍可直接编辑任意字符串。
+- ASCII 提供 Demo 级配色预设、字符色与背景色取色器；源图色模式禁用字符色编辑但保留固定色值。
 - ASCII 与自定义场景共享输入源控制模型，提供同源静态图片、至少四种程序化动态场（包含旋转星旋）和本地图片上传。
 - 动态 Source 由 `MatrixProceduralSource` 驱动，播放开关只透传核心 `playing`，不得在 Demo 内创建第二条 rAF。
 - 上传图片直接使用 `File` Source，仅保存在页面状态，不上传、不持久化、不自行持有 object URL。
@@ -365,6 +366,7 @@ REG-1 -> QA-1 -> QA-2
 完成条件：
 
 - ASCII 初始字符集与 `createAsciiRenderer()` 默认值一致，四类预设与自定义编辑均可生效。
+- ASCII 配色预设可同步模式与两项颜色；独立改色后进入自定义状态，固定色/源图色切换不丢失字符色。
 - ASCII 与自定义场景的四个动态 Source 均产生非空且随时间变化的 Canvas；暂停后画面稳定，恢复后继续。
 - 静态示例与本地上传图片均可切换，上传文件名可识别且不发生对象 URL 泄漏。
 - 桌面与 390px 移动视口下控件不溢出、不重叠，切换场景后只有活动 Canvas 挂载。
