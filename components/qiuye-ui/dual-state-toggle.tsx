@@ -13,7 +13,12 @@ import { cn } from "@/lib/utils";
 type ButtonProps = React.ComponentProps<typeof Button>;
 
 /** 内置过渡效果预设名 */
-type ToggleEffectPreset = "fade" | "rotate" | "slide-up" | "slide-down" | "scale";
+type ToggleEffectPreset =
+  | "fade"
+  | "rotate"
+  | "slide-up"
+  | "slide-down"
+  | "scale";
 
 type MotionValues = Record<string, string | number>;
 
@@ -71,8 +76,10 @@ const EFFECT_PRESETS: Record<ToggleEffectPreset, ToggleEffectConfig> = {
 /*                                   Props                                    */
 /* -------------------------------------------------------------------------- */
 
-export interface DualStateToggleProps
-  extends Omit<ButtonProps, "onToggle" | "children"> {
+export interface DualStateToggleProps extends Omit<
+  ButtonProps,
+  "onToggle" | "children"
+> {
   /** 是否处于激活状态 */
   active: boolean;
   /** 状态切换回调 */
@@ -95,7 +102,8 @@ export interface DualStateToggleProps
    * - `"square"` — 默认圆角矩形（shadcn/ui Button 原始圆角）
    * - `"circle"` — 纯圆形按钮（`rounded-full`）
    *
-   * 也可以忽略此属性，通过 `className` 自定义圆角
+   * 圆形模式会覆盖 Button 自身的圆角与 `corner-shape` 样式。
+   * 也可以忽略此属性，通过 `className` 或 `style` 自定义圆角。
    * @default "square"
    */
   shape?: "square" | "circle";
@@ -226,6 +234,7 @@ export const DualStateToggle = React.forwardRef<
     variant = "default",
     size = "icon",
     className,
+    style,
     onClick,
     ...buttonProps
   },
@@ -254,8 +263,17 @@ export const DualStateToggle = React.forwardRef<
       className={cn(
         "relative transition-transform duration-150 active:scale-[0.97] cursor-pointer",
         shape === "circle" && "rounded-full",
-        className
+        className,
       )}
+      style={
+        shape === "circle"
+          ? ({
+              ...style,
+              borderRadius: "9999px",
+              cornerShape: "round",
+            } as React.CSSProperties)
+          : style
+      }
       onClick={(event) => {
         onClick?.(event);
         if (event.defaultPrevented) return;
@@ -290,9 +308,7 @@ export const DualStateToggle = React.forwardRef<
       </AnimatePresence>
 
       {(activeLabel || inactiveLabel) && (
-        <span className="sr-only">
-          {active ? activeLabel : inactiveLabel}
-        </span>
+        <span className="sr-only">{active ? activeLabel : inactiveLabel}</span>
       )}
     </Button>
   );
