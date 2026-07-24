@@ -60,6 +60,9 @@ export type ThemeTransitionEffect = "reveal" | "wipe" | "split" | "diagonal";
 /** 边缘扫入与轴线展开的运动轴向 */
 export type ThemeTransitionAxis = "auto" | "horizontal" | "vertical";
 
+/** 对角揭幕使用的视口角 */
+export type ThemeTransitionCorner = "auto" | ViewportCorner;
+
 /** 计算揭幕动画起点时可使用的来源 */
 export type ThemeTransitionOrigin =
   | HTMLElement
@@ -113,6 +116,13 @@ export interface ThemeTransitionOptions {
    * @default "auto"
    */
   transitionAxis?: ThemeTransitionAxis;
+  /**
+   * 对角揭幕使用的视口角
+   * - `"auto"`：根据触发点自动选择最近的视口角
+   * - 其余值：固定从指定视口角揭幕或向该角收拢
+   * @default "auto"
+   */
+  transitionCorner?: ThemeTransitionCorner;
   /**
    * reveal 过渡使用的揭幕形状
    * - `"circle"`：圆形揭幕
@@ -518,6 +528,7 @@ function getClipPathKeyframes({
   shape,
   transitionEffect,
   transitionAxis,
+  transitionCorner,
   layer,
 }: {
   x: number;
@@ -529,6 +540,7 @@ function getClipPathKeyframes({
   shape: ThemeTransitionShape;
   transitionEffect: ThemeTransitionEffect;
   transitionAxis: ThemeTransitionAxis;
+  transitionCorner: ThemeTransitionCorner;
   layer: ThemeTransitionLayer;
 }) {
   const edge = getNearestViewportEdge(x, y, width, height, transitionAxis);
@@ -559,7 +571,10 @@ function getClipPathKeyframes({
         : `inset(${topInset}% 0% ${bottomInset}% 0%)`;
     visible = "inset(0% 0% 0% 0%)";
   } else if (transitionEffect === "diagonal") {
-    const corner = getNearestViewportCorner(x, y, width, height);
+    const corner =
+      transitionCorner === "auto"
+        ? getNearestViewportCorner(x, y, width, height)
+        : transitionCorner;
     const diagonalPaths: Record<
       ViewportCorner,
       { hidden: string; visible: string }
@@ -702,6 +717,7 @@ export async function runThemeViewTransition({
   timing = "spring",
   transitionEffect = "reveal",
   transitionAxis = "auto",
+  transitionCorner = "auto",
   shape = "circle",
   direction = "auto",
   isDark = false,
@@ -745,6 +761,7 @@ export async function runThemeViewTransition({
     shape,
     transitionEffect,
     transitionAxis,
+    transitionCorner,
     layer,
   });
   const pseudoElement =
@@ -839,6 +856,7 @@ export function useThemeTransition({
   timing = "spring",
   transitionEffect = "reveal",
   transitionAxis = "auto",
+  transitionCorner = "auto",
   shape = "circle",
   direction = "auto",
   isDark = false,
@@ -862,6 +880,7 @@ export function useThemeTransition({
         timing,
         transitionEffect,
         transitionAxis,
+        transitionCorner,
         shape,
         direction,
         isDark,
@@ -892,6 +911,7 @@ export function useThemeTransition({
       themeClassName,
       transitionEffect,
       transitionAxis,
+      transitionCorner,
       updateTheme,
     ],
   );
@@ -936,6 +956,7 @@ export const ThemeTransitionToggle = React.forwardRef<
     timing = "spring",
     transitionEffect = "reveal",
     transitionAxis = "auto",
+    transitionCorner = "auto",
     shape = "circle",
     direction = "auto",
     targetDark,
@@ -990,6 +1011,7 @@ export const ThemeTransitionToggle = React.forwardRef<
         timing,
         transitionEffect,
         transitionAxis,
+        transitionCorner,
         shape,
         direction,
         targetDark: targetDark ?? nextDark,
@@ -1023,6 +1045,7 @@ export const ThemeTransitionToggle = React.forwardRef<
       themeClassName,
       transitionEffect,
       transitionAxis,
+      transitionCorner,
     ],
   );
 

@@ -766,6 +766,7 @@ function ThemeTransitionTogglePreview() {
     {
       transitionEffect: "wipe",
       transitionAxis: "vertical",
+      transitionCorner: "auto",
       label: "边缘扫入",
       icon: ScanLineIcon,
       variant: "outline",
@@ -773,6 +774,7 @@ function ThemeTransitionTogglePreview() {
     {
       transitionEffect: "split",
       transitionAxis: "horizontal",
+      transitionCorner: "auto",
       label: "轴线展开",
       icon: ChevronsLeftRightIcon,
       variant: "secondary",
@@ -780,6 +782,7 @@ function ThemeTransitionTogglePreview() {
     {
       transitionEffect: "diagonal",
       transitionAxis: "auto",
+      transitionCorner: "bottom-right",
       label: "对角揭幕",
       icon: MoveDiagonal2Icon,
       variant: "outline",
@@ -789,13 +792,21 @@ function ThemeTransitionTogglePreview() {
   return (
     <div className="flex items-center justify-center gap-3 rounded-full border bg-muted/30 p-3">
       {examples.map(
-        ({ transitionEffect, transitionAxis, label, icon: Icon, variant }) => (
+        ({
+          transitionEffect,
+          transitionAxis,
+          transitionCorner,
+          label,
+          icon: Icon,
+          variant,
+        }) => (
           <ThemeTransitionToggle
             key={transitionEffect}
             isDark={isDark}
             onToggle={(nextDark) => setTheme(nextDark ? "dark" : "light")}
             transitionEffect={transitionEffect}
             transitionAxis={transitionAxis}
+            transitionCorner={transitionCorner}
             variant={variant}
             buttonShape="circle"
             lightIcon={<Icon className="size-4" />}

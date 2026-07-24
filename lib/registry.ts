@@ -999,6 +999,14 @@ export const componentRegistry: ComponentRegistry = {
             default: '"auto"',
           },
           {
+            name: "transitionCorner",
+            type: '"auto" | "top-left" | "top-right" | "bottom-right" | "bottom-left"',
+            description:
+              "对角揭幕使用的视口角：auto 选择离触发点最近的角，也可固定为指定角",
+            required: false,
+            default: '"auto"',
+          },
+          {
             name: "shape",
             type: '"circle" | "ellipse" | "star" | "diamond" | "hexagon"',
             description:
@@ -1209,6 +1217,14 @@ export const componentRegistry: ComponentRegistry = {
             default: '"auto"',
           },
           {
+            name: "transitionCorner",
+            type: '"auto" | "top-left" | "top-right" | "bottom-right" | "bottom-left"',
+            description:
+              "对角揭幕使用的视口角：auto 选择离触发点最近的角，也可固定为指定角",
+            required: false,
+            default: '"auto"',
+          },
+          {
             name: "shape",
             type: '"circle" | "ellipse" | "star" | "diamond" | "hexagon"',
             description:
@@ -1290,6 +1306,14 @@ export const componentRegistry: ComponentRegistry = {
             type: '"auto" | "horizontal" | "vertical"',
             description:
               "边缘扫入与轴线展开的运动轴向：auto 自动选择，horizontal 左右运动，vertical 上下运动",
+            required: false,
+            default: '"auto"',
+          },
+          {
+            name: "transitionCorner",
+            type: '"auto" | "top-left" | "top-right" | "bottom-right" | "bottom-left"',
+            description:
+              "对角揭幕使用的视口角：auto 选择离触发点最近的角，也可固定为指定角",
             required: false,
             default: '"auto"',
           },

@@ -19,6 +19,7 @@ import {
 import {
   ThemeTransitionToggle,
   type ThemeTransitionAxis,
+  type ThemeTransitionCorner,
   type ThemeTransitionEffect,
   type ThemeTransitionShape,
   useThemeTransition,
@@ -109,6 +110,7 @@ const geometryExamples: Array<{
 const transitionEffectExamples: Array<{
   transitionEffect: Exclude<ThemeTransitionEffect, "reveal">;
   transitionAxis?: ThemeTransitionAxis;
+  transitionCorner?: ThemeTransitionCorner;
   label: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }> = [
@@ -126,6 +128,7 @@ const transitionEffectExamples: Array<{
   },
   {
     transitionEffect: "diagonal",
+    transitionCorner: "bottom-right",
     label: "对角揭幕",
     icon: MoveDiagonal2Icon,
   },
@@ -312,7 +315,13 @@ export function ThemeTransitionToggleDemo() {
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
               {transitionEffectExamples.map(
-                ({ transitionEffect, transitionAxis, label, icon: Icon }) => (
+                ({
+                  transitionEffect,
+                  transitionAxis,
+                  transitionCorner,
+                  label,
+                  icon: Icon,
+                }) => (
                   <div
                     key={transitionEffect}
                     className="flex items-center justify-between gap-3 rounded-lg border bg-muted/20 p-3"
@@ -332,6 +341,7 @@ export function ThemeTransitionToggleDemo() {
                       }
                       transitionEffect={transitionEffect}
                       transitionAxis={transitionAxis}
+                      transitionCorner={transitionCorner}
                       variant="secondary"
                       lightIcon={<Icon className="size-4" />}
                       darkIcon={<Icon className="size-4" />}
