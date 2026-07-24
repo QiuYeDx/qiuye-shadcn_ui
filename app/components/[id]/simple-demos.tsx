@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "next-themes";
 import {
+  CircleOff,
   FolderKanban,
   Menu,
   Search,
@@ -395,8 +396,7 @@ export function SmoothCornersSimpleDemo() {
         {
           label: "0",
           smoothing: 0,
-          className:
-            "border border-sky-500/35 bg-sky-50 text-sky-950 shadow-[inset_0_0_0_1px_rgba(14,165,233,0.12)] dark:border-sky-400/35 dark:bg-sky-950/35 dark:text-sky-50",
+          className: "bg-primary text-primary-foreground",
         },
         {
           label: "0.6",
@@ -413,13 +413,32 @@ export function SmoothCornersSimpleDemo() {
           key={item.label}
           radius={28}
           smoothing={item.smoothing}
+          style={
+            {
+              borderRadius: 28,
+              cornerShape: item.smoothing === 0 ? "round" : undefined,
+            } as React.CSSProperties
+          }
           className={cn(
             "flex aspect-[4/3] min-h-24 flex-col justify-between p-4 shadow-sm",
             item.className,
           )}
         >
-          <span className="text-sm font-medium">smoothing</span>
-          <span className="font-mono text-lg">{item.label}</span>
+          <span className="flex items-center gap-1.5 text-sm font-medium">
+            {item.smoothing === 0 && (
+              <CircleOff className="size-3.5" aria-hidden="true" />
+            )}
+            {item.smoothing === 0 ? "普通圆角" : "smoothing"}
+          </span>
+          <span
+            className={cn(
+              item.smoothing === 0
+                ? "text-sm font-medium"
+                : "font-mono text-lg",
+            )}
+          >
+            {item.smoothing === 0 ? "未使用平滑" : item.label}
+          </span>
         </SmoothCorners>
       ))}
     </div>

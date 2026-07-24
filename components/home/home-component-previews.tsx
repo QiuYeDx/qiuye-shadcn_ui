@@ -5,7 +5,7 @@ import {
   ArrowUpRightIcon,
   BellOffIcon,
   BellIcon,
-  FolderKanbanIcon,
+  CircleOffIcon,
   GripVerticalIcon,
   MenuIcon,
   MousePointer2Icon,
@@ -65,10 +65,7 @@ function ResponsiveTabsPreview() {
         fadeMasks={false}
       >
         <div className="rounded-md border bg-muted/30 p-4">
-          <div className="mb-3 flex items-center gap-2">
-            <FolderKanbanIcon className="size-4" />
-            <span className="text-sm font-medium capitalize">{value}</span>
-          </div>
+          <div className="mb-3 text-sm font-medium capitalize">{value}</div>
           <div className="space-y-2">
             <div className="h-2 w-3/4 rounded bg-foreground/15" />
             <div className="h-2 w-1/2 rounded bg-foreground/10" />
@@ -768,9 +765,9 @@ function ThemeTransitionTogglePreview() {
       <ThemeTransitionToggle
         isDark={isDark}
         onToggle={(nextDark) => setTheme(nextDark ? "dark" : "light")}
-        variant="ghost"
+        variant="outline"
         buttonShape="circle"
-        className="size-11 rounded-full border border-border/70 bg-background text-foreground shadow-none hover:bg-muted/70 dark:bg-background dark:hover:bg-muted/40"
+        className="size-11"
       />
     </div>
   );
@@ -1305,31 +1302,43 @@ function SmoothCornersPreview() {
         {
           label: "0",
           smoothing: 0,
-          className:
-            "border border-sky-500/35 bg-sky-50 text-sky-950 shadow-[inset_0_0_0_1px_rgba(14,165,233,0.12)] dark:border-sky-400/35 dark:bg-sky-950/35 dark:text-sky-50",
+          className: "bg-primary text-primary-foreground",
         },
         {
           label: "0.6",
           smoothing: 0.6,
           className: "bg-primary text-primary-foreground",
         },
-        {
-          label: "0.95",
-          smoothing: 0.95,
-          className: "bg-foreground text-background",
-        },
       ].map((item) => (
         <SmoothCorners
           key={item.label}
           radius={24}
           smoothing={item.smoothing}
+          style={
+            {
+              borderRadius: 24,
+              cornerShape: item.smoothing === 0 ? "round" : undefined,
+            } as React.CSSProperties
+          }
           className={cn(
-            "flex h-28 w-[72px] shrink-0 flex-col justify-between p-3 text-xs shadow-sm",
+            "flex h-28 w-24 shrink-0 flex-col justify-between p-3 text-xs shadow-sm",
             item.className,
           )}
         >
-          <span className="font-medium">s</span>
-          <span className="font-mono">{item.label}</span>
+          {item.smoothing === 0 ? (
+            <CircleOffIcon className="size-3.5" aria-hidden="true" />
+          ) : (
+            <span className="font-medium">smooth</span>
+          )}
+          <span
+            className={cn(
+              item.smoothing === 0
+                ? "whitespace-nowrap text-[10px] font-medium"
+                : "font-mono",
+            )}
+          >
+            {item.smoothing === 0 ? "普通圆角" : item.label}
+          </span>
         </SmoothCorners>
       ))}
     </div>

@@ -11,7 +11,6 @@ import {
   MoonIcon,
   MousePointer2Icon,
   ScanLineIcon,
-  ShapesIcon,
   SparklesIcon,
   StarIcon,
   SunIcon,
@@ -33,7 +32,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ViewSourceButton } from "@/components/view-source-button";
-import { cn } from "@/lib/utils";
 
 const sourceCodes = {
   basic: `import { useTheme } from "next-themes";
@@ -81,32 +79,6 @@ function GeometryDemo() {
       shape="star"
       onToggle={(nextDark) => setTheme(nextDark ? "dark" : "light")}
     />
-  );
-}`,
-  customOrigin: `import { useRef } from "react";
-import { useTheme } from "next-themes";
-import { runThemeViewTransition } from "@/components/qiuye-ui/theme-transition-toggle";
-
-function CustomOriginDemo() {
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const { resolvedTheme, setTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
-
-  return (
-    <button
-      ref={buttonRef}
-      onClick={() =>
-        runThemeViewTransition({
-          isDark,
-          targetDark: !isDark,
-          origin: buttonRef,
-          direction: "enter",
-          updateTheme: () => setTheme(isDark ? "light" : "dark"),
-        })
-      }
-    >
-      Run transition
-    </button>
   );
 }`,
 };
@@ -234,7 +206,10 @@ export function ThemeTransitionToggleDemo() {
                 从按钮中心触发全屏圆形揭幕，自动降级到普通主题切换
               </CardDescription>
             </div>
-            <ViewSourceButton code={sourceCodes.basic} title="基础用法 - 源码" />
+            <ViewSourceButton
+              code={sourceCodes.basic}
+              title="基础用法 - 源码"
+            />
           </div>
         </CardHeader>
         <CardContent className="space-y-5">
@@ -273,10 +248,7 @@ export function ThemeTransitionToggleDemo() {
                 分别控制揭幕形状与快照的运动路径，触发点会决定最近的边、轴线或视口角
               </CardDescription>
             </div>
-            <ViewSourceButton
-              code={sourceCodes.hook}
-              title="几何形状 - 源码"
-            />
+            <ViewSourceButton code={sourceCodes.hook} title="几何形状 - 源码" />
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -307,24 +279,19 @@ export function ThemeTransitionToggleDemo() {
                 key={shape}
                 className="flex items-center justify-between gap-3 rounded-lg border bg-muted/20 p-3"
               >
-                <div className="flex min-w-0 items-center gap-2">
-                  <div className="flex size-8 shrink-0 items-center justify-center rounded-md border bg-background">
-                    <Icon className="size-4" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-medium">{label}</div>
-                    <code className="block truncate text-xs text-muted-foreground">
-                      {`shape="${shape}"`}
-                    </code>
-                  </div>
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-medium">{label}</div>
+                  <code className="block truncate text-xs text-muted-foreground">
+                    {`shape="${shape}"`}
+                  </code>
                 </div>
                 <ThemeTransitionToggle
                   isDark={isDark}
                   onToggle={(nextDark) => setTheme(nextDark ? "dark" : "light")}
                   shape={shape}
                   variant="secondary"
-                  lightIcon={<ShapesIcon className="size-4" />}
-                  darkIcon={<ShapesIcon className="size-4" />}
+                  lightIcon={<Icon className="size-4" />}
+                  darkIcon={<Icon className="size-4" />}
                   lightLabel={`${label}揭幕切换到深色主题`}
                   darkLabel={`${label}揭幕切换到浅色主题`}
                 />
@@ -346,18 +313,13 @@ export function ThemeTransitionToggleDemo() {
                     key={transitionEffect}
                     className="flex items-center justify-between gap-3 rounded-lg border bg-muted/20 p-3"
                   >
-                    <div className="flex min-w-0 items-center gap-2">
-                      <div className="flex size-8 shrink-0 items-center justify-center rounded-md border bg-background">
-                        <Icon className="size-4" />
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium">
+                        {label}
                       </div>
-                      <div className="min-w-0">
-                        <div className="truncate text-sm font-medium">
-                          {label}
-                        </div>
-                        <code className="block truncate text-xs text-muted-foreground">
-                          {`transitionEffect="${transitionEffect}"`}
-                        </code>
-                      </div>
+                      <code className="block truncate text-xs text-muted-foreground">
+                        {`transitionEffect="${transitionEffect}"`}
+                      </code>
                     </div>
                     <ThemeTransitionToggle
                       isDark={isDark}
@@ -374,90 +336,6 @@ export function ThemeTransitionToggleDemo() {
                   </div>
                 ),
               )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-1.5">
-              <CardTitle>适合真实页面的状态展示</CardTitle>
-              <CardDescription>
-                组件只负责过渡编排，主题状态仍由 next-themes 或你的 store 管理
-              </CardDescription>
-            </div>
-            <ViewSourceButton
-              code={sourceCodes.customOrigin}
-              title="自定义原点 - 源码"
-            />
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div
-            className={cn(
-              "grid gap-4 rounded-lg border p-4 transition-colors sm:grid-cols-2",
-              isDark
-                ? "bg-zinc-950 text-zinc-50"
-                : "bg-white text-zinc-950",
-            )}
-          >
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <div
-                  className={cn(
-                    "flex size-9 items-center justify-center rounded-md",
-                    isDark ? "bg-white text-zinc-950" : "bg-zinc-950 text-white",
-                  )}
-                >
-                  {isDark ? (
-                    <MoonIcon className="size-4" />
-                  ) : (
-                    <SunIcon className="size-4" />
-                  )}
-                </div>
-                <div>
-                  <div className="text-sm font-semibold">Theme surface</div>
-                  <div
-                    className={cn(
-                      "text-xs",
-                      isDark ? "text-zinc-400" : "text-zinc-500",
-                    )}
-                  >
-                    真实 DOM 主题切换，不是截图遮罩
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div
-                  className={cn(
-                    "h-2 w-5/6 rounded-full",
-                    isDark ? "bg-white/20" : "bg-zinc-950/15",
-                  )}
-                />
-                <div
-                  className={cn(
-                    "h-2 w-3/5 rounded-full",
-                    isDark ? "bg-white/12" : "bg-zinc-950/10",
-                  )}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {["API", "Hook", "Button"].map((item) => (
-                <div
-                  key={item}
-                  className={cn(
-                    "rounded-md border px-3 py-4 text-center text-xs font-medium",
-                    isDark
-                      ? "border-white/10 bg-white/5"
-                      : "border-zinc-950/10 bg-zinc-950/[0.03]",
-                  )}
-                >
-                  {item}
-                </div>
-              ))}
             </div>
           </div>
         </CardContent>
