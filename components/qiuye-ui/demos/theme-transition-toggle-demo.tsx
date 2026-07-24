@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useTheme } from "next-themes";
 import {
-  Columns3Icon,
+  ChevronsLeftRightIcon,
   DiamondIcon,
   HexagonIcon,
   LaptopIcon,
@@ -18,6 +18,7 @@ import {
 
 import {
   ThemeTransitionToggle,
+  type ThemeTransitionAxis,
   type ThemeTransitionEffect,
   type ThemeTransitionShape,
   useThemeTransition,
@@ -107,18 +108,21 @@ const geometryExamples: Array<{
 
 const transitionEffectExamples: Array<{
   transitionEffect: Exclude<ThemeTransitionEffect, "reveal">;
+  transitionAxis?: ThemeTransitionAxis;
   label: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }> = [
   {
     transitionEffect: "wipe",
+    transitionAxis: "vertical",
     label: "边缘扫入",
     icon: ScanLineIcon,
   },
   {
     transitionEffect: "split",
+    transitionAxis: "horizontal",
     label: "轴线展开",
-    icon: Columns3Icon,
+    icon: ChevronsLeftRightIcon,
   },
   {
     transitionEffect: "diagonal",
@@ -308,7 +312,7 @@ export function ThemeTransitionToggleDemo() {
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
               {transitionEffectExamples.map(
-                ({ transitionEffect, label, icon: Icon }) => (
+                ({ transitionEffect, transitionAxis, label, icon: Icon }) => (
                   <div
                     key={transitionEffect}
                     className="flex items-center justify-between gap-3 rounded-lg border bg-muted/20 p-3"
@@ -327,6 +331,7 @@ export function ThemeTransitionToggleDemo() {
                         setTheme(nextDark ? "dark" : "light")
                       }
                       transitionEffect={transitionEffect}
+                      transitionAxis={transitionAxis}
                       variant="secondary"
                       lightIcon={<Icon className="size-4" />}
                       darkIcon={<Icon className="size-4" />}

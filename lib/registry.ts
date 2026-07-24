@@ -991,6 +991,14 @@ export const componentRegistry: ComponentRegistry = {
             default: '"reveal"',
           },
           {
+            name: "transitionAxis",
+            type: '"auto" | "horizontal" | "vertical"',
+            description:
+              "边缘扫入与轴线展开的运动轴向：auto 自动选择，horizontal 左右运动，vertical 上下运动",
+            required: false,
+            default: '"auto"',
+          },
+          {
             name: "shape",
             type: '"circle" | "ellipse" | "star" | "diamond" | "hexagon"',
             description:
@@ -1193,6 +1201,14 @@ export const componentRegistry: ComponentRegistry = {
             default: '"reveal"',
           },
           {
+            name: "transitionAxis",
+            type: '"auto" | "horizontal" | "vertical"',
+            description:
+              "边缘扫入与轴线展开的运动轴向：auto 自动选择，horizontal 左右运动，vertical 上下运动",
+            required: false,
+            default: '"auto"',
+          },
+          {
             name: "shape",
             type: '"circle" | "ellipse" | "star" | "diamond" | "hexagon"',
             description:
@@ -1268,6 +1284,14 @@ export const componentRegistry: ComponentRegistry = {
               "几何过渡效果：孔径揭幕、最近边缘扫入、触发点轴线展开或最近视口角对角揭幕",
             required: false,
             default: '"reveal"',
+          },
+          {
+            name: "transitionAxis",
+            type: '"auto" | "horizontal" | "vertical"',
+            description:
+              "边缘扫入与轴线展开的运动轴向：auto 自动选择，horizontal 左右运动，vertical 上下运动",
+            required: false,
+            default: '"auto"',
           },
           {
             name: "shape",

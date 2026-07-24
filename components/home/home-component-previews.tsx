@@ -5,11 +5,14 @@ import {
   ArrowUpRightIcon,
   BellOffIcon,
   BellIcon,
+  ChevronsLeftRightIcon,
   CircleOffIcon,
   GripVerticalIcon,
   MenuIcon,
+  MoveDiagonal2Icon,
   MousePointer2Icon,
   MoonIcon,
+  ScanLineIcon,
   SunIcon,
   XIcon,
 } from "lucide-react";
@@ -759,16 +762,50 @@ function ThemeTransitionTogglePreview() {
   }, []);
 
   const isDark = mounted && resolvedTheme === "dark";
+  const examples = [
+    {
+      transitionEffect: "wipe",
+      transitionAxis: "vertical",
+      label: "边缘扫入",
+      icon: ScanLineIcon,
+      variant: "outline",
+    },
+    {
+      transitionEffect: "split",
+      transitionAxis: "horizontal",
+      label: "轴线展开",
+      icon: ChevronsLeftRightIcon,
+      variant: "secondary",
+    },
+    {
+      transitionEffect: "diagonal",
+      transitionAxis: "auto",
+      label: "对角揭幕",
+      icon: MoveDiagonal2Icon,
+      variant: "outline",
+    },
+  ] as const;
 
   return (
-    <div className="flex h-full w-full items-center justify-center">
-      <ThemeTransitionToggle
-        isDark={isDark}
-        onToggle={(nextDark) => setTheme(nextDark ? "dark" : "light")}
-        variant="outline"
-        buttonShape="circle"
-        className="size-11"
-      />
+    <div className="flex items-center justify-center gap-3 rounded-full border bg-muted/30 p-3">
+      {examples.map(
+        ({ transitionEffect, transitionAxis, label, icon: Icon, variant }) => (
+          <ThemeTransitionToggle
+            key={transitionEffect}
+            isDark={isDark}
+            onToggle={(nextDark) => setTheme(nextDark ? "dark" : "light")}
+            transitionEffect={transitionEffect}
+            transitionAxis={transitionAxis}
+            variant={variant}
+            buttonShape="circle"
+            lightIcon={<Icon className="size-4" />}
+            darkIcon={<Icon className="size-4" />}
+            lightLabel={`${label}切换到深色主题`}
+            darkLabel={`${label}切换到浅色主题`}
+            className="size-10"
+          />
+        ),
+      )}
     </div>
   );
 }

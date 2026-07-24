@@ -20,6 +20,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
+import { DualStateToggle } from "@/components/qiuye-ui/dual-state-toggle";
 import { SegmentedControl } from "@/components/qiuye-ui/segmented-control";
 import {
   ResponsiveTabs,
@@ -371,18 +372,18 @@ function ComponentCard({
             <code className="text-sm font-mono">
               {generateCommand(component.cliName)}
             </code>
-            <Button
-              size="sm"
+            <DualStateToggle
+              active={copied}
+              onToggle={handleCopy}
+              activeIcon={<CheckCircle className="size-3 text-emerald-500" />}
+              inactiveIcon={<Copy className="size-3" />}
+              activeLabel={`已复制 ${component.name} 安装命令`}
+              inactiveLabel={`复制 ${component.name} 安装命令`}
               variant="ghost"
-              onClick={handleCopy}
-              className="h-6 w-6 p-0"
-            >
-              {copied ? (
-                <CheckCircle className="h-3 w-3 text-green-500" />
-              ) : (
-                <Copy className="h-3 w-3" />
-              )}
-            </Button>
+              effect="scale"
+              transitionDuration={0.18}
+              className="size-6"
+            />
           </div>
         </div>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { SearchIcon } from "lucide-react";
+import { CommandIcon, SearchIcon } from "lucide-react";
 import * as React from "react";
 
 import {
@@ -37,9 +37,9 @@ export function SiteSearch({
   const results = React.useMemo(() => {
     const trimmed = query.trim();
     if (!trimmed) {
-      return allComponents.slice(0, 8);
+      return allComponents;
     }
-    return searchComponents(trimmed).slice(0, 8);
+    return searchComponents(trimmed);
   }, [allComponents, query]);
 
   React.useEffect(() => {
@@ -77,8 +77,10 @@ export function SiteSearch({
             variant="outline"
             className={cn(
               "h-9 justify-start gap-2 rounded-md bg-muted/45 px-3 text-muted-foreground shadow-none",
-              fullWidth ? "flex w-full" : "hidden w-[240px] lg:flex xl:w-[300px]",
-              className
+              fullWidth
+                ? "flex w-full"
+                : "hidden w-[240px] lg:flex xl:w-[300px]",
+              className,
             )}
           >
             <SearchIcon className="size-4" />
@@ -86,12 +88,16 @@ export function SiteSearch({
               Search components...
             </span>
             <kbd
+              aria-hidden="true"
               className={cn(
-                "pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground",
-                fullWidth ? "sm:inline-flex" : "xl:inline-flex"
+                "pointer-events-none hidden h-6 min-w-9 select-none items-center justify-center gap-0.5 rounded-md border border-border/70 bg-background/80 px-1.5 text-muted-foreground shadow-xs",
+                fullWidth ? "sm:inline-flex" : "xl:inline-flex",
               )}
             >
-              ⌘K
+              <CommandIcon className="size-3" strokeWidth={1.75} />
+              <span className="inline-flex size-3 items-center justify-center font-sans text-xs font-medium leading-none">
+                K
+              </span>
             </kbd>
           </Button>
         )}

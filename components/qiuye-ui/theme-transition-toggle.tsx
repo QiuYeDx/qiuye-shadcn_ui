@@ -57,6 +57,9 @@ export type ThemeTransitionTiming = "spring" | "smooth";
 /** 主题切换时的几何过渡效果 */
 export type ThemeTransitionEffect = "reveal" | "wipe" | "split" | "diagonal";
 
+/** 边缘扫入与轴线展开的运动轴向 */
+export type ThemeTransitionAxis = "auto" | "horizontal" | "vertical";
+
 /** 计算揭幕动画起点时可使用的来源 */
 export type ThemeTransitionOrigin =
   | HTMLElement
@@ -102,6 +105,14 @@ export interface ThemeTransitionOptions {
    * @default "reveal"
    */
   transitionEffect?: ThemeTransitionEffect;
+  /**
+   * 边缘扫入与轴线展开的运动轴向
+   * - `"auto"`：根据触发点离视口边缘的距离自动选择
+   * - `"horizontal"`：沿水平方向从左右边缘扫入，或从轴线向左右展开
+   * - `"vertical"`：沿垂直方向从上下边缘扫入，或从轴线向上下展开
+   * @default "auto"
+   */
+  transitionAxis?: ThemeTransitionAxis;
   /**
    * reveal 过渡使用的揭幕形状
    * - `"circle"`：圆形揭幕
@@ -330,15 +341,27 @@ function getNearestViewportEdge(
   y: number,
   width: number,
   height: number,
+  transitionAxis: ThemeTransitionAxis,
 ): ViewportEdge {
   const pointX = clamp(x, 0, width);
   const pointY = clamp(y, 0, height);
-  const distances: Array<{ edge: ViewportEdge; distance: number }> = [
+  const horizontalDistances: Array<{
+    edge: ViewportEdge;
+    distance: number;
+  }> = [
     { edge: "left", distance: pointX },
     { edge: "right", distance: width - pointX },
+  ];
+  const verticalDistances: Array<{ edge: ViewportEdge; distance: number }> = [
     { edge: "top", distance: pointY },
     { edge: "bottom", distance: height - pointY },
   ];
+  const distances =
+    transitionAxis === "horizontal"
+      ? horizontalDistances
+      : transitionAxis === "vertical"
+        ? verticalDistances
+        : [...horizontalDistances, ...verticalDistances];
 
   return distances.reduce((nearest, current) =>
     current.distance < nearest.distance ? current : nearest,
@@ -494,6 +517,7 @@ function getClipPathKeyframes({
   radiusY,
   shape,
   transitionEffect,
+  transitionAxis,
   layer,
 }: {
   x: number;
@@ -504,9 +528,10 @@ function getClipPathKeyframes({
   radiusY: number;
   shape: ThemeTransitionShape;
   transitionEffect: ThemeTransitionEffect;
+  transitionAxis: ThemeTransitionAxis;
   layer: ThemeTransitionLayer;
 }) {
-  const edge = getNearestViewportEdge(x, y, width, height);
+  const edge = getNearestViewportEdge(x, y, width, height, transitionAxis);
   const pointX = clamp(x, 0, width);
   const pointY = clamp(y, 0, height);
   let hidden: string;
@@ -676,6 +701,7 @@ export async function runThemeViewTransition({
   easing = DEFAULT_TRANSITION_EASING,
   timing = "spring",
   transitionEffect = "reveal",
+  transitionAxis = "auto",
   shape = "circle",
   direction = "auto",
   isDark = false,
@@ -718,6 +744,7 @@ export async function runThemeViewTransition({
     radiusY,
     shape,
     transitionEffect,
+    transitionAxis,
     layer,
   });
   const pseudoElement =
@@ -811,6 +838,7 @@ export function useThemeTransition({
   easing = DEFAULT_TRANSITION_EASING,
   timing = "spring",
   transitionEffect = "reveal",
+  transitionAxis = "auto",
   shape = "circle",
   direction = "auto",
   isDark = false,
@@ -833,6 +861,7 @@ export function useThemeTransition({
         easing,
         timing,
         transitionEffect,
+        transitionAxis,
         shape,
         direction,
         isDark,
@@ -862,6 +891,7 @@ export function useThemeTransition({
       targetDark,
       themeClassName,
       transitionEffect,
+      transitionAxis,
       updateTheme,
     ],
   );
@@ -905,6 +935,7 @@ export const ThemeTransitionToggle = React.forwardRef<
     easing = DEFAULT_TRANSITION_EASING,
     timing = "spring",
     transitionEffect = "reveal",
+    transitionAxis = "auto",
     shape = "circle",
     direction = "auto",
     targetDark,
@@ -958,6 +989,7 @@ export const ThemeTransitionToggle = React.forwardRef<
         easing,
         timing,
         transitionEffect,
+        transitionAxis,
         shape,
         direction,
         targetDark: targetDark ?? nextDark,
@@ -990,6 +1022,7 @@ export const ThemeTransitionToggle = React.forwardRef<
       targetDark,
       themeClassName,
       transitionEffect,
+      transitionAxis,
     ],
   );
 
