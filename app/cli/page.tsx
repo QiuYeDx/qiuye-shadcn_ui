@@ -34,6 +34,7 @@ import {
   CodeBlock as CodeBlockDisplay,
   CodeBlockPanel,
 } from "@/components/qiuye-ui/code-block";
+import { DualStateToggle } from "@/components/qiuye-ui/dual-state-toggle";
 import { SegmentedControl } from "@/components/qiuye-ui/segmented-control";
 import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
 import {
@@ -292,30 +293,29 @@ function CopyCommandButton({
   copied,
   label,
   onCopy,
+  tooltip = "复制命令",
 }: {
   copied: boolean;
   label: string;
   onCopy: () => void;
+  tooltip?: string;
 }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button
-          type="button"
+        <DualStateToggle
+          active={copied}
+          onToggle={onCopy}
+          activeIcon={<CheckIcon className="text-emerald-500" />}
+          inactiveIcon={<CopyIcon />}
+          activeLabel={`已${label}`}
+          inactiveLabel={label}
           variant="ghost"
-          size="icon"
-          className="size-8"
-          onClick={onCopy}
-          aria-label={label}
-        >
-          {copied ? (
-            <CheckIcon className="size-4 text-emerald-500" />
-          ) : (
-            <CopyIcon className="size-4" />
-          )}
-        </Button>
+          effect="scale"
+          transitionDuration={0.18}
+        />
       </TooltipTrigger>
-      <TooltipContent>{copied ? "已复制" : "复制命令"}</TooltipContent>
+      <TooltipContent>{copied ? "已复制" : tooltip}</TooltipContent>
     </Tooltip>
   );
 }
@@ -735,20 +735,14 @@ export default function QuickStartPage() {
                 国内访问优先使用 ui.qiuyedx.com
               </h2>
             </div>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() =>
+            <CopyCommandButton
+              copied={copiedKey === "registry"}
+              label="复制 Registry 配置"
+              tooltip="复制配置"
+              onCopy={() =>
                 copyText(registryConfig, "registry", "Registry 配置")
               }
-              aria-label="复制 Registry 配置"
-            >
-              {copiedKey === "registry" ? (
-                <CheckIcon className="size-4 text-emerald-500" />
-              ) : (
-                <CopyIcon className="size-4" />
-              )}
-            </Button>
+            />
           </div>
           <CodeSample
             code={registryConfig}

@@ -295,7 +295,6 @@ export default function ComponentsPage() {
                   <ComponentCard
                     component={component}
                     onCopyCommand={handleCopyCommand}
-                    packageManager={packageManager}
                   />
                 </motion.div>
               ))}
@@ -310,20 +309,10 @@ export default function ComponentsPage() {
 interface ComponentCardProps {
   component: ComponentInfo;
   onCopyCommand: (componentId: string) => void;
-  packageManager: "npm" | "pnpm";
 }
 
-function ComponentCard({
-  component,
-  onCopyCommand,
-  packageManager,
-}: ComponentCardProps) {
+function ComponentCard({ component, onCopyCommand }: ComponentCardProps) {
   const [copied, setCopied] = useState(false);
-
-  const generateCommand = (componentId: string) => {
-    const prefix = packageManager === "npm" ? "npx" : "pnpm dlx";
-    return `${prefix} shadcn@latest add @qiuye-ui/${componentId}`;
-  };
 
   const handleCopy = () => {
     onCopyCommand(component.cliName);
@@ -368,21 +357,20 @@ function ComponentCard({
 
         {/* CLI Command */}
         <div className="bg-muted/50 rounded-md p-3">
-          <div className="flex items-center justify-between">
-            <code className="text-sm font-mono">
-              {generateCommand(component.cliName)}
+          <div className="flex items-center justify-between gap-2">
+            <code className="min-w-0 truncate text-sm font-mono">
+              @qiuye-ui/{component.cliName}
             </code>
             <DualStateToggle
               active={copied}
               onToggle={handleCopy}
-              activeIcon={<CheckCircle className="size-3 text-emerald-500" />}
-              inactiveIcon={<Copy className="size-3" />}
+              activeIcon={<CheckCircle className="text-emerald-500" />}
+              inactiveIcon={<Copy />}
               activeLabel={`已复制 ${component.name} 安装命令`}
               inactiveLabel={`复制 ${component.name} 安装命令`}
               variant="ghost"
               effect="scale"
               transitionDuration={0.18}
-              className="size-6"
             />
           </div>
         </div>
