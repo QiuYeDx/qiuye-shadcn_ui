@@ -23,7 +23,7 @@ const DEFAULT_DOT_COLOR = "#71717a";
 const DEFAULT_DOT_CELL_SIZE = 10;
 const DEFAULT_DOT_CELL_ASPECT_RATIO = 1;
 const DEFAULT_DOT_MAX_CELLS = 10_000;
-const DEFAULT_DOT_RADIUS_RANGE = [0.35, 4] as const;
+const DEFAULT_DOT_RADIUS_RANGE = [0, 4] as const;
 const DEFAULT_DOT_OPACITY_RANGE = [1, 1] as const;
 const DEFAULT_ASCII_CELL_SIZE = 10;
 const DEFAULT_ASCII_CELL_ASPECT_RATIO = 1;
@@ -164,7 +164,7 @@ export function resolveAsciiMatrixGrid(
  * <DotMatrixEffect
  *   className="aspect-video w-full"
  *   color="#71717a"
- *   radiusRange={[0.25, 4]}
+ *   radiusRange={[0, 4]}
  * />
  * ```
  */

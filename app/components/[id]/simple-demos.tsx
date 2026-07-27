@@ -53,7 +53,7 @@ const MATRIX_EFFECT_SIMPLE_GRID = {
   maxCells: 3_500,
 } as const;
 
-const MATRIX_EFFECT_SIMPLE_RADIUS_RANGE = [0.25, 3] as const;
+const MATRIX_EFFECT_SIMPLE_RADIUS_RANGE = [0, 3] as const;
 const MATRIX_EFFECT_SIMPLE_LEVELS = { contrast: 1.2 } as const;
 const MATRIX_EFFECT_SIMPLE_PALETTES = {
   light: {

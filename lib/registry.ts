@@ -2297,7 +2297,7 @@ export const componentRegistry: ComponentRegistry = {
             type: "readonly [minimum: number, maximum: number]",
             description: "主信号从 0 到 1 时对应的圆点半径范围，单位为 CSS px",
             required: false,
-            default: "[0.35, 4]",
+            default: "[0, 4]",
           },
           {
             name: "opacityRange",

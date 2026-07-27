@@ -447,7 +447,7 @@ function DotScene() {
     [speed],
   );
   const radiusRange = React.useMemo(
-    () => [0.25, maximumRadius] as const,
+    () => [0, maximumRadius] as const,
     [maximumRadius],
   );
   const levels = React.useMemo(() => ({ contrast }), [contrast]);

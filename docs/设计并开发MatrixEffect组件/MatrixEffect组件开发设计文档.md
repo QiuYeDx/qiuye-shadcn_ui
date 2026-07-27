@@ -887,7 +887,7 @@ export interface DotMatrixEffectProps extends Omit<
 <DotMatrixEffect
   className="aspect-square w-full"
   color="#a1a1aa"
-  radiusRange={[0.2, 3.2]}
+  radiusRange={[0, 3.2]}
 />
 ```
 

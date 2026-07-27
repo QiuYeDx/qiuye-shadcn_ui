@@ -251,7 +251,7 @@ return (
   color="#9C9C9C"
   backgroundColor="#F6F6F6"
   grid={{ mode: "auto", cellSize: 10, maxCells: 7_000 }}
-  radiusRange={[0.25, 3]}
+  radiusRange={[0, 3]}
   blobOptions={{
     count: 4,
     minRadius: 0.18,

@@ -8,7 +8,7 @@ import type {
 } from "./types";
 
 const DEFAULT_DOT_COLOR = "#71717a";
-const DEFAULT_DOT_RADIUS_RANGE = [0.35, 4] as const;
+const DEFAULT_DOT_RADIUS_RANGE = [0, 4] as const;
 const DEFAULT_DOT_OPACITY_RANGE = [1, 1] as const;
 const DEFAULT_ASCII_CHARACTERS = " .:-=+*#%@";
 const DEFAULT_ASCII_COLOR = "#71717a";
@@ -305,7 +305,7 @@ export function createCellRenderer(
  * ```ts
  * const renderer = createDotRenderer({
  *   color: "#52525b",
- *   radiusRange: [0.25, 4],
+ *   radiusRange: [0, 4],
  * });
  * ```
  */

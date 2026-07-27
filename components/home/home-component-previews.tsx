@@ -467,7 +467,7 @@ function MatrixEffectPreview() {
           className="h-full w-full"
           source={MATRIX_EFFECT_HOME_SOURCE}
           grid={MATRIX_EFFECT_HOME_GRID}
-          radiusRange={[0.2, 2.7]}
+          radiusRange={[0, 2.7]}
           levels={MATRIX_EFFECT_HOME_LEVELS}
           color={palette.dotColor}
           backgroundColor={palette.backgroundColor}

@@ -418,7 +418,7 @@ export interface DotRendererOptions {
    * 主信号从 0 到 1 时对应的半径范围，单位为 CSS px
    *
    * 实际半径还会被限制到当前单元格可容纳的范围。
-   * @default [0.35, 4]
+   * @default [0, 4]
    */
   radiusRange?: readonly [minimum: number, maximum: number];
   /**
@@ -616,7 +616,7 @@ export interface DotMatrixEffectProps extends Omit<
   backgroundColor?: string | null;
   /**
    * 主信号从 0 到 1 时对应的半径范围，单位为 CSS px
-   * @default [0.35, 4]
+   * @default [0, 4]
    */
   radiusRange?: readonly [minimum: number, maximum: number];
   /**
