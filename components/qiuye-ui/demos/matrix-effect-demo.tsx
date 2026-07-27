@@ -5,6 +5,7 @@ import {
   CaseUpperIcon,
   CircleDotIcon,
   ImageIcon,
+  OrbitIcon,
   PaletteIcon,
   SlidersHorizontalIcon,
   UploadIcon,
@@ -28,6 +29,7 @@ import {
   createMatrixDemoUploadSource,
   getMatrixDemoPresetSource,
   getMatrixDemoSourcePreset,
+  MATRIX_DEMO_GALAXY_SOURCE,
   MATRIX_DEMO_SOURCE_PRESETS,
   type MatrixDemoPresetSourceId,
   type MatrixDemoSourceId,
@@ -51,7 +53,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-type DemoScene = "dot" | "ascii" | "custom";
+type DemoScene = "dot" | "ascii" | "galaxy" | "custom";
 type AsciiColorMode = "fixed" | "source";
 type CustomTransformMode = "continuous" | "threshold";
 type CustomRendererMode = "tiles" | "bars";
@@ -860,6 +862,69 @@ function AsciiScene() {
   );
 }
 
+function GalaxyScene() {
+  const [cellSize, setCellSize] = React.useState(8);
+  const [playing, setPlaying] = React.useState(true);
+  const grid = React.useMemo<MatrixGridConfig>(
+    () => ({ mode: "auto", cellSize, maxCells: 32_000 }),
+    [cellSize],
+  );
+
+  return (
+    <div className="min-w-0 space-y-5">
+      <div className="aspect-[4/3] min-w-0 overflow-hidden rounded-md border bg-[#02040a] sm:aspect-video">
+        <AsciiEffect
+          className="h-full w-full"
+          source={MATRIX_DEMO_GALAXY_SOURCE}
+          characters=" .·,:;i1tfLCG08@"
+          colorMode="source"
+          backgroundColor="#02040a"
+          fontWeight={600}
+          fontScale={0.92}
+          levels={{
+            inputMin: 0.035,
+            inputMax: 0.94,
+            contrast: 1.12,
+            gamma: 1.15,
+          }}
+          grid={grid}
+          frameRate={30}
+          playing={playing}
+          decorative={false}
+          ariaLabel="ASCII 字符绘制的旋转星系、地球与月球动画"
+          fallback={<PreviewFallback />}
+        />
+      </div>
+
+      <div className="grid gap-5 border-t pt-5 sm:grid-cols-[minmax(0,1fr)_12rem] sm:items-center">
+        <div className="space-y-2.5">
+          <div className="flex items-center justify-between gap-3">
+            <Label>字符尺寸</Label>
+            <ControlValue>{cellSize}px</ControlValue>
+          </div>
+          <Slider
+            aria-label="ASCII 星系字符尺寸"
+            value={[cellSize]}
+            min={6}
+            max={14}
+            step={1}
+            onValueChange={(value) => setCellSize(value[0] ?? 8)}
+          />
+        </div>
+
+        <div className="flex items-center justify-between gap-3 sm:border-l sm:pl-5">
+          <Label htmlFor="matrix-galaxy-playing">播放动画</Label>
+          <Switch
+            id="matrix-galaxy-playing"
+            checked={playing}
+            onCheckedChange={setPlaying}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CustomScene() {
   const [cellSize, setCellSize] = React.useState(12);
   const [threshold, setThreshold] = React.useState(0.48);
@@ -1045,7 +1110,7 @@ export function MatrixEffectDemo() {
           <CardTitle className="text-lg tracking-normal">
             Matrix Effect
           </CardTitle>
-          <TabsList className="grid h-auto w-full grid-cols-3">
+          <TabsList className="grid h-auto w-full grid-cols-2 sm:grid-cols-4">
             <TabsTrigger value="dot">
               <CircleDotIcon />
               圆点
@@ -1053,6 +1118,10 @@ export function MatrixEffectDemo() {
             <TabsTrigger value="ascii">
               <CaseUpperIcon />
               ASCII
+            </TabsTrigger>
+            <TabsTrigger value="galaxy">
+              <OrbitIcon />
+              星系
             </TabsTrigger>
             <TabsTrigger value="custom">
               <SlidersHorizontalIcon />
@@ -1067,6 +1136,9 @@ export function MatrixEffectDemo() {
           </TabsContent>
           <TabsContent value="ascii">
             <AsciiScene />
+          </TabsContent>
+          <TabsContent value="galaxy">
+            <GalaxyScene />
           </TabsContent>
           <TabsContent value="custom">
             <CustomScene />
