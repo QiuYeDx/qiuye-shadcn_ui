@@ -21,6 +21,21 @@ export interface MatrixDemoSourcePreset {
 
 const TAU = Math.PI * 2;
 const SOURCE_BACKGROUND = "#030712";
+const SPIRAL_HALO_STOPS = [
+  [0, 0.3],
+  [0.34, 0.22],
+  [0.64, 0.09],
+  [0.84, 0.025],
+  [1, 0],
+] as const;
+const SPIRAL_CORE_STOPS = [
+  [0, 0.98],
+  [0.24, 0.9],
+  [0.5, 0.64],
+  [0.72, 0.34],
+  [0.88, 0.12],
+  [1, 0],
+] as const;
 
 export const MATRIX_DEMO_SOURCE_PRESETS = [
   { id: "swirl", label: "旋转星旋", animated: true },
@@ -90,6 +105,34 @@ function appendSpiralArm(
   }
 }
 
+function createSpiralStrokeGradient(
+  ctx: CanvasRenderingContext2D,
+  centerX: number,
+  centerY: number,
+  outerRadius: number,
+  color: readonly [red: number, green: number, blue: number],
+  stops: readonly (readonly [offset: number, opacity: number])[],
+) {
+  const gradient = ctx.createRadialGradient(
+    centerX,
+    centerY,
+    0,
+    centerX,
+    centerY,
+    outerRadius,
+  );
+  const [red, green, blue] = color;
+
+  stops.forEach(([offset, opacity]) => {
+    gradient.addColorStop(
+      offset,
+      `rgba(${red}, ${green}, ${blue}, ${opacity})`,
+    );
+  });
+
+  return gradient;
+}
+
 const MATRIX_DEMO_SWIRL_SOURCE = {
   type: "procedural",
   animated: true,
@@ -101,12 +144,13 @@ const MATRIX_DEMO_SWIRL_SOURCE = {
     const centerY = height * 0.5;
     const rotation = time * 0.46;
     const armColors = [
-      "rgb(94, 234, 212)",
-      "rgb(125, 211, 252)",
-      "rgb(251, 113, 133)",
-      "rgb(253, 186, 116)",
-      "rgb(244, 244, 245)",
+      [94, 234, 212],
+      [125, 211, 252],
+      [251, 113, 133],
+      [253, 186, 116],
+      [244, 244, 245],
     ] as const;
+    const armOuterRadius = shortSide * 0.54;
 
     ctx.globalCompositeOperation = "lighter";
     ctx.lineCap = "round";
@@ -122,21 +166,26 @@ const MATRIX_DEMO_SWIRL_SOURCE = {
         armIndex,
         armColors.length,
       );
-      ctx.globalAlpha = 0.14;
-      ctx.strokeStyle = color;
-      ctx.lineWidth = Math.max(2, shortSide * 0.065);
-      ctx.stroke();
-
-      appendSpiralArm(
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = createSpiralStrokeGradient(
         ctx,
         centerX,
         centerY,
-        shortSide,
-        rotation,
-        armIndex,
-        armColors.length,
+        armOuterRadius,
+        color,
+        SPIRAL_HALO_STOPS,
       );
-      ctx.globalAlpha = 0.82;
+      ctx.lineWidth = Math.max(2, shortSide * 0.065);
+      ctx.stroke();
+
+      ctx.strokeStyle = createSpiralStrokeGradient(
+        ctx,
+        centerX,
+        centerY,
+        armOuterRadius,
+        color,
+        SPIRAL_CORE_STOPS,
+      );
       ctx.lineWidth = Math.max(1, shortSide * 0.018);
       ctx.stroke();
     });
