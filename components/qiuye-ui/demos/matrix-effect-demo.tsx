@@ -5,8 +5,11 @@ import {
   CaseUpperIcon,
   CircleDotIcon,
   ImageIcon,
+  Layers3Icon,
   OrbitIcon,
   PaletteIcon,
+  PauseIcon,
+  PlayIcon,
   SlidersHorizontalIcon,
   UploadIcon,
 } from "lucide-react";
@@ -30,6 +33,7 @@ import {
   getMatrixDemoPresetSource,
   getMatrixDemoSourcePreset,
   MATRIX_DEMO_GALAXY_SOURCE,
+  MATRIX_DEMO_PELAGIC_SOURCE,
   MATRIX_DEMO_SOURCE_PRESETS,
   type MatrixDemoPresetSourceId,
   type MatrixDemoSourceId,
@@ -53,7 +57,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-type DemoScene = "dot" | "ascii" | "galaxy" | "custom";
+type DemoScene = "dot" | "ascii" | "galaxy" | "composition" | "custom";
 type AsciiColorMode = "fixed" | "source";
 type CustomTransformMode = "continuous" | "threshold";
 type CustomRendererMode = "tiles" | "bars";
@@ -925,6 +929,108 @@ function GalaxyScene() {
   );
 }
 
+function TransparentCompositionScene() {
+  const [playing, setPlaying] = React.useState(true);
+  const grid = React.useMemo<MatrixGridConfig>(
+    () => ({ mode: "auto", cellSize: 7, maxCells: 24_000 }),
+    [],
+  );
+
+  return (
+    <section className="relative isolate min-h-[34rem] overflow-hidden rounded-md border bg-[#f1f3ee] text-[#18201d] dark:bg-[#101513] dark:text-[#edf2ee] sm:min-h-[31rem]">
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <span className="absolute inset-y-0 left-[8%] border-l border-[#18201d]/10 dark:border-white/10" />
+        <span className="absolute inset-y-0 left-[54%] border-l border-[#18201d]/10 dark:border-white/10" />
+        <span className="absolute inset-x-0 top-[24%] border-t border-[#18201d]/10 dark:border-white/10" />
+        <span className="absolute inset-x-0 top-[64%] border-t border-[#18201d]/10 dark:border-white/10" />
+      </div>
+
+      <AsciiEffect
+        className="pointer-events-none absolute inset-0 z-0"
+        source={MATRIX_DEMO_PELAGIC_SOURCE}
+        characters=" .·,:;+=*#@"
+        colorMode="source"
+        backgroundColor={null}
+        fontWeight={600}
+        fontScale={0.9}
+        levels={{ inputMin: 0.06, inputMax: 0.92, contrast: 1.08, gamma: 1.1 }}
+        grid={grid}
+        frameRate={30}
+        playing={playing}
+        decorative
+      />
+
+      <div className="relative z-10 flex min-h-[34rem] flex-col p-5 sm:min-h-[31rem] sm:p-7">
+        <header className="flex items-start justify-between gap-4">
+          <div className="space-y-1">
+            <p className="font-mono text-[11px] font-semibold text-[#36453f] dark:text-[#b7c3bc]">
+              PELAGIA / NODE 04
+            </p>
+            <div className="flex items-center gap-2 text-xs text-[#5e6b65] dark:text-[#9ba9a1]">
+              <span
+                className="size-1.5 rounded-full bg-[#f97360]"
+                aria-hidden="true"
+              />
+              实时观测
+            </div>
+          </div>
+
+          <Button
+            className="border-[#18201d]/20 bg-transparent text-[#18201d] shadow-none hover:bg-white/50 dark:border-white/20 dark:text-[#edf2ee] dark:hover:bg-white/10"
+            type="button"
+            variant="outline"
+            size="icon"
+            aria-label={playing ? "暂停观测动画" : "播放观测动画"}
+            title={playing ? "暂停观测动画" : "播放观测动画"}
+            onClick={() => setPlaying((current) => !current)}
+          >
+            {playing ? <PauseIcon /> : <PlayIcon />}
+          </Button>
+        </header>
+
+        <div className="mt-auto max-w-[19rem] pb-7 sm:max-w-[22rem] sm:pb-9">
+          <p className="font-mono text-xs text-[#c65245] dark:text-[#f59e8b]">
+            北太平洋 · 深度 580 M
+          </p>
+          <h3 className="mt-3 text-3xl font-medium leading-tight sm:text-4xl">
+            暮光层观测
+          </h3>
+          <p className="mt-4 text-sm leading-6 text-[#4f5d57] dark:text-[#aeb9b2]">
+            水母群正沿黑潮支流向东北缓慢迁移，生物发光信号保持稳定。
+          </p>
+        </div>
+
+        <dl className="grid grid-cols-3 border-t border-[#18201d]/15 dark:border-white/15">
+          <div className="min-w-0 py-4 pr-3 sm:py-5">
+            <dt className="text-[11px] text-[#68736e] dark:text-[#95a199]">
+              水温
+            </dt>
+            <dd className="mt-1 font-mono text-base font-semibold tabular-nums sm:text-lg">
+              7.8°C
+            </dd>
+          </div>
+          <div className="min-w-0 border-x border-[#18201d]/15 px-3 py-4 dark:border-white/15 sm:px-5 sm:py-5">
+            <dt className="text-[11px] text-[#68736e] dark:text-[#95a199]">
+              流速
+            </dt>
+            <dd className="mt-1 font-mono text-base font-semibold tabular-nums sm:text-lg">
+              2.6 kt
+            </dd>
+          </div>
+          <div className="min-w-0 py-4 pl-3 sm:py-5 sm:pl-5">
+            <dt className="text-[11px] text-[#68736e] dark:text-[#95a199]">
+              信号
+            </dt>
+            <dd className="mt-1 font-mono text-base font-semibold tabular-nums sm:text-lg">
+              94.2%
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+  );
+}
+
 function CustomScene() {
   const [cellSize, setCellSize] = React.useState(12);
   const [threshold, setThreshold] = React.useState(0.48);
@@ -1110,7 +1216,7 @@ export function MatrixEffectDemo() {
           <CardTitle className="text-lg tracking-normal">
             Matrix Effect
           </CardTitle>
-          <TabsList className="grid h-auto w-full grid-cols-2 sm:grid-cols-4">
+          <TabsList className="grid h-auto w-full grid-cols-3 sm:grid-cols-5">
             <TabsTrigger value="dot">
               <CircleDotIcon />
               圆点
@@ -1122,6 +1228,10 @@ export function MatrixEffectDemo() {
             <TabsTrigger value="galaxy">
               <OrbitIcon />
               星系
+            </TabsTrigger>
+            <TabsTrigger value="composition">
+              <Layers3Icon />
+              融合
             </TabsTrigger>
             <TabsTrigger value="custom">
               <SlidersHorizontalIcon />
@@ -1139,6 +1249,9 @@ export function MatrixEffectDemo() {
           </TabsContent>
           <TabsContent value="galaxy">
             <GalaxyScene />
+          </TabsContent>
+          <TabsContent value="composition">
+            <TransparentCompositionScene />
           </TabsContent>
           <TabsContent value="custom">
             <CustomScene />

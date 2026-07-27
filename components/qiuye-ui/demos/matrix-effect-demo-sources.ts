@@ -726,6 +726,222 @@ export const MATRIX_DEMO_GALAXY_SOURCE = {
   },
 } satisfies MatrixProceduralSource;
 
+function drawPelagicCurrent(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  time: number,
+  index: number,
+  portrait: boolean,
+) {
+  const shortSide = Math.min(width, height);
+  const startX = width * (portrait ? 0.08 : 0.36);
+  const endX = width * 1.04;
+  const centerY =
+    height * (portrait ? 0.17 + index * 0.11 : 0.25 + index * 0.16);
+  const amplitude = shortSide * (0.025 + index * 0.008);
+  const phase = time * (0.34 + index * 0.07) + index * 1.8;
+
+  ctx.beginPath();
+
+  for (let step = 0; step <= 48; step += 1) {
+    const progress = step / 48;
+    const x = startX + (endX - startX) * progress;
+    const y =
+      centerY +
+      Math.sin(progress * TAU * (1.15 + index * 0.13) + phase) * amplitude +
+      Math.cos(progress * Math.PI * 3.2 - phase * 0.72) * amplitude * 0.34;
+
+    if (step === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  }
+
+  ctx.globalAlpha = 0.28 - index * 0.035;
+  ctx.strokeStyle = index === 1 ? "#f59e8b" : "#3fb8c4";
+  ctx.lineWidth = Math.max(0.7, shortSide * 0.008);
+  ctx.stroke();
+}
+
+function drawPelagicTentacles(
+  ctx: CanvasRenderingContext2D,
+  centerX: number,
+  centerY: number,
+  radius: number,
+  time: number,
+) {
+  ctx.lineCap = "round";
+
+  for (let index = 0; index < 7; index += 1) {
+    const offset = (index - 3) / 3;
+    const startX = centerX + offset * radius * 0.72;
+    const startY = centerY + radius * (0.13 + Math.abs(offset) * 0.04);
+    const length = radius * (1.18 + (index % 3) * 0.22);
+    const wave = Math.sin(time * 0.78 + index * 1.13);
+
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.bezierCurveTo(
+      startX + radius * (0.18 * wave - offset * 0.08),
+      startY + length * 0.28,
+      startX - radius * (0.24 * wave + offset * 0.12),
+      startY + length * 0.68,
+      startX + radius * (0.12 * wave - offset * 0.18),
+      startY + length,
+    );
+    ctx.globalAlpha = index % 2 === 0 ? 0.72 : 0.48;
+    ctx.strokeStyle = index % 3 === 1 ? "#f97360" : "#2ca8b6";
+    ctx.lineWidth = Math.max(0.75, radius * (index % 2 === 0 ? 0.045 : 0.028));
+    ctx.stroke();
+  }
+}
+
+function drawPelagicBell(
+  ctx: CanvasRenderingContext2D,
+  centerX: number,
+  centerY: number,
+  radius: number,
+  time: number,
+) {
+  const pulse = 1 + Math.sin(time * 0.92) * 0.035;
+  const bellRadius = radius * pulse;
+  const bell = ctx.createRadialGradient(
+    centerX - bellRadius * 0.22,
+    centerY - bellRadius * 0.44,
+    bellRadius * 0.08,
+    centerX,
+    centerY,
+    bellRadius * 1.08,
+  );
+
+  bell.addColorStop(0, "rgba(236, 254, 255, 0.96)");
+  bell.addColorStop(0.34, "rgba(67, 193, 203, 0.86)");
+  bell.addColorStop(0.74, "rgba(34, 139, 151, 0.56)");
+  bell.addColorStop(1, "rgba(34, 139, 151, 0.08)");
+
+  ctx.beginPath();
+  ctx.moveTo(centerX - bellRadius, centerY + bellRadius * 0.08);
+  ctx.bezierCurveTo(
+    centerX - bellRadius * 0.96,
+    centerY - bellRadius * 0.64,
+    centerX - bellRadius * 0.48,
+    centerY - bellRadius * 1.02,
+    centerX,
+    centerY - bellRadius * 1.05,
+  );
+  ctx.bezierCurveTo(
+    centerX + bellRadius * 0.48,
+    centerY - bellRadius * 1.02,
+    centerX + bellRadius * 0.96,
+    centerY - bellRadius * 0.64,
+    centerX + bellRadius,
+    centerY + bellRadius * 0.08,
+  );
+  ctx.quadraticCurveTo(
+    centerX + bellRadius * 0.78,
+    centerY + bellRadius * 0.36,
+    centerX + bellRadius * 0.52,
+    centerY + bellRadius * 0.12,
+  );
+  ctx.quadraticCurveTo(
+    centerX + bellRadius * 0.26,
+    centerY + bellRadius * 0.42,
+    centerX,
+    centerY + bellRadius * 0.15,
+  );
+  ctx.quadraticCurveTo(
+    centerX - bellRadius * 0.26,
+    centerY + bellRadius * 0.42,
+    centerX - bellRadius * 0.52,
+    centerY + bellRadius * 0.12,
+  );
+  ctx.quadraticCurveTo(
+    centerX - bellRadius * 0.78,
+    centerY + bellRadius * 0.36,
+    centerX - bellRadius,
+    centerY + bellRadius * 0.08,
+  );
+  ctx.closePath();
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = bell;
+  ctx.fill();
+
+  ctx.globalCompositeOperation = "lighter";
+  ctx.beginPath();
+  ctx.moveTo(centerX - bellRadius * 0.68, centerY - bellRadius * 0.18);
+  ctx.quadraticCurveTo(
+    centerX,
+    centerY - bellRadius * 0.68,
+    centerX + bellRadius * 0.68,
+    centerY - bellRadius * 0.18,
+  );
+  ctx.globalAlpha = 0.48;
+  ctx.strokeStyle = "#d9fbff";
+  ctx.lineWidth = Math.max(0.8, radius * 0.035);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(centerX, centerY - bellRadius * 0.24, bellRadius * 0.18, 0, TAU);
+  ctx.globalAlpha = 0.5;
+  ctx.fillStyle = "#f59e8b";
+  ctx.fill();
+  ctx.globalCompositeOperation = "source-over";
+}
+
+function drawPelagicParticles(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  time: number,
+  portrait: boolean,
+) {
+  const shortSide = Math.min(width, height);
+  const startX = width * (portrait ? 0.1 : 0.45);
+
+  for (let index = 0; index < 18; index += 1) {
+    const progressX = seededUnit(index, 71);
+    const baseY = seededUnit(index, 72) * height * (portrait ? 0.58 : 0.82);
+    const x = startX + progressX * (width - startX);
+    const y =
+      (baseY - time * (0.9 + seededUnit(index, 73) * 1.4) + height) % height;
+    const twinkle = 0.28 + (Math.sin(time * 1.4 + index * 2.1) + 1) * 0.18;
+    const size = Math.max(
+      0.45,
+      shortSide * (0.003 + seededUnit(index, 74) * 0.004),
+    );
+
+    ctx.globalAlpha = twinkle;
+    ctx.fillStyle = index % 5 === 0 ? "#f8b4a4" : "#8bd8de";
+    ctx.fillRect(x - size / 2, y - size / 2, size, size);
+  }
+}
+
+export const MATRIX_DEMO_PELAGIC_SOURCE = {
+  type: "procedural",
+  animated: true,
+  background: null,
+  draw({ ctx, width, height, time }) {
+    const portrait = height > width * 0.9;
+    const shortSide = Math.min(width, height);
+    const centerX = width * (portrait ? 0.62 : 0.74);
+    const centerY = height * (portrait ? 0.27 : 0.44);
+    const radius = shortSide * (portrait ? 0.23 : 0.27);
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.globalCompositeOperation = "source-over";
+
+    for (let index = 0; index < 3; index += 1) {
+      drawPelagicCurrent(ctx, width, height, time, index, portrait);
+    }
+
+    drawPelagicParticles(ctx, width, height, time, portrait);
+    drawPelagicTentacles(ctx, centerX, centerY, radius, time);
+    drawPelagicBell(ctx, centerX, centerY, radius, time);
+  },
+} satisfies MatrixProceduralSource;
+
 function appendSpiralArm(
   ctx: CanvasRenderingContext2D,
   centerX: number,
