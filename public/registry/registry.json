@@ -4,6 +4,23 @@
   "homepage": "https://ui.qiuyedx.com",
   "items": [
     {
+      "name": "clip-path-tabs",
+      "type": "registry:component",
+      "title": "ClipPathTabs",
+      "author": "QiuYeDx <me@qiuyedx.com>",
+      "dependencies": [],
+      "registryDependencies": [
+        "tabs"
+      ],
+      "files": [
+        {
+          "type": "registry:component",
+          "path": "components/qiuye-ui/clip-path-tabs.tsx"
+        }
+      ],
+      "description": "通过 clip-path 平滑切换背景与文本颜色的标签按钮组，默认使用无间隙的连续背景，也支持保留间隙的分段过渡。"
+    },
+    {
       "name": "code-block",
       "type": "registry:component",
       "title": "CodeBlock",

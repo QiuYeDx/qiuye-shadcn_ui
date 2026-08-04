@@ -341,6 +341,7 @@ export default function QuickStartPage() {
   const featuredComponents = useMemo(() => {
     const priority = [
       "responsive-tabs",
+      "clip-path-tabs",
       "segmented-control",
       "scrollable-dialog",
       "code-block",

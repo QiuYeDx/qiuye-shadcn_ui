@@ -7,6 +7,7 @@
 // TODO: 新增自定义组件时需要更新这里
 export enum ComponentId {
   RESPONSIVE_TABS = "responsive-tabs",
+  CLIP_PATH_TABS = "clip-path-tabs",
   SEGMENTED_CONTROL = "segmented-control",
   SCROLLABLE_DIALOG = "scrollable-dialog",
   DOT_GLASS = "dot-glass",
@@ -51,6 +52,31 @@ return (
       {value === "tab2" && <div>标签二的内容</div>}
     </div>
   </ResponsiveTabs>
+);`,
+  },
+  [ComponentId.CLIP_PATH_TABS]: {
+    import: `import {
+  ClipPathTabs,
+  ClipPathTabsContent,
+} from "@/components/qiuye-ui/clip-path-tabs";
+import { useState } from "react";`,
+    usage: `const [value, setValue] = useState("overview");
+
+return (
+  <ClipPathTabs
+    ariaLabel="项目视图"
+    value={value}
+    onValueChange={setValue}
+    items={[
+      { value: "overview", label: "概览" },
+      { value: "activity", label: "动态" },
+      { value: "settings", label: "设置" },
+    ]}
+  >
+    <ClipPathTabsContent value="overview">概览内容</ClipPathTabsContent>
+    <ClipPathTabsContent value="activity">动态内容</ClipPathTabsContent>
+    <ClipPathTabsContent value="settings">设置内容</ClipPathTabsContent>
+  </ClipPathTabs>
 );`,
   },
   [ComponentId.SEGMENTED_CONTROL]: {

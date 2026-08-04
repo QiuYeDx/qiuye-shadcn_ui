@@ -36,6 +36,7 @@ export async function generateStaticParams() {
 
 // 导入演示组件
 import { ResponsiveTabsDemo } from "@/components/qiuye-ui/demos/responsive-tabs-demo";
+import { ClipPathTabsDemo } from "@/components/qiuye-ui/demos/clip-path-tabs-demo";
 import { SegmentedControlDemo } from "@/components/qiuye-ui/demos/segmented-control-demo";
 import { ScrollableDialogDemo } from "@/components/qiuye-ui/demos/scrollable-dialog-demo";
 import { DotGlassDemo } from "@/components/qiuye-ui/demos/dot-glass-demo";
@@ -53,6 +54,7 @@ import { MatrixEffectDemo } from "@/components/qiuye-ui/demos/matrix-effect-demo
 // TODO: 新增 qiuye-ui 自定义组件时需要完善 demo 文件
 const demoComponents = {
   [ComponentId.RESPONSIVE_TABS]: ResponsiveTabsDemo,
+  [ComponentId.CLIP_PATH_TABS]: ClipPathTabsDemo,
   [ComponentId.SEGMENTED_CONTROL]: SegmentedControlDemo,
   [ComponentId.SCROLLABLE_DIALOG]: ScrollableDialogDemo,
   [ComponentId.DOT_GLASS]: DotGlassDemo,
@@ -71,6 +73,7 @@ const demoComponents = {
 // 导入简单演示组件
 import {
   ResponsiveTabsSimpleDemo,
+  ClipPathTabsSimpleDemo,
   SegmentedControlSimpleDemo,
   ScrollableDialogSimpleDemo,
   DotGlassSimpleDemo,
@@ -89,6 +92,7 @@ import {
 // 精简的单例演示组件
 const simpleDemoComponents = {
   [ComponentId.RESPONSIVE_TABS]: ResponsiveTabsSimpleDemo,
+  [ComponentId.CLIP_PATH_TABS]: ClipPathTabsSimpleDemo,
   [ComponentId.SEGMENTED_CONTROL]: SegmentedControlSimpleDemo,
   [ComponentId.SCROLLABLE_DIALOG]: ScrollableDialogSimpleDemo,
   [ComponentId.DOT_GLASS]: DotGlassSimpleDemo,

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
+import { ClipPathTabs } from "@/components/qiuye-ui/clip-path-tabs";
 import { SegmentedControl } from "@/components/qiuye-ui/segmented-control";
 import {
   ScrollableDialog,
@@ -83,6 +84,30 @@ export function ResponsiveTabsSimpleDemo() {
         {value === "tab3" && <p>标签三的内容</p>}
       </div>
     </ResponsiveTabs>
+  );
+}
+
+// ClipPathTabs 简单演示
+export function ClipPathTabsSimpleDemo() {
+  const [value, setValue] = React.useState("overview");
+
+  return (
+    <div className="w-full max-w-lg space-y-3">
+      <ClipPathTabs
+        ariaLabel="项目视图"
+        value={value}
+        onValueChange={setValue}
+        fullWidth
+        items={[
+          { value: "overview", label: "概览" },
+          { value: "activity", label: "动态" },
+          { value: "settings", label: "设置" },
+        ]}
+      />
+      <p className="text-center text-sm text-muted-foreground">
+        Current: <span className="font-medium text-foreground">{value}</span>
+      </p>
+    </div>
   );
 }
 
