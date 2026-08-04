@@ -126,7 +126,7 @@ export function HomeHero({ componentCount }: HomeHeroProps) {
           variants={heroActionsVariants}
         >
           <motion.div variants={heroActionVariants}>
-            <Button asChild size="lg">
+            <Button asChild>
               <Link href="/components">
                 浏览组件
                 <ArrowRightIcon className="size-4" />
@@ -134,7 +134,7 @@ export function HomeHero({ componentCount }: HomeHeroProps) {
             </Button>
           </motion.div>
           <motion.div variants={heroActionVariants}>
-            <Button asChild variant="outline" size="lg">
+            <Button asChild variant="outline">
               <Link href="/cli">
                 <RocketIcon className="size-4" />
                 快速开始

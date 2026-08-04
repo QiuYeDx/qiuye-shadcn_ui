@@ -380,7 +380,11 @@ function ComponentCard({ component, onCopyCommand }: ComponentCardProps) {
           <Button asChild variant="outline" size="sm" className="flex-1">
             <Link href={`/components/${component.cliName}`}>查看详情</Link>
           </Button>
-          <Button onClick={handleCopy} size="sm" className="flex-1">
+          <Button
+            onClick={handleCopy}
+            size="sm"
+            className="flex-1 cursor-pointer active:scale-[0.97]"
+          >
             {copied ? "已复制" : "复制命令"}
           </Button>
         </div>
