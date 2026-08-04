@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { GithubIcon, PackageIcon } from "lucide-react";
+import { GithubIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { usePathname } from "next/navigation";
 import * as React from "react";
@@ -9,6 +9,7 @@ import * as React from "react";
 import { SiteMobileNav } from "@/components/site/site-mobile-nav";
 import { SiteSearch } from "@/components/site/site-search";
 import { siteNavItems } from "@/components/site/site-nav";
+import { QiuYeLogo } from "@/components/site/qiuye-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -61,9 +62,7 @@ export function SiteHeader() {
       />
       <div className="relative z-10 mx-auto flex h-14 w-full max-w-screen-2xl items-center gap-3 px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex shrink-0 items-center gap-2">
-          <div className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <PackageIcon className="size-4" />
-          </div>
+          <QiuYeLogo className="size-8 text-foreground" />
           <span className="font-semibold">QiuYe UI</span>
         </Link>
 

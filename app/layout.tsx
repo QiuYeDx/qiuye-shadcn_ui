@@ -22,6 +22,9 @@ export const metadata: Metadata = {
   title: "QiuYe UI - Based on Shadcn/ui",
   description:
     "精心设计的自定义UI组件库，基于 Shadcn/ui 构建，支持一键CLI安装，让您的项目开发更加高效、优雅",
+  icons: {
+    icon: "/qiuye-ui-icon.svg",
+  },
 };
 
 export default function RootLayout({

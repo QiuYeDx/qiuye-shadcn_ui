@@ -2,7 +2,9 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { HomeIcon, PaletteIcon, PackageIcon, RocketIcon } from "lucide-react";
+import { HomeIcon, PaletteIcon, RocketIcon } from "lucide-react";
+
+import { QiuYeLogo } from "@/components/site/qiuye-logo";
 
 import {
   Sidebar,
@@ -59,9 +61,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <div className="flex items-center gap-2 py-1">
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-            <PackageIcon className="size-4" />
-          </div>
+          <QiuYeLogo className="size-8 text-sidebar-primary" />
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">QiuYe UI</span>
             <span className="truncate text-xs">Based on Shadcn/ui</span>
