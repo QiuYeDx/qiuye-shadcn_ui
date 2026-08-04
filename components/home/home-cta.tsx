@@ -77,7 +77,10 @@ export function HomeCta() {
           variants={ctaContainerVariants}
         >
           <motion.div variants={ctaActionVariants}>
-            <Button asChild>
+            <Button
+              asChild
+              className="gap-1.5 pl-4 pr-3 has-[>svg]:pl-4 has-[>svg]:pr-3"
+            >
               <Link href="/components">
                 浏览全部组件
                 <ArrowRightIcon className="size-4" />
@@ -85,7 +88,11 @@ export function HomeCta() {
             </Button>
           </motion.div>
           <motion.div variants={ctaActionVariants}>
-            <Button asChild variant="outline">
+            <Button
+              asChild
+              variant="outline"
+              className="gap-1.5 pl-3 pr-4 has-[>svg]:pl-3 has-[>svg]:pr-4"
+            >
               <Link href="/cli">
                 <RocketIcon className="size-4" />
                 快速开始

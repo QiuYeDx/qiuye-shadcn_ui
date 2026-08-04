@@ -126,7 +126,10 @@ export function HomeHero({ componentCount }: HomeHeroProps) {
           variants={heroActionsVariants}
         >
           <motion.div variants={heroActionVariants}>
-            <Button asChild>
+            <Button
+              asChild
+              className="gap-1.5 pl-4 pr-3 has-[>svg]:pl-4 has-[>svg]:pr-3"
+            >
               <Link href="/components">
                 浏览组件
                 <ArrowRightIcon className="size-4" />
@@ -134,7 +137,11 @@ export function HomeHero({ componentCount }: HomeHeroProps) {
             </Button>
           </motion.div>
           <motion.div variants={heroActionVariants}>
-            <Button asChild variant="outline">
+            <Button
+              asChild
+              variant="outline"
+              className="gap-1.5 pl-3 pr-4 has-[>svg]:pl-3 has-[>svg]:pr-4"
+            >
               <Link href="/cli">
                 <RocketIcon className="size-4" />
                 快速开始
