@@ -10,7 +10,8 @@
       "author": "QiuYeDx <me@qiuyedx.com>",
       "dependencies": [],
       "registryDependencies": [
-        "tabs"
+        "tabs",
+        "@qiuye-ui/smooth-corners"
       ],
       "files": [
         {

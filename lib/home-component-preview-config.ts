@@ -34,8 +34,8 @@ export const homePreviewConfigs: HomePreviewConfig[] = [
     featured: true,
   },
   {
-    id: ComponentId.RESPONSIVE_TABS,
-    size: "square",
+    id: ComponentId.CLIP_PATH_TABS,
+    size: "compact",
   },
   {
     id: ComponentId.SEGMENTED_CONTROL,
@@ -60,6 +60,10 @@ export const homePreviewConfigs: HomePreviewConfig[] = [
   {
     id: ComponentId.TYPEWRITER,
     size: "compact",
+  },
+  {
+    id: ComponentId.RESPONSIVE_TABS,
+    size: "square",
   },
   {
     id: ComponentId.SCROLLABLE_DIALOG,

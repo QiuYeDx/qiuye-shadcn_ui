@@ -8,12 +8,15 @@ import {
   ChevronsLeftRightIcon,
   CircleOffIcon,
   GripVerticalIcon,
+  ListFilterIcon,
   MenuIcon,
   MoveDiagonal2Icon,
   MousePointer2Icon,
   MoonIcon,
   ScanLineIcon,
   SunIcon,
+  UserRoundIcon,
+  WalletCardsIcon,
   XIcon,
 } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
@@ -29,6 +32,7 @@ import {
 } from "@/components/qiuye-ui/scrollable-dialog";
 import { CodeBlock, CodeBlockPanel } from "@/components/qiuye-ui/code-block";
 import { ColorPicker } from "@/components/qiuye-ui/color-picker";
+import { ClipPathTabs } from "@/components/qiuye-ui/clip-path-tabs";
 import { DotGlass } from "@/components/qiuye-ui/dot-glass";
 import { DualStateToggle } from "@/components/qiuye-ui/dual-state-toggle";
 import { MarkdownRenderer } from "@/components/qiuye-ui/markdown-renderer";
@@ -59,7 +63,7 @@ function ResponsiveTabsPreview() {
         onValueChange={setValue}
         items={[
           { value: "overview", label: "Overview" },
-          { value: "tasks", label: "Tasks", badge: "8" },
+          { value: "tasks", label: "Tasks" },
           { value: "files", label: "Files" },
         ]}
         layout="grid"
@@ -75,6 +79,47 @@ function ResponsiveTabsPreview() {
           </div>
         </div>
       </ResponsiveTabs>
+    </div>
+  );
+}
+
+function ClipPathTabsPreview() {
+  const [value, setValue] = React.useState("payments");
+  const labels: Record<string, string> = {
+    payments: "支付",
+    balances: "余额",
+    customers: "客户",
+  };
+
+  return (
+    <div className="flex w-full flex-col items-center gap-4">
+      <ClipPathTabs
+        ariaLabel="项目视图"
+        value={value}
+        onValueChange={setValue}
+        size="sm"
+        items={[
+          {
+            value: "payments",
+            label: "支付",
+            icon: <WalletCardsIcon />,
+          },
+          {
+            value: "balances",
+            label: "余额",
+            icon: <ListFilterIcon />,
+          },
+          {
+            value: "customers",
+            label: "客户",
+            icon: <UserRoundIcon />,
+          },
+        ]}
+      />
+      <div className="w-full max-w-60 rounded-md border bg-muted/30 px-3 py-2 text-center text-xs text-muted-foreground">
+        当前视图：
+        <span className="font-medium text-foreground">{labels[value]}</span>
+      </div>
     </div>
   );
 }
@@ -1398,6 +1443,7 @@ export const homePreviewComponents: Partial<
 > = {
   [ComponentId.MATRIX_EFFECT]: MatrixEffectPreview,
   [ComponentId.RESPONSIVE_TABS]: ResponsiveTabsPreview,
+  [ComponentId.CLIP_PATH_TABS]: ClipPathTabsPreview,
   [ComponentId.SEGMENTED_CONTROL]: SegmentedControlPreview,
   [ComponentId.SCROLLABLE_DIALOG]: ScrollableDialogPreview,
   [ComponentId.DOT_GLASS]: DotGlassPreview,

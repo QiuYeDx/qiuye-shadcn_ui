@@ -2,6 +2,7 @@
 
 import * as React from "react";
 
+import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
@@ -57,6 +58,18 @@ export interface ClipPathTabsProps extends Omit<
    * - 传入 `string` 时作为 CSS 值
    */
   cornerRadius?: number | string;
+  /**
+   * 是否为圆角矩形启用 Figma/iOS 风格平滑圆角
+   * - 仅在 `shape="rounded"` 时生效
+   * - 配合 `transitionMode="segmented"` 可让选中项保持完整平滑轮廓
+   * @default false
+   */
+  smoothCorners?: boolean;
+  /**
+   * 平滑圆角强度，范围 0..1。仅在 `smoothCorners` 为 true 时生效
+   * @default 0.7
+   */
+  smoothCornerSmoothing?: number;
   /**
    * 标签尺寸
    * - `"sm"`：32px
@@ -152,6 +165,13 @@ function toFixedPixel(value: number) {
   return `${Math.max(0, Number(value.toFixed(3)))}px`;
 }
 
+function toPixelNumber(value: number | string) {
+  if (typeof value === "number") return value;
+
+  const match = /^(-?\d+(?:\.\d+)?)px$/i.exec(value.trim());
+  return match ? Number(match[1]) : null;
+}
+
 /**
  * ClipPathTabs — 通过 clip-path 平滑切换选中态的标签按钮组
  *
@@ -194,6 +214,8 @@ export const ClipPathTabs = React.forwardRef<
     onValueChange,
     shape = "pill",
     cornerRadius,
+    smoothCorners = false,
+    smoothCornerSmoothing = 0.7,
     size = "md",
     fullWidth = false,
     disabled = false,
@@ -235,9 +257,14 @@ export const ClipPathTabs = React.forwardRef<
   const updateClipPathRef = React.useRef<(animate: boolean) => void>(() => {});
 
   const styles = sizeStyles[size];
-  const radius = toCssLength(
-    cornerRadius ?? (shape === "pill" ? "9999px" : "8px"),
-  );
+  const resolvedCornerRadius =
+    cornerRadius ?? (shape === "pill" ? "9999px" : "8px");
+  const radius = toCssLength(resolvedCornerRadius);
+  const smoothCornerRadius = toPixelNumber(resolvedCornerRadius);
+  const shouldSmoothCorners =
+    smoothCorners && shape === "rounded" && smoothCornerRadius !== null;
+  const clipRadius =
+    shouldSmoothCorners && transitionMode === "segmented" ? "0px" : radius;
   const columns = `repeat(${Math.max(items.length, 1)}, minmax(0, 1fr))`;
   const itemValuesKey = items.map((item) => item.value).join("\u0000");
 
@@ -304,11 +331,11 @@ export const ClipPathTabs = React.forwardRef<
           ? `${Math.max(0, transitionDuration)}ms`
           : "0ms";
       activeLayer.style.transitionTimingFunction = transitionEasing;
-      activeLayer.style.clipPath = `inset(${toFixedPixel(top)} ${toFixedPixel(right)} ${toFixedPixel(bottom)} ${toFixedPixel(left)} round ${radius})`;
+      activeLayer.style.clipPath = `inset(${toFixedPixel(top)} ${toFixedPixel(right)} ${toFixedPixel(bottom)} ${toFixedPixel(left)} round ${clipRadius})`;
       activeLayer.style.visibility = "visible";
       hasMeasuredRef.current = true;
     },
-    [radius, resolvedValue, transitionDuration, transitionEasing],
+    [clipRadius, resolvedValue, transitionDuration, transitionEasing],
   );
 
   React.useLayoutEffect(() => {
@@ -406,34 +433,43 @@ export const ClipPathTabs = React.forwardRef<
           style={{ gridTemplateColumns: columns }}
         >
           {items.map((item) => (
-            <TabsTrigger
+            <SmoothCorners
               key={item.value}
-              ref={(node) => {
-                if (node) triggerRefs.current.set(item.value, node);
-                else triggerRefs.current.delete(item.value);
-              }}
-              value={item.value}
-              disabled={disabled || item.disabled}
-              aria-label={item.ariaLabel}
-              data-slot="clip-path-tabs-trigger"
-              className={cn(
-                "relative min-w-0 flex-none cursor-pointer border-transparent bg-transparent font-medium shadow-none outline-offset-2 transition-none",
-                "text-[var(--clip-path-tabs-inactive-foreground)] data-[state=active]:bg-transparent data-[state=active]:text-[var(--clip-path-tabs-inactive-foreground)] data-[state=active]:shadow-none",
-                "dark:data-[state=active]:border-transparent dark:data-[state=active]:bg-transparent",
-                "focus-visible:outline-2 focus-visible:outline-ring focus-visible:ring-0",
-                shape === "pill" ? "rounded-full" : "rounded-lg",
-                styles.item,
-                fullWidth && "w-full",
-                triggerClassName,
-              )}
-              style={{
-                borderRadius: "var(--clip-path-tabs-radius)",
-                backgroundColor: "var(--clip-path-tabs-inactive-background)",
-                color: "var(--clip-path-tabs-inactive-foreground)",
-              }}
+              asChild
+              radius={smoothCornerRadius ?? 8}
+              smoothing={smoothCornerSmoothing}
+              disabled={!shouldSmoothCorners}
             >
-              {renderItemContent(item)}
-            </TabsTrigger>
+              <TabsTrigger
+                ref={(node) => {
+                  if (node) triggerRefs.current.set(item.value, node);
+                  else triggerRefs.current.delete(item.value);
+                }}
+                value={item.value}
+                disabled={disabled || item.disabled}
+                aria-label={item.ariaLabel}
+                data-slot="clip-path-tabs-trigger"
+                className={cn(
+                  "relative min-w-0 flex-none cursor-pointer border-transparent bg-transparent font-medium shadow-none outline-offset-2 transition-none",
+                  "text-[var(--clip-path-tabs-inactive-foreground)] data-[state=active]:bg-transparent data-[state=active]:text-[var(--clip-path-tabs-inactive-foreground)] data-[state=active]:shadow-none",
+                  "dark:data-[state=active]:border-transparent dark:data-[state=active]:bg-transparent",
+                  "focus-visible:outline-2 focus-visible:outline-ring focus-visible:ring-0",
+                  shape === "pill" ? "rounded-full" : "rounded-lg",
+                  styles.item,
+                  fullWidth && "w-full",
+                  triggerClassName,
+                )}
+                style={{
+                  borderRadius: shouldSmoothCorners
+                    ? undefined
+                    : "var(--clip-path-tabs-radius)",
+                  backgroundColor: "var(--clip-path-tabs-inactive-background)",
+                  color: "var(--clip-path-tabs-inactive-foreground)",
+                }}
+              >
+                {renderItemContent(item)}
+              </TabsTrigger>
+            </SmoothCorners>
           ))}
         </TabsList>
 
@@ -453,27 +489,36 @@ export const ClipPathTabs = React.forwardRef<
           }}
         >
           {items.map((item) => (
-            <span
+            <SmoothCorners
               key={item.value}
-              data-slot="clip-path-tabs-active-item"
-              className={cn(
-                "flex min-w-0 items-center justify-center overflow-hidden border border-transparent font-medium",
-                shape === "pill" ? "rounded-full" : "rounded-lg",
-                styles.item,
-                fullWidth && "w-full",
-                activeItemClassName,
-              )}
-              style={{
-                borderRadius: "var(--clip-path-tabs-radius)",
-                backgroundColor:
-                  transitionMode === "segmented"
-                    ? "var(--clip-path-tabs-active-background)"
-                    : "transparent",
-                color: "var(--clip-path-tabs-active-foreground)",
-              }}
+              asChild
+              radius={smoothCornerRadius ?? 8}
+              smoothing={smoothCornerSmoothing}
+              disabled={!shouldSmoothCorners}
             >
-              {renderItemContent(item)}
-            </span>
+              <span
+                data-slot="clip-path-tabs-active-item"
+                className={cn(
+                  "flex min-w-0 items-center justify-center overflow-hidden border border-transparent font-medium",
+                  shape === "pill" ? "rounded-full" : "rounded-lg",
+                  styles.item,
+                  fullWidth && "w-full",
+                  activeItemClassName,
+                )}
+                style={{
+                  borderRadius: shouldSmoothCorners
+                    ? undefined
+                    : "var(--clip-path-tabs-radius)",
+                  backgroundColor:
+                    transitionMode === "segmented"
+                      ? "var(--clip-path-tabs-active-background)"
+                      : "transparent",
+                  color: "var(--clip-path-tabs-active-foreground)",
+                }}
+              >
+                {renderItemContent(item)}
+              </span>
+            </SmoothCorners>
           ))}
         </div>
       </div>

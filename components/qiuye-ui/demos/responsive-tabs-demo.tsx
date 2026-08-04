@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -61,9 +60,9 @@ const sourceCodes = {
   <TabsContent value="forms">表单组件内容…</TabsContent>
 </ResponsiveTabs>`,
 
-  iconsAndBadges: `const items: TabItem[] = [
-  { value: "inbox", label: "收件箱", icon: <Mail className="h-4 w-4" />, badge: 12 },
-  { value: "starred", label: "星标邮件", icon: <Star className="h-4 w-4" />, badge: "新" },
+  iconsAndDisabled: `const items: TabItem[] = [
+  { value: "inbox", label: "收件箱", icon: <Mail className="h-4 w-4" /> },
+  { value: "starred", label: "星标邮件", icon: <Star className="h-4 w-4" /> },
   { value: "archive", label: "归档", icon: <Package className="h-4 w-4" />, disabled: true },
 ];
 
@@ -142,18 +141,13 @@ const deleteTab = () => {
 function ContentPanel({
   title,
   description,
-  badge,
 }: {
   title: string;
   description: string;
-  badge?: string | number;
 }) {
   return (
     <div className="rounded-lg border p-4">
-      <div className="flex items-center gap-2">
-        <h3 className="font-semibold">{title}</h3>
-        {badge !== undefined && <Badge variant="secondary">{badge}</Badge>}
-      </div>
+      <h3 className="font-semibold">{title}</h3>
       <p className="mt-2 text-sm text-muted-foreground">{description}</p>
     </div>
   );
@@ -175,20 +169,18 @@ export function ResponsiveTabsDemo() {
     { value: "display", label: "展示组件" },
   ];
 
-  /* ── 2. 图标 & 徽标 & 禁用 ── */
-  const [badgeTab, setBadgeTab] = useState("inbox");
-  const badgeItems: TabItem[] = [
+  /* ── 2. 图标 & 禁用 ── */
+  const [iconTab, setIconTab] = useState("inbox");
+  const iconItems: TabItem[] = [
     {
       value: "inbox",
       label: "收件箱",
       icon: <Mail className="h-4 w-4" />,
-      badge: 12,
     },
     {
       value: "starred",
       label: "星标邮件",
       icon: <Star className="h-4 w-4" />,
-      badge: "新",
     },
     {
       value: "sent",
@@ -199,7 +191,6 @@ export function ResponsiveTabsDemo() {
       value: "drafts",
       label: "草稿箱",
       icon: <FileText className="h-4 w-4" />,
-      badge: 3,
     },
     {
       value: "archive",
@@ -275,7 +266,6 @@ export function ResponsiveTabsDemo() {
       value: "mail",
       label: "邮件",
       icon: <Mail className="h-4 w-4" />,
-      badge: 5,
     },
     {
       value: "settings",
@@ -302,7 +292,6 @@ export function ResponsiveTabsDemo() {
         label:
           i % 3 === 0 ? `这是一个很长的标签标题 ${i}` : `标签 ${i + 1}`,
         icon: <Icon className="h-3 w-3" />,
-        badge: i % 4 === 0 ? i + 1 : undefined,
       } as TabItem;
     });
   }, []);
@@ -352,41 +341,35 @@ export function ResponsiveTabsDemo() {
         </CardContent>
       </Card>
 
-      {/* ━━━━━━━━━━━ 2. 图标、徽标与禁用态 ━━━━━━━━━━━━━ */}
+      {/* ━━━━━━━━━━━ 2. 图标与禁用态 ━━━━━━━━━━━━━━━━━ */}
       <Card>
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="space-y-1.5">
-              <CardTitle>图标、徽标与禁用态</CardTitle>
+              <CardTitle>图标与禁用态</CardTitle>
               <CardDescription>
-                每个 Tab 可独立配置{" "}
-                <code>icon</code>（前置图标）、<code>badge</code>
-                （数字/文字徽标）和 <code>disabled</code>（禁用）。
+                每个 Tab 可独立配置 <code>icon</code>（前置图标）和{" "}
+                <code>disabled</code>（禁用）。
               </CardDescription>
             </div>
             <ViewSourceButton
-              code={sourceCodes.iconsAndBadges}
-              title="图标与徽标 - 源码"
+              code={sourceCodes.iconsAndDisabled}
+              title="图标与禁用态 - 源码"
             />
           </div>
         </CardHeader>
         <CardContent>
           <ResponsiveTabs
-            value={badgeTab}
-            onValueChange={setBadgeTab}
-            items={badgeItems}
+            value={iconTab}
+            onValueChange={setIconTab}
+            items={iconItems}
             gridColsClass="sm:grid-cols-3 md:grid-cols-5"
           >
-            {badgeItems.map((item) => (
+            {iconItems.map((item) => (
               <TabsContent key={item.value} value={item.value}>
                 <ContentPanel
                   title={item.label}
-                  badge={item.badge}
-                  description={
-                    item.badge !== undefined
-                      ? `徽标值为「${item.badge}」。可以是数字表示数量，也可以是文字标记状态。`
-                      : `「${item.label}」— 普通标签页，未配置徽标。注意：「归档」标签页处于 disabled 禁用状态，无法点击。`
-                  }
+                  description={`当前选中「${item.label}」。每个标签都配置了前置图标；「归档」处于 disabled 禁用状态，无法点击。`}
                 />
               </TabsContent>
             ))}
@@ -681,7 +664,6 @@ export function ResponsiveTabsDemo() {
               <TabsContent key={item.value} value={item.value}>
                 <ContentPanel
                   title={item.label}
-                  badge={item.badge}
                   description="此示例使用了 primary 色系的选中态样式，容器添加了半透明背景色。关闭了 animatedHighlight 以避免与自定义样式冲突。"
                 />
               </TabsContent>
@@ -697,7 +679,7 @@ export function ResponsiveTabsDemo() {
             <CardTitle>交互式 Playground</CardTitle>
             <CardDescription>
               调整所有可配置参数，实时观察行为变化。包含 14
-              个标签项（含长标题、图标、徽标）以充分测试溢出与滚动。
+              个标签项（含长标题和图标）以充分测试溢出与滚动。
             </CardDescription>
           </div>
         </CardHeader>
@@ -849,7 +831,6 @@ export function ResponsiveTabsDemo() {
               <TabsContent key={item.value} value={item.value}>
                 <ContentPanel
                   title={item.label}
-                  badge={item.badge}
                   description={`layout: ${playLayout} · size: ${playSize} · animatedHighlight: ${playAnimatedHL ? "on" : "off"} · fadeMasks: ${playFadeMasks ? "on" : "off"} · scrollStep: ${playScrollStep}px · fadeMaskWidth: ${playFadeMaskWidth}px`}
                 />
               </TabsContent>

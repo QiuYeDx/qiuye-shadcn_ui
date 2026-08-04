@@ -51,6 +51,9 @@ export function Demo() {
   ariaLabel="工作区视图"
   shape="rounded"
   cornerRadius={10}
+  smoothCorners
+  smoothCornerSmoothing={0.75}
+  transitionMode="segmented"
   fullWidth
   inactiveBackground="var(--muted)"
   inactiveForeground="var(--muted-foreground)"
@@ -158,7 +161,7 @@ export function ClipPathTabsDemo() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between gap-4">
-            <CardTitle>圆角矩形与自定义配色</CardTitle>
+            <CardTitle>平滑圆角矩形与自定义配色</CardTitle>
             <ViewSourceButton
               code={sourceCodes.rounded}
               title="圆角矩形 - 源码"
@@ -170,6 +173,9 @@ export function ClipPathTabsDemo() {
             ariaLabel="工作区视图"
             shape="rounded"
             cornerRadius={10}
+            smoothCorners
+            smoothCornerSmoothing={0.75}
+            transitionMode="segmented"
             fullWidth
             value={workspaceView}
             onValueChange={setWorkspaceView}

@@ -29,12 +29,15 @@ import { useTheme } from "next-themes";
 import {
   CircleOff,
   FolderKanban,
+  ListFilter,
   Menu,
   Search,
   Sun,
   Moon,
+  UserRound,
   Volume2,
   VolumeOff,
+  WalletCards,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -89,23 +92,32 @@ export function ResponsiveTabsSimpleDemo() {
 
 // ClipPathTabs 简单演示
 export function ClipPathTabsSimpleDemo() {
-  const [value, setValue] = React.useState("overview");
+  const [value, setValue] = React.useState("payments");
+  const labels: Record<string, string> = {
+    payments: "支付",
+    balances: "余额",
+    customers: "客户",
+  };
 
   return (
-    <div className="w-full max-w-lg space-y-3">
+    <div className="flex w-full flex-col items-center gap-3">
       <ClipPathTabs
         ariaLabel="项目视图"
         value={value}
         onValueChange={setValue}
-        fullWidth
         items={[
-          { value: "overview", label: "概览" },
-          { value: "activity", label: "动态" },
-          { value: "settings", label: "设置" },
+          {
+            value: "payments",
+            label: "支付",
+            icon: <WalletCards />,
+          },
+          { value: "balances", label: "余额", icon: <ListFilter /> },
+          { value: "customers", label: "客户", icon: <UserRound /> },
         ]}
       />
       <p className="text-center text-sm text-muted-foreground">
-        Current: <span className="font-medium text-foreground">{value}</span>
+        当前视图：
+        <span className="font-medium text-foreground">{labels[value]}</span>
       </p>
     </div>
   );

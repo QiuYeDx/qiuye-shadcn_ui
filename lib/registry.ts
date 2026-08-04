@@ -275,7 +275,7 @@ export const componentRegistry: ComponentRegistry = {
   [ComponentId.CLIP_PATH_TABS]: {
     name: "Clip Path Tabs",
     description:
-      "通过 clip-path 平滑切换完整选中态的标签按钮组：默认使用无间隙的连续背景，也可选择保留间隙的分段过渡；背景与文本颜色保持同步，支持胶囊/圆角矩形、自定义配色、三档尺寸、等宽布局、禁用项及受控/非受控状态。",
+      "通过 clip-path 平滑切换完整选中态的标签按钮组：默认使用无间隙的连续背景，也可选择保留间隙的分段过渡；背景与文本颜色保持同步，支持胶囊/圆角矩形、Figma/iOS 风格平滑圆角、自定义配色、三档尺寸、等宽布局、禁用项及受控/非受控状态。",
     category: "导航",
     dependencies: [],
     files: {
@@ -320,6 +320,21 @@ export const componentRegistry: ComponentRegistry = {
         type: "number | string",
         description: "自定义圆角；number 使用 px，string 作为 CSS 值",
         required: false,
+      },
+      {
+        name: "smoothCorners",
+        type: "boolean",
+        description:
+          '是否为圆角矩形启用 Figma/iOS 风格平滑圆角；配合 transitionMode="segmented" 可保持完整选中轮廓',
+        required: false,
+        default: "false",
+      },
+      {
+        name: "smoothCornerSmoothing",
+        type: "number",
+        description: "平滑圆角强度（0..1），仅在 smoothCorners 为 true 时生效",
+        required: false,
+        default: "0.7",
       },
       {
         name: "size",
@@ -430,7 +445,7 @@ export const componentRegistry: ComponentRegistry = {
         required: false,
       },
     ],
-    version: "1.1.2",
+    version: "1.2.0",
     author: "QiuYeDx",
     tags: [
       "tabs",
@@ -439,6 +454,7 @@ export const componentRegistry: ComponentRegistry = {
       "navigation",
       "pill",
       "rounded",
+      "smooth-corners",
       "keyboard",
       "radix",
     ],
