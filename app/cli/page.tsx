@@ -53,6 +53,10 @@ const REVEAL_VIEWPORT = {
   amount: 0.08,
   margin: "0px 0px -56px 0px",
 } as const;
+const TRAILING_ICON_BUTTON_CLASS =
+  "gap-1.5 pl-4 pr-3 has-[>svg]:pl-4 has-[>svg]:pr-3";
+const LEADING_ICON_BUTTON_CLASS =
+  "gap-1.5 pl-3 pr-4 has-[>svg]:pl-3 has-[>svg]:pr-4";
 
 const heroCopyVariants = {
   hidden: {},
@@ -458,7 +462,13 @@ export default function QuickStartPage() {
               className="mt-7 flex flex-col gap-3 sm:flex-row"
               variants={heroItemVariants}
             >
-              <Button asChild size="lg" className="w-full sm:w-auto">
+              <Button
+                asChild
+                className={cn(
+                  TRAILING_ICON_BUTTON_CLASS,
+                  "w-full sm:w-auto",
+                )}
+              >
                 <Link href="/components">
                   浏览组件
                   <ArrowRightIcon className="size-4" />
@@ -466,9 +476,11 @@ export default function QuickStartPage() {
               </Button>
               <Button
                 asChild
-                size="lg"
                 variant="outline"
-                className="w-full sm:w-auto"
+                className={cn(
+                  LEADING_ICON_BUTTON_CLASS,
+                  "w-full sm:w-auto",
+                )}
               >
                 <Link
                   href="https://github.com/qiuyedx/qiuye-shadcn_ui"
@@ -613,7 +625,10 @@ export default function QuickStartPage() {
               <Button
                 asChild
                 variant="outline"
-                className="hidden sm:inline-flex"
+                className={cn(
+                  TRAILING_ICON_BUTTON_CLASS,
+                  "hidden sm:inline-flex",
+                )}
               >
                 <Link href="/components">
                   全部组件
@@ -815,13 +830,17 @@ export default function QuickStartPage() {
             className="flex flex-col gap-3 sm:flex-row"
             variants={footerActionsVariants}
           >
-            <Button asChild>
+            <Button asChild className={TRAILING_ICON_BUTTON_CLASS}>
               <Link href="/components">
                 打开组件列表
                 <ArrowRightIcon className="size-4" />
               </Link>
             </Button>
-            <Button asChild variant="outline">
+            <Button
+              asChild
+              variant="outline"
+              className={TRAILING_ICON_BUTTON_CLASS}
+            >
               <Link
                 href="https://github.com/qiuyedx/qiuye-shadcn_ui/issues"
                 target="_blank"
