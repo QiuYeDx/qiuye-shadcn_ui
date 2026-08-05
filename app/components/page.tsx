@@ -383,7 +383,20 @@ function ComponentCard({ component, onCopyCommand }: ComponentCardProps) {
             size="sm"
             className="flex-1 cursor-pointer active:scale-[0.97]"
           >
-            {copied ? "已复制" : "复制命令"}
+            <span className="relative inline-flex h-5 min-w-[4em] items-center justify-center">
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.span
+                  key={copied ? "copied" : "copy"}
+                  initial={{ opacity: 0, filter: "blur(2px)" }}
+                  animate={{ opacity: 1, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, filter: "blur(2px)" }}
+                  transition={{ duration: 0.18 }}
+                  className="absolute inset-0 flex items-center justify-center"
+                >
+                  {copied ? "已复制" : "复制命令"}
+                </motion.span>
+              </AnimatePresence>
+            </span>
           </Button>
         </div>
 
