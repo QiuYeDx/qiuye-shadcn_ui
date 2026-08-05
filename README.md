@@ -64,7 +64,7 @@ pnpm dlx shadcn@latest add https://ui.qiuyedx.com/registry/responsive-tabs.json
 | [Image Viewer](https://ui.qiuyedx.com/components/image-viewer)                       | `image-viewer`            | 图片查看器，支持灯箱、缩放、平移、触控和加载过渡。                                     |
 | [Markdown Renderer](https://ui.qiuyedx.com/components/markdown-renderer)             | `markdown-renderer`       | Markdown 渲染器，支持 GFM、代码高亮、Mermaid、图片预览和自定义 Widget。                |
 | [Matrix Effect](https://ui.qiuyedx.com/components/matrix-effect)                     | `matrix-effect`           | 可组合的 Canvas 矩阵效果管线，支持图像采样、圆点矩阵、ASCII 和自定义渲染。             |
-| [Responsive Tabs](https://ui.qiuyedx.com/components/responsive-tabs)                 | `responsive-tabs`         | 适配不同屏幕宽度的 Tabs，支持滚动按钮、边缘遮罩、徽标和选中态动画。                    |
+| [Responsive Tabs](https://ui.qiuyedx.com/components/responsive-tabs)                 | `responsive-tabs`         | 空间充足时单行等分、放不下时横向滚动，支持固定网格、边缘遮罩和选中态动画。             |
 | [Scrollable Dialog](https://ui.qiuyedx.com/components/scrollable-dialog)             | `scrollable-dialog`       | 头部和底部固定、内容区独立滚动的对话框。                                               |
 | [Segmented Control](https://ui.qiuyedx.com/components/segmented-control)             | `segmented-control`       | 滑块式分段选择器，支持键盘导航、禁用项、表单提交和受控模式。                           |
 | [Smooth Corners](https://ui.qiuyedx.com/components/smooth-corners)                   | `smooth-corners`          | Figma / iOS 风格的平滑圆角，基于 CSS `corner-shape` 渐进增强并回退到 `border-radius`。 |

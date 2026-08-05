@@ -70,7 +70,6 @@ const sourceCodes = {
   value={tab}
   onValueChange={setTab}
   items={items}
-  gridColsClass="sm:grid-cols-3 md:grid-cols-5"
 >
   <TabsContent value="inbox">…</TabsContent>
 </ResponsiveTabs>`,
@@ -81,7 +80,7 @@ const sourceCodes = {
 // 关闭动画高亮 → 回到默认即时切换
 <ResponsiveTabs animatedHighlight={false} ... />`,
 
-  layoutModes: `// 自适应（默认）：小屏横向滚动 → 大屏网格
+  layoutModes: `// 自适应（默认）：空间足够时单行等分，放不下时横向滚动
 <ResponsiveTabs layout="responsive" ... />
 
 // 始终横向滚动
@@ -249,7 +248,7 @@ export function ResponsiveTabsDemo() {
     Array.from({ length: 5 }).map((_, i) => ({
       value: `d${i}`,
       label: `标签 ${i + 1}`,
-    }))
+    })),
   );
   const [dynActive, setDynActive] = useState("d0");
 
@@ -289,8 +288,7 @@ export function ResponsiveTabsDemo() {
       const Icon = icons[i % icons.length];
       return {
         value: `p${i}`,
-        label:
-          i % 3 === 0 ? `这是一个很长的标签标题 ${i}` : `标签 ${i + 1}`,
+        label: i % 3 === 0 ? `这是一个很长的标签标题 ${i}` : `标签 ${i + 1}`,
         icon: <Icon className="h-3 w-3" />,
       } as TabItem;
     });
@@ -316,11 +314,14 @@ export function ResponsiveTabsDemo() {
               <CardTitle>基本用法</CardTitle>
               <CardDescription>
                 默认 <code>responsive</code>{" "}
-                布局：小屏横向滚动，≥sm&nbsp;断点自动切换为网格。
+                布局：空间足够时单行等分，放不下完整文案时自动横向滚动。
                 尝试缩放浏览器宽度观察变化。
               </CardDescription>
             </div>
-            <ViewSourceButton code={sourceCodes.basic} title="基本用法 - 源码" />
+            <ViewSourceButton
+              code={sourceCodes.basic}
+              title="基本用法 - 源码"
+            />
           </div>
         </CardHeader>
         <CardContent>
@@ -333,7 +334,7 @@ export function ResponsiveTabsDemo() {
               <TabsContent key={item.value} value={item.value}>
                 <ContentPanel
                   title={item.label}
-                  description={`当前选中「${item.label}」。缩小窗口宽度 → 标签栏自动变为横向滚动；放大窗口 → 自动切换为网格平铺。`}
+                  description={`当前选中「${item.label}」。标签会优先等分整行宽度；缩小到无法容纳完整文案时，标签栏自动变为横向滚动。`}
                 />
               </TabsContent>
             ))}
@@ -363,7 +364,6 @@ export function ResponsiveTabsDemo() {
             value={iconTab}
             onValueChange={setIconTab}
             items={iconItems}
-            gridColsClass="sm:grid-cols-3 md:grid-cols-5"
           >
             {iconItems.map((item) => (
               <TabsContent key={item.value} value={item.value}>
@@ -409,7 +409,6 @@ export function ResponsiveTabsDemo() {
             onValueChange={setHlTab}
             items={hlItems}
             animatedHighlight={hlEnabled}
-            gridColsClass="sm:grid-cols-5"
           >
             {hlItems.map((item) => (
               <TabsContent key={item.value} value={item.value}>
@@ -436,8 +435,7 @@ export function ResponsiveTabsDemo() {
               <CardDescription>
                 <code>responsive</code>（自适应，默认）、
                 <code>scroll</code>（始终横向滚动）、
-                <code>grid</code>（始终网格平铺）。
-                切换按钮实时对比差异。
+                <code>grid</code>（始终网格平铺）。 切换按钮实时对比差异。
               </CardDescription>
             </div>
             <ViewSourceButton
@@ -471,9 +469,7 @@ export function ResponsiveTabsDemo() {
             layout={layoutMode}
             scrollStep={200}
             gridColsClass={
-              layoutMode === "grid"
-                ? "grid-cols-5 lg:grid-cols-10"
-                : "sm:grid-cols-5 lg:grid-cols-10"
+              layoutMode === "grid" ? "grid-cols-5 lg:grid-cols-10" : undefined
             }
           >
             {layoutItems.map((item) => (
@@ -482,7 +478,7 @@ export function ResponsiveTabsDemo() {
                   title={item.label}
                   description={
                     layoutMode === "responsive"
-                      ? "当前为 responsive 模式：小屏自动横向滚动（可手势左右滑动），大屏切换为网格平铺展示。"
+                      ? "当前为 responsive 模式：空间足够时所有标签单行等分，无法容纳完整文案时自动横向滚动。"
                       : layoutMode === "scroll"
                         ? "当前为 scroll 模式：所有屏幕尺寸均保持横向滚动，配合左右箭头按钮导航。适合标签数量不确定或频繁变化的场景。"
                         : "当前为 grid 模式：所有屏幕尺寸均为网格平铺，选项卡均匀分布。适合数量固定、需要一目了然的场景。"
@@ -637,8 +633,7 @@ export function ResponsiveTabsDemo() {
             <div className="space-y-1.5">
               <CardTitle>自定义样式</CardTitle>
               <CardDescription>
-                通过 <code>listClassName</code>、
-                <code>triggerClassName</code>
+                通过 <code>listClassName</code>、<code>triggerClassName</code>
                 自定义容器与选项卡样式。自定义选中态时建议关闭{" "}
                 <code>animatedHighlight</code> 以避免冲突。
               </CardDescription>
@@ -689,9 +684,7 @@ export function ResponsiveTabsDemo() {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {/* 布局模式 */}
               <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">
-                  layout
-                </Label>
+                <Label className="text-xs text-muted-foreground">layout</Label>
                 <div className="flex gap-1.5">
                   {(["responsive", "scroll", "grid"] as const).map((m) => (
                     <Button

@@ -141,7 +141,7 @@ export const componentRegistry: ComponentRegistry = {
   [ComponentId.RESPONSIVE_TABS]: {
     name: "Responsive Tabs",
     description:
-      "响应式标签页组件：小屏横向滚动、可选左右滚动按钮与渐变遮罩；大屏可切换为网格布局；支持图标、徽标、禁用与自定义样式。",
+      "响应式标签页组件：空间足够时单行等分，放不下完整内容时横向滚动；支持固定网格、滚动按钮、渐变遮罩、图标、徽标、禁用与自定义样式。",
     category: "导航",
     dependencies: ["lucide-react", "motion"],
     files: {
@@ -171,13 +171,13 @@ export const componentRegistry: ComponentRegistry = {
         name: "children",
         type: "React.ReactNode",
         description: "与标签页内容区域（Tabs.Content）对应的子节点",
-        required: true,
+        required: false,
       },
       {
         name: "layout",
         type: '"responsive" | "scroll" | "grid"',
         description:
-          "布局模式：responsive（小屏滚动/大屏网格）、scroll（所有断点滚动）、grid（所有断点网格）",
+          "布局模式：responsive（空间足够时单行等分，放不下时横向滚动）、scroll（始终横向滚动）、grid（始终固定网格）",
         required: false,
         default: "responsive",
       },
@@ -185,7 +185,7 @@ export const componentRegistry: ComponentRegistry = {
         name: "scrollButtons",
         type: "boolean",
         description:
-          "是否显示左右滚动按钮（滚动模式在大屏也显示；responsive 模式下仅小屏显示）",
+          "是否在 responsive / scroll 模式发生横向溢出时显示左右滚动按钮",
         required: false,
         default: "true",
       },
@@ -200,7 +200,7 @@ export const componentRegistry: ComponentRegistry = {
         name: "fadeMasks",
         type: "boolean",
         description:
-          '是否显示左右渐变遮罩（在 layout="scroll" 或 responsive 的小屏下生效）',
+          '是否在 layout="responsive" 或 "scroll" 发生横向溢出时显示左右渐变遮罩',
         required: false,
         default: "true",
       },
@@ -209,13 +209,13 @@ export const componentRegistry: ComponentRegistry = {
         type: "number",
         description: "渐变遮罩宽度（像素）",
         required: false,
-        default: "32",
+        default: "64",
       },
       {
         name: "gridColsClass",
         type: "string",
         description:
-          '≥sm 的网格列定义（应用在 TabsList；layout="grid" 时可传无断点或自定义断点的类）',
+          'layout="grid" 时的网格列定义，可传无断点或自定义断点的 Tailwind 类',
         required: false,
         default: "sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8",
       },
@@ -254,7 +254,7 @@ export const componentRegistry: ComponentRegistry = {
         default: "default",
       },
     ],
-    version: "1.3.0",
+    version: "1.4.0",
     author: "QiuYeDx",
     tags: [
       "tabs",

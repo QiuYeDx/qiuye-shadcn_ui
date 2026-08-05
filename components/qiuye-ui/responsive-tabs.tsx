@@ -24,7 +24,7 @@ export interface TabItem {
 
 /**
  * 布局模式
- * - `"responsive"` — 小屏横向滚动，大屏（≥sm）切换为 grid 布局
+ * - `"responsive"` — 空间足够时单行等分，放不下完整内容时横向滚动
  * - `"scroll"` — 始终横向滚动
  * - `"grid"` — 始终 grid 网格布局
  */
@@ -48,7 +48,7 @@ export interface ResponsiveTabsProps {
   /** Tab 面板内容（`TabsContent` 区域），不传则不渲染内容区域 */
   children?: React.ReactNode;
   /**
-   * 是否显示左右滚动箭头按钮（仅在滚动模式下生效）
+   * 是否在 responsive / scroll 模式发生横向溢出时显示左右滚动箭头按钮
    * @default true
    */
   scrollButtons?: boolean;
@@ -58,9 +58,8 @@ export interface ResponsiveTabsProps {
    */
   scrollStep?: number;
   /**
-   * ≥sm 断点下的网格列数 Tailwind 类名（应用在 TabsList 上）
-   *
-   * 在 `layout="grid"` 时请提供无断点或自定义断点的类
+   * `layout="grid"` 时的网格列数 Tailwind 类名
+   * 请提供无断点或自定义断点的类
    * @default "sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8"
    */
   gridColsClass?: string;
@@ -70,7 +69,7 @@ export interface ResponsiveTabsProps {
   triggerClassName?: string;
   /**
    * 布局模式
-   * - `"responsive"` — 小屏横向滚动，大屏（≥sm）切换为 grid 布局（默认）
+   * - `"responsive"` — 空间足够时单行等分，放不下完整内容时横向滚动（默认）
    * - `"scroll"` — 始终横向滚动
    * - `"grid"` — 始终 grid 网格布局
    * @default "responsive"
@@ -79,7 +78,7 @@ export interface ResponsiveTabsProps {
   /** 根容器的自定义 className */
   className?: string;
   /**
-   * 是否在滚动模式下显示左右渐变遮罩，用于提示可滚动
+   * 是否在 responsive / scroll 模式发生横向溢出时显示左右渐变遮罩
    * @default true
    */
   fadeMasks?: boolean;
@@ -108,9 +107,10 @@ export interface ResponsiveTabsProps {
 /**
  * ResponsiveTabs — 响应式标签页组件
  *
- * 基于 shadcn/ui Tabs 扩展，根据屏幕宽度自动切换布局：
- * - **小屏**：横向滚动模式，支持左右箭头按钮和渐变遮罩提示
- * - **大屏**：网格布局模式，Tab 选项平铺展示
+ * 基于 shadcn/ui Tabs 扩展，根据可用空间自动调整布局：
+ * - **空间充足**：所有 Tab 在单行内等宽分配，充分利用容器宽度
+ * - **空间不足**：保留完整文案所需宽度并横向滚动，避免挤压或截断
+ * - **滚动提示**：支持左右箭头按钮和渐变遮罩
  *
  * 支持三种布局模式：`responsive`（自动切换）、`scroll`（始终滚动）、`grid`（始终网格）。
  * 每个 Tab 选项支持图标、徽标、禁用等配置。
@@ -156,7 +156,7 @@ const ResponsiveTabs = React.forwardRef<
       size = "default",
       ...props
     },
-    ref
+    ref,
   ) => {
     // layoutId 动画高亮的唯一前缀（避免多实例冲突）
     const instanceId = React.useId();
@@ -166,6 +166,8 @@ const ResponsiveTabs = React.forwardRef<
     const tabsListRef = useRef<HTMLDivElement>(null);
     // 可滚动轨道（只滚内容）
     const scrollerRef = useRef<HTMLDivElement>(null);
+    // Tab 行（监听内容尺寸变化）
+    const rowRef = useRef<HTMLDivElement>(null);
 
     const [showLeftButton, setShowLeftButton] = React.useState(false);
     const [showRightButton, setShowRightButton] = React.useState(false);
@@ -242,6 +244,7 @@ const ResponsiveTabs = React.forwardRef<
         scrollToActiveTab();
       });
       ro.observe(el);
+      if (rowRef.current) ro.observe(rowRef.current);
 
       const onWinResize = () => {
         checkScrollAffordance();
@@ -312,59 +315,49 @@ const ResponsiveTabs = React.forwardRef<
 
     // TabsList：固定背景层（圆角灰底通常在这里），不滚动，负责 padding（edge gutter）
     const listClass = cn(
-      // grid/responsive 的列定义（只在需要 grid 时作用）
-      (isGridAll || isResponsive) && gridColsClass,
       "h-auto w-full overflow-hidden p-0", // 关键：overflow-hidden，固定背景
       sizeClasses.listRadius,
-      // 当大屏 grid 时让内部布局切换到 grid（见 rowClass）
-      listClassName
+      listClassName,
     );
 
     // scroller：真正滚动的层
     const scrollerClass = cn(
       "w-full",
       sizeClasses.gutter,
-      isGridAll
-        ? "overflow-visible"
-        : isScrollAll
-          ? "overflow-x-auto"
-          : "overflow-x-auto sm:overflow-visible",
+      isGridAll ? "overflow-visible" : "overflow-x-auto",
       // 隐藏滚动条
       !isGridAll &&
-      "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+        "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
       // 阻断 inline 方向滚动链
-      "overscroll-contain"
+      "overscroll-contain",
     );
 
-    // row：承载触发器的行；滚动场景下 inline-flex + w-max，grid 场景下切为 grid
+    // responsive 使用 max-content 计算所有等宽列所需的最小宽度：
+    // 放得下时由 min-w-full 撑满并等分，放不下时由 scroller 横向滚动。
     const rowClass = cn(
       isGridAll
         ? cn("grid w-full", sizeClasses.gap)
         : isScrollAll
           ? cn("inline-flex w-max whitespace-nowrap", sizeClasses.gap)
           : cn(
-              "inline-flex w-max whitespace-nowrap sm:grid sm:w-full",
+              "grid w-max min-w-full grid-flow-col auto-cols-[minmax(max-content,1fr)] whitespace-nowrap",
               sizeClasses.gap,
-              isSm ? "sm:gap-0.5" : "sm:gap-1"
             ),
-      (isGridAll || isResponsive) && gridColsClass
+      isGridAll && gridColsClass,
     );
 
     const triggerClass = cn(
       isSm ? "px-2 py-1 text-xs" : "px-3 py-2",
       sizeClasses.triggerRadius,
-      !isGridAll && "shrink-0 min-w-fit",
+      isScrollAll && "shrink-0 min-w-fit",
       isGridAll && "shrink min-w-0 flex items-center justify-center",
-      isResponsive &&
-      "sm:shrink sm:min-w-0 sm:flex sm:items-center sm:justify-center",
+      isResponsive && "min-w-max flex items-center justify-center",
       "data-[state=active]:font-medium",
       // 当启用 layoutId 动画高亮时，取消 trigger 自带的选中态背景/阴影/边框，改由 motion.span 承载
       animatedHighlight &&
-      "relative data-[state=active]:bg-transparent data-[state=active]:shadow-none dark:data-[state=active]:bg-transparent dark:data-[state=active]:border-transparent",
-      triggerClassName
+        "relative data-[state=active]:bg-transparent data-[state=active]:shadow-none dark:data-[state=active]:bg-transparent dark:data-[state=active]:border-transparent",
+      triggerClassName,
     );
-
-    const buttonVisibilityClass = isScrollAll ? "" : "sm:hidden";
 
     return (
       <Tabs
@@ -381,7 +374,7 @@ const ResponsiveTabs = React.forwardRef<
               <motion.div
                 className={cn(
                   "absolute top-1/2 z-10 -translate-y-1/2 rounded-full bg-background/80 p-0 shadow-md backdrop-blur-sm origin-left",
-                  isSm ? "left-0.5 h-6 w-6" : "left-1 h-8 w-8"
+                  isSm ? "left-0.5 h-6 w-6" : "left-1 h-8 w-8",
                 )}
                 initial={{ opacity: 0, scale: 0, x: -10 }}
                 animate={{ opacity: 1, scale: 1, x: 0 }}
@@ -394,7 +387,6 @@ const ResponsiveTabs = React.forwardRef<
                   className={cn(
                     "rounded-full hover:bg-transparent cursor-pointer",
                     isSm ? "h-6 w-6 size-6" : "h-8 w-8 size-8",
-                    buttonVisibilityClass
                   )}
                   onClick={() => scrollByDir("left")}
                   aria-label="向左滚动"
@@ -411,7 +403,7 @@ const ResponsiveTabs = React.forwardRef<
               <motion.div
                 className={cn(
                   "absolute top-1/2 z-10 -translate-y-1/2 rounded-full bg-background/80 p-0 shadow-md backdrop-blur-sm origin-right",
-                  isSm ? "right-0.5 h-6 w-6" : "right-1 h-8 w-8"
+                  isSm ? "right-0.5 h-6 w-6" : "right-1 h-8 w-8",
                 )}
                 initial={{ opacity: 0, scale: 0, x: 10 }}
                 animate={{ opacity: 1, scale: 1, x: 0 }}
@@ -424,7 +416,6 @@ const ResponsiveTabs = React.forwardRef<
                   className={cn(
                     "rounded-full hover:bg-transparent cursor-pointer",
                     isSm ? "h-6 w-6 size-6" : "h-8 w-8 size-8",
-                    buttonVisibilityClass
                   )}
                   onClick={() => scrollByDir("right")}
                   aria-label="向右滚动"
@@ -440,7 +431,7 @@ const ResponsiveTabs = React.forwardRef<
             {/* 仅 scroller 层滚动 */}
             <div ref={scrollerRef} className={scrollerClass}>
               {/* 真正承载触发器的行 */}
-              <div className={rowClass}>
+              <div ref={rowRef} className={rowClass}>
                 {items.map((item) => (
                   <TabsTrigger
                     key={item.value}
@@ -454,7 +445,7 @@ const ResponsiveTabs = React.forwardRef<
                         layoutId={`${instanceId}-tab-highlight`}
                         className={cn(
                           "absolute inset-0 bg-background shadow-sm dark:border dark:border-input dark:bg-input/30",
-                          sizeClasses.triggerRadius
+                          sizeClasses.triggerRadius,
                         )}
                         transition={{
                           type: "spring",
@@ -467,7 +458,7 @@ const ResponsiveTabs = React.forwardRef<
                       className={cn(
                         "flex items-center max-w-full",
                         isSm ? "gap-1.5" : "gap-2",
-                        animatedHighlight && "relative z-[1]"
+                        animatedHighlight && "relative z-[1]",
                       )}
                     >
                       {item.icon && (
@@ -499,7 +490,7 @@ const ResponsiveTabs = React.forwardRef<
                   aria-hidden="true"
                   className={cn(
                     "pointer-events-none absolute left-0 top-0 bottom-0 z-[5] bg-gradient-to-r from-muted to-transparent",
-                    sizeClasses.listRadius
+                    sizeClasses.listRadius,
                   )}
                   style={{ width: `${fadeMaskWidth}px` }}
                   initial={{ opacity: 0 }}
@@ -515,7 +506,7 @@ const ResponsiveTabs = React.forwardRef<
                   aria-hidden="true"
                   className={cn(
                     "pointer-events-none absolute right-0 top-0 bottom-0 z-[5] bg-gradient-to-l from-muted to-transparent",
-                    sizeClasses.listRadius
+                    sizeClasses.listRadius,
                   )}
                   style={{ width: `${fadeMaskWidth}px` }}
                   initial={{ opacity: 0 }}
@@ -531,7 +522,7 @@ const ResponsiveTabs = React.forwardRef<
         {children != null && <div className="mt-3">{children}</div>}
       </Tabs>
     );
-  }
+  },
 );
 
 ResponsiveTabs.displayName = "ResponsiveTabs";
