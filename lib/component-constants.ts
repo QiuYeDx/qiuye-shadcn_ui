@@ -39,17 +39,17 @@ export const basicUsageExamples: BasicUsageExamples = {
   [ComponentId.RESPONSIVE_TABS]: {
     import: `import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
 import { useState } from "react";`,
-    usage: `const [value, setValue] = useState("tab1");
+    usage: `const [value, setValue] = useState("all");
 const items = [
-  { value: "tab1", label: "标签一" },
-  { value: "tab2", label: "标签二" },
+  { value: "all", label: "全部" },
+  { value: "active", label: "进行中" },
+  { value: "review", label: "等待审批" },
 ];
 
 return (
   <ResponsiveTabs value={value} onValueChange={setValue} items={items}>
     <div className="p-4">
-      {value === "tab1" && <div>标签一的内容</div>}
-      {value === "tab2" && <div>标签二的内容</div>}
+      当前选中：{items.find((item) => item.value === value)?.label}
     </div>
   </ResponsiveTabs>
 );`,

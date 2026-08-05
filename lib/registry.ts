@@ -141,7 +141,7 @@ export const componentRegistry: ComponentRegistry = {
   [ComponentId.RESPONSIVE_TABS]: {
     name: "Responsive Tabs",
     description:
-      "响应式标签页组件：空间足够时单行等分，放不下完整内容时横向滚动；支持固定网格、滚动按钮、渐变遮罩、图标、徽标、禁用与自定义样式。",
+      "响应式标签页组件：responsive 模式统一等宽并在空间不足时滚动，scroll 模式按内容宽度滚动，grid 模式按配置列数等分换行；支持图标、徽标与禁用状态。",
     category: "导航",
     dependencies: ["lucide-react", "motion"],
     files: {
@@ -177,7 +177,7 @@ export const componentRegistry: ComponentRegistry = {
         name: "layout",
         type: '"responsive" | "scroll" | "grid"',
         description:
-          "布局模式：responsive（空间足够时单行等分，放不下时横向滚动）、scroll（始终横向滚动）、grid（始终固定网格）",
+          "布局模式：responsive（所有选项始终等宽；空间不足时以最长项为统一最小宽度并横向滚动）、scroll（各选项按自身内容宽度排列并横向滚动）、grid（按 gridColsClass 的列数等分并允许换行）",
         required: false,
         default: "responsive",
       },
@@ -215,7 +215,7 @@ export const componentRegistry: ComponentRegistry = {
         name: "gridColsClass",
         type: "string",
         description:
-          'layout="grid" 时的网格列定义，可传无断点或自定义断点的 Tailwind 类',
+          'layout="grid" 时的网格列定义，可传无断点或自定义断点的 Tailwind 类；其他模式下忽略',
         required: false,
         default: "sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8",
       },
@@ -254,7 +254,7 @@ export const componentRegistry: ComponentRegistry = {
         default: "default",
       },
     ],
-    version: "1.4.0",
+    version: "1.4.1",
     author: "QiuYeDx",
     tags: [
       "tabs",

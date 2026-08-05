@@ -24,9 +24,9 @@ export interface TabItem {
 
 /**
  * 布局模式
- * - `"responsive"` — 空间足够时单行等分，放不下完整内容时横向滚动
- * - `"scroll"` — 始终横向滚动
- * - `"grid"` — 始终 grid 网格布局
+ * - `"responsive"` — 所有选项始终等宽；空间不足时以最长选项为统一最小宽度并横向滚动
+ * - `"scroll"` — 每个选项按自身内容宽度排列并始终支持横向滚动
+ * - `"grid"` — 按 `gridColsClass` 配置的列数等分并允许换行
  */
 type LayoutMode = "responsive" | "scroll" | "grid";
 
@@ -59,7 +59,7 @@ export interface ResponsiveTabsProps {
   scrollStep?: number;
   /**
    * `layout="grid"` 时的网格列数 Tailwind 类名
-   * 请提供无断点或自定义断点的类
+   * 请提供无断点或自定义断点的类；其他布局模式下忽略
    * @default "sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8"
    */
   gridColsClass?: string;
@@ -69,9 +69,9 @@ export interface ResponsiveTabsProps {
   triggerClassName?: string;
   /**
    * 布局模式
-   * - `"responsive"` — 空间足够时单行等分，放不下完整内容时横向滚动（默认）
-   * - `"scroll"` — 始终横向滚动
-   * - `"grid"` — 始终 grid 网格布局
+   * - `"responsive"` — 所有选项始终等宽；空间不足时以最长选项为统一最小宽度并横向滚动（默认）
+   * - `"scroll"` — 每个选项按自身内容宽度排列并始终支持横向滚动
+   * - `"grid"` — 按 `gridColsClass` 配置的列数等分并允许换行
    * @default "responsive"
    */
   layout?: LayoutMode;
@@ -109,10 +109,10 @@ export interface ResponsiveTabsProps {
  *
  * 基于 shadcn/ui Tabs 扩展，根据可用空间自动调整布局：
  * - **空间充足**：所有 Tab 在单行内等宽分配，充分利用容器宽度
- * - **空间不足**：保留完整文案所需宽度并横向滚动，避免挤压或截断
+ * - **空间不足**：以最长 Tab 的文案、图标和徽标所需宽度作为所有选项的统一最小宽度，并横向滚动
  * - **滚动提示**：支持左右箭头按钮和渐变遮罩
  *
- * 支持三种布局模式：`responsive`（自动切换）、`scroll`（始终滚动）、`grid`（始终网格）。
+ * 支持三种布局模式：`responsive`（统一等宽并在必要时滚动）、`scroll`（按内容宽度滚动）、`grid`（按配置列数等分换行）。
  * 每个 Tab 选项支持图标、徽标、禁用等配置。
  *
  * @example

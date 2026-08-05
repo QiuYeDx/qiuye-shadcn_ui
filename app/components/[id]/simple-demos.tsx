@@ -72,19 +72,18 @@ const MATRIX_EFFECT_SIMPLE_PALETTES = {
 
 // ResponsiveTabs 简单演示
 export function ResponsiveTabsSimpleDemo() {
-  const [value, setValue] = React.useState("tab1");
+  const [value, setValue] = React.useState("all");
   const items = [
-    { value: "tab1", label: "标签一" },
-    { value: "tab2", label: "标签二" },
-    { value: "tab3", label: "标签三" },
+    { value: "all", label: "全部" },
+    { value: "active", label: "进行中" },
+    { value: "review", label: "等待审批" },
+    { value: "done", label: "已完成" },
   ];
 
   return (
     <ResponsiveTabs value={value} onValueChange={setValue} items={items}>
-      <div className="p-4 border rounded-md">
-        {value === "tab1" && <p>标签一的内容</p>}
-        {value === "tab2" && <p>标签二的内容</p>}
-        {value === "tab3" && <p>标签三的内容</p>}
+      <div className="border-t pt-3 text-sm text-muted-foreground">
+        当前选中：{items.find((item) => item.value === value)?.label}
       </div>
     </ResponsiveTabs>
   );
