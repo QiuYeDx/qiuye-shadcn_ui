@@ -17,10 +17,19 @@ export interface ComponentPropsInfo {
   props: PropDefinition[];
 }
 
+export const COMPONENT_CATEGORIES = [
+  "选择与切换",
+  "浮层与引导",
+  "内容与媒体",
+  "视觉与动效",
+] as const;
+
+export type ComponentCategory = (typeof COMPONENT_CATEGORIES)[number];
+
 export interface ComponentInfo {
   name: string;
   description: string;
-  category: string;
+  category: ComponentCategory;
   dependencies: string[];
   files: {
     component: string;
@@ -142,7 +151,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Responsive Tabs",
     description:
       "响应式标签页组件：responsive 模式统一等宽并在空间不足时滚动，scroll 模式按内容宽度滚动，grid 模式按配置列数等分换行；支持图标、徽标与禁用状态。",
-    category: "导航",
+    category: "选择与切换",
     dependencies: ["lucide-react", "motion"],
     files: {
       component: "components/qiuye-ui/responsive-tabs.tsx",
@@ -276,7 +285,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Clip Path Tabs",
     description:
       "通过 clip-path 平滑切换完整选中态的标签按钮组：默认使用无间隙的连续背景，也可选择保留间隙的分段过渡；背景与文本颜色保持同步，支持胶囊/圆角矩形、Figma/iOS 风格平滑圆角、自定义配色、三档尺寸、等宽布局、禁用项及受控/非受控状态。",
-    category: "导航",
+    category: "选择与切换",
     dependencies: [],
     files: {
       component: "components/qiuye-ui/clip-path-tabs.tsx",
@@ -466,7 +475,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Segmented Control",
     description:
       "ChatGPT 风格的分段单选控件：使用 Motion layoutId 与 spring 弹性滑块过渡，提供内嵌与悬浮两种风格及中、小两档尺寸，并支持受控/非受控状态、键盘导航、禁用项与表单提交。",
-    category: "交互",
+    category: "选择与切换",
     dependencies: ["motion"],
     files: {
       component: "components/qiuye-ui/segmented-control.tsx",
@@ -582,7 +591,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Scrollable Dialog",
     description:
       "可滚动对话框组件：头部和底部固定，内容区域可滚动，支持自定义高度，适用于需要展示大量内容的场景。",
-    category: "弹窗",
+    category: "浮层与引导",
     dependencies: ["motion"],
     files: {
       component: "components/qiuye-ui/scrollable-dialog.tsx",
@@ -722,7 +731,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Dot Glass",
     description:
       "点阵开孔毛玻璃组件：一种「反直觉」的玻璃效果，只在点阵孔洞里露出背后内容的模糊（blur），其余区域是纯色盖板遮挡，适用于 Header、Navbar 等需要特殊视觉效果的场景。",
-    category: "特效",
+    category: "视觉与动效",
     dependencies: [],
     files: {
       component: "components/qiuye-ui/dot-glass.tsx",
@@ -832,7 +841,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Image Viewer",
     description:
       "带灯箱预览的图片查看器，支持点击放大、滚轮/触控缩放、拖拽平移、平滑圆角、骨架屏加载过渡与悬浮放大动效。",
-    category: "媒体",
+    category: "内容与媒体",
     dependencies: ["motion", "lucide-react"],
     files: {
       component: "components/qiuye-ui/image-viewer.tsx",
@@ -1014,7 +1023,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Dual State Toggle",
     description:
       "双状态切换按钮：基于 shadcn/ui Button，内置点击缩放 + 图标切换动画（opacity + blur），支持 5 种过渡效果预设与自定义过渡配置。",
-    category: "交互",
+    category: "选择与切换",
     dependencies: ["motion", "lucide-react"],
     files: {
       component: "components/qiuye-ui/dual-state-toggle.tsx",
@@ -1127,7 +1136,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Theme Transition Toggle",
     description:
       "基于浏览器 View Transition API 的深浅模式切换组件：支持从触发点播放圆形、椭圆或多边形揭幕，也可选择边缘扫入、轴线展开与对角揭幕，封装按钮、Hook 与纯函数三种复用方式，并在不支持 API 或减少动态效果偏好下自动降级。",
-    category: "交互",
+    category: "选择与切换",
     dependencies: ["lucide-react", "motion", "next-themes"],
     files: {
       component: "components/qiuye-ui/theme-transition-toggle.tsx",
@@ -1541,7 +1550,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Code Block",
     description:
       "通用代码块显示组件：基于 prism-react-renderer 的语法高亮，7 套内置配色主题（浅/深色变体）+ 自定义主题支持，支持折叠、滚动、自适应高度三种显示模式，Diff 高亮模式（绿色/红色行背景 + 左侧指示条），行高亮标记（淡蓝色背景标记指定行），行号 sticky 固定，自带完整样式。含 CodeBlockPanel 外层容器面板（仿 Tailwind CSS 官网风格），支持文件名标签与复制按钮。",
-    category: "展示",
+    category: "内容与媒体",
     dependencies: ["prism-react-renderer", "motion", "lucide-react"],
     files: {
       component: "components/qiuye-ui/code-block/code-block.tsx",
@@ -1734,7 +1743,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Typewriter",
     description:
       "平滑打字机效果组件：弹簧宽度跟随（useSpring）实现无顿挫的容器缩放，全文渲染 + overflow 裁剪避免字符闪现，支持多文案轮播、单次打字、自定义光标与弹簧参数。",
-    category: "特效",
+    category: "视觉与动效",
     dependencies: ["motion"],
     files: {
       component: "components/qiuye-ui/typewriter.tsx",
@@ -1840,7 +1849,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Markdown Renderer",
     description:
       "通用 Markdown 渲染器：内置 Blog / Chat 两套预设，支持 GFM、标题锚点、代码块高亮、Mermaid 图表、图片预览、安全链接策略与可扩展 Widget 运行时。",
-    category: "展示",
+    category: "内容与媒体",
     dependencies: [
       "react-markdown",
       "remark-gfm",
@@ -2001,7 +2010,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Color Picker",
     description:
       "通用取色器组件：基于 HSV 色彩模型的饱和度/亮度面板与色相条拖拽选色，支持可选透明度（Alpha）选择、触屏操作、十六进制输入、40 色预设色卡、最近使用颜色记录、渐进增强平滑圆角，以及 Popover 弹出与 Inline 内嵌两种布局模式。",
-    category: "表单",
+    category: "选择与切换",
     dependencies: [],
     files: {
       component: "components/qiuye-ui/color-picker.tsx",
@@ -2158,7 +2167,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Smooth Corners",
     description:
       "Figma/iOS 风格平滑圆角组件：基于 CSS corner-shape 的渐进增强方案，将 radius + smoothing 转换为补偿半径和 superellipse，并在不支持的浏览器中自动回退到标准 border-radius。",
-    category: "特效",
+    category: "视觉与动效",
     dependencies: ["@qiuyedx/smooth-corners", "@radix-ui/react-slot"],
     files: {
       component: "components/qiuye-ui/smooth-corners.tsx",
@@ -2239,7 +2248,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Tour",
     description:
       "产品引导组件：基于目标 selector 高亮页面元素并展示步骤 Popover，内置遮罩聚焦、Motion layoutId 迁移动画、进度显示、上一步/下一步/跳过与自动滚动定位。",
-    category: "导航",
+    category: "浮层与引导",
     dependencies: ["motion", "lucide-react"],
     files: {
       component: "components/qiuye-ui/tour.tsx",
@@ -2398,7 +2407,7 @@ export const componentRegistry: ComponentRegistry = {
     name: "Matrix Effect",
     description:
       "通用 Canvas 矩阵视觉效果组件：将图片、外部 Canvas 或程序化信号场按响应式网格采样，通过可组合的 Mapper、Transform 与 Renderer 管线生成圆点矩阵、ASCII 艺术和自定义效果，并内置自适应帧率、DPR 限制、离屏暂停与 Reduced Motion 支持。",
-    category: "特效",
+    category: "视觉与动效",
     dependencies: [],
     files: {
       component: "components/qiuye-ui/matrix-effect/index.ts",
@@ -2640,12 +2649,8 @@ export const componentRegistry: ComponentRegistry = {
 };
 
 // 获取所有组件分类
-export function getCategories(): string[] {
-  const categories = new Set<string>();
-  Object.values(componentRegistry).forEach((component) => {
-    categories.add(component.category);
-  });
-  return Array.from(categories);
+export function getCategories(): ComponentCategory[] {
+  return [...COMPONENT_CATEGORIES];
 }
 
 // 根据分类获取组件
