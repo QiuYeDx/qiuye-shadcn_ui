@@ -76,11 +76,13 @@ const gridVariants = {
 const cardVariants = {
   hidden: {
     opacity: 0,
-    transform: "translate3d(0, 12px, 0) scale(0.992)",
+    y: 12,
+    scale: 0.992,
   },
   show: (index: number = 0) => ({
     opacity: 1,
-    transform: "translate3d(0, 0, 0) scale(1)",
+    y: 0,
+    scale: 1,
     transition: {
       delay: 0.14 + index * 0.04,
       duration: 0.36,
@@ -89,7 +91,8 @@ const cardVariants = {
   }),
   exit: {
     opacity: 0,
-    transform: "translate3d(0, -4px, 0) scale(0.995)",
+    y: -4,
+    scale: 0.995,
     transition: {
       duration: 0.16,
       ease: ENTRANCE_EASE,
@@ -280,22 +283,17 @@ export default function ComponentsPage() {
                       bounce: 0.08,
                     },
                   }}
-                  whileHover={
-                    prefersReducedMotion
-                      ? undefined
-                      : {
-                          y: -3,
-                          transition: {
-                            duration: 0.16,
-                            ease: ENTRANCE_EASE,
-                          },
-                        }
-                  }
                 >
-                  <ComponentCard
-                    component={component}
-                    onCopyCommand={handleCopyCommand}
-                  />
+                  <motion.div
+                    className="h-full"
+                    whileHover={prefersReducedMotion ? undefined : { y: -3 }}
+                    transition={{ duration: 0.16, ease: ENTRANCE_EASE }}
+                  >
+                    <ComponentCard
+                      component={component}
+                      onCopyCommand={handleCopyCommand}
+                    />
+                  </motion.div>
                 </motion.div>
               ))}
             </AnimatePresence>
