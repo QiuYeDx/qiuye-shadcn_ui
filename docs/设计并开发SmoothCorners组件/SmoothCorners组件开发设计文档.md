@@ -8,15 +8,15 @@
 本需求横跨三个仓库：
 
 - `/Users/qiuyedx/Documents/Github/smooth-corners-web`：提供平滑圆角算法、CSS 变量 API、尺寸感知计算和 DOM Observer。
-- `/Users/qiuyedx/Documents/Github/qiuye-shadcn_ui`：新增一个可通过 shadcn/ui registry 安装的 `smooth-corners` 组件，并在组件详情页提供示例。
+- 本仓库：新增一个可通过 shadcn/ui registry 安装的 `smooth-corners` 组件，并在组件详情页提供示例。
 - `/Users/qiuyedx/Documents/Github/qiuye-skills`：新增一个面向 AI Agent 的 Smooth Corners Skill，让 Agent 在任意前端项目中按用户意图正确实现平滑圆角。
 
 最终推荐主线：
 
 1. `smooth-corners-web` 已整理并发布自有 npm 包：`@qiuyedx/smooth-corners@0.1.0`；非 scoped 的 `smooth-corners` 已被其他包占用，不建议争用。
-2. `qiuye-shadcn_ui` 直接依赖 `@qiuyedx/smooth-corners@0.1.0`，组件 public API 与底层包名解耦，后续算法升级只需更新依赖和 registry。
+2. `qiuye-ui` 直接依赖 `@qiuyedx/smooth-corners@0.1.0`，组件 public API 与底层包名解耦，后续算法升级只需更新依赖和 registry。
 3. `@lixiaolin94/smooth-corners@0.1.0` 仅保留为历史来源参考，不作为本实现的默认依赖。
-4. `qiuye-shadcn_ui` 新增的组件不是重新发明算法，而是一个 shadcn/ui 体系里的 React 包装层：参数化、支持 `asChild`、支持可选尺寸感知、自动注入渐进增强 CSS，并能通过 registry 被其他项目复制安装。
+4. `qiuye-ui` 新增的组件不是重新发明算法，而是一个 shadcn/ui 体系里的 React 包装层：参数化、支持 `asChild`、支持可选尺寸感知、自动注入渐进增强 CSS，并能通过 registry 被其他项目复制安装。
 5. `qiuye-skills` 的 Skill 不能只写“安装 npm 包”。它应先判断项目是否能安装包或是否使用 QiuYe UI registry，再提供包方案、shadcn 组件方案和无依赖内联方案三条路径。
 
 ## 需求摘要
@@ -79,7 +79,7 @@ npm 状态，2026-07-06 检查：
 - `@qiuyedx/smooth-corners` 已由用户手动发布成功，版本 `0.1.0`。
 - `smooth-corners` 已被其他包占用，不建议争用非 scoped 包名。
 
-### qiuye-shadcn_ui
+### qiuye-ui
 
 技术栈与约束：
 
@@ -145,7 +145,7 @@ QiuYe UI registry 中写入：
 当前状态：
 
 - 用户已手动发布 `@qiuyedx/smooth-corners@0.1.0`。
-- 已用 pnpm 8.x 在 `qiuye-shadcn_ui` 安装该依赖，`pnpm-lock.yaml` 保持 `lockfileVersion: '6.0'`。
+- 已用 pnpm 8.x 在 `qiuye-ui` 安装该依赖，`pnpm-lock.yaml` 保持 `lockfileVersion: '6.0'`。
 - 后续如升级底层算法，优先发布新版本 npm 包，再更新 QiuYe UI dependency 和 registry item。
 
 ### 过渡策略：先依赖已发布包

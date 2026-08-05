@@ -31,7 +31,7 @@
 ## 核心目录
 
 ```text
-qiuye-shadcn_ui/
+qiuye-ui/
 ├── app/                         # Next.js App Router 页面
 │   ├── components/              # 组件列表页
 │   ├── components/[id]/         # 组件详情页、Demo、API、依赖信息

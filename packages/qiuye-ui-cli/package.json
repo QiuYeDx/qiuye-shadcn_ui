@@ -7,7 +7,7 @@
   "homepage": "https://ui.qiuyedx.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/qiuyedx/qiuye-shadcn_ui.git",
+    "url": "https://github.com/qiuyedx/qiuye-ui.git",
     "directory": "packages/qiuye-ui-cli"
   },
   "type": "module",

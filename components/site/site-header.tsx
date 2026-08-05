@@ -100,7 +100,7 @@ export function SiteHeader() {
           </div>
           <Button variant="ghost" size="icon" asChild>
             <Link
-              href="https://github.com/qiuyedx/qiuye-shadcn_ui"
+              href="https://github.com/qiuyedx/qiuye-ui"
               target="_blank"
               rel="noreferrer"
               aria-label="打开 GitHub 仓库"

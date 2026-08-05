@@ -104,8 +104,8 @@ QIUIYE_UI_REGISTRY_BASE=http://localhost:3000/registry npx -y --package @qiuye-u
 
 ```bash
 # 克隆仓库
-git clone https://github.com/qiuyedx/qiuye-shadcn_ui.git
-cd qiuye-shadcn_ui
+git clone https://github.com/qiuyedx/qiuye-ui.git
+cd qiuye-ui
 
 # 安装依赖
 pnpm install
@@ -131,7 +131,7 @@ cd packages/qiuye-ui-cli && npm publish --access public
 
 - 组件浏览：[ui.qiuyedx.com/components](https://ui.qiuyedx.com/components)
 - CLI 文档：[ui.qiuyedx.com/cli](https://ui.qiuyedx.com/cli)
-- GitHub：[github.com/qiuyedx/qiuye-shadcn_ui](https://github.com/qiuyedx/qiuye-shadcn_ui)
+- GitHub：[github.com/qiuyedx/qiuye-ui](https://github.com/qiuyedx/qiuye-ui)
 
 ## License
 

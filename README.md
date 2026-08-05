@@ -247,8 +247,8 @@ npx -y --package @qiuye-ui/mcp@latest qiuye-ui-mcp --check
 ### 开发步骤
 
 ```bash
-git clone https://github.com/qiuyedx/qiuye-shadcn_ui.git
-cd qiuye-shadcn_ui
+git clone https://github.com/qiuyedx/qiuye-ui.git
+cd qiuye-ui
 
 pnpm install
 pnpm dev
@@ -271,7 +271,7 @@ pnpm update-registry:dry  # registry 更新预览
 ### 项目结构
 
 ```text
-qiuye-shadcn_ui/
+qiuye-ui/
 ├── app/                         # Next.js App Router 页面
 │   ├── components/              # 组件列表页
 │   ├── components/[id]/         # 组件详情页、Demo、API 和依赖信息
@@ -333,7 +333,7 @@ pnpm start
 
 部署到 Vercel：
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/qiuyedx/qiuye-shadcn_ui)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/qiuyedx/qiuye-ui)
 
 ## 🛠️ 开发者指南
 
@@ -486,9 +486,9 @@ MIT License © 2026 秋夜
 
 如果这个项目对您有帮助，欢迎给它一个 ⭐️。
 
-- [报告问题](https://github.com/qiuyedx/qiuye-shadcn_ui/issues)
-- [功能建议](https://github.com/qiuyedx/qiuye-shadcn_ui/discussions)
-- [贡献代码](https://github.com/qiuyedx/qiuye-shadcn_ui/pulls)
+- [报告问题](https://github.com/qiuyedx/qiuye-ui/issues)
+- [功能建议](https://github.com/qiuyedx/qiuye-ui/discussions)
+- [贡献代码](https://github.com/qiuyedx/qiuye-ui/pulls)
 
 ---
 

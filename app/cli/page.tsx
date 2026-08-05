@@ -483,7 +483,7 @@ export default function QuickStartPage() {
                 )}
               >
                 <Link
-                  href="https://github.com/qiuyedx/qiuye-shadcn_ui"
+                  href="https://github.com/qiuyedx/qiuye-ui"
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -842,7 +842,7 @@ export default function QuickStartPage() {
               className={TRAILING_ICON_BUTTON_CLASS}
             >
               <Link
-                href="https://github.com/qiuyedx/qiuye-shadcn_ui/issues"
+                href="https://github.com/qiuyedx/qiuye-ui/issues"
                 target="_blank"
                 rel="noreferrer"
               >

@@ -35,7 +35,7 @@ shadcn CLI 的工作就是：下载这个 JSON → 按 `files[].target`（若提
 ## 项目结构（以本仓库为例）
 
 ```text
-qiuye-shadcn_ui/
+qiuye-ui/
 ├── app/
 │   ├── components/                 # 组件浏览页
 │   │   └── [id]/                   # 组件详情页（静态生成）

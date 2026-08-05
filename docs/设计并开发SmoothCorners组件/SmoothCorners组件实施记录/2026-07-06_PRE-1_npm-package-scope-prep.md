@@ -15,7 +15,7 @@
 - 更新 package metadata 的 repository、bugs、homepage 到 `QiuYeDx/smooth-corners-web`。
 - 保留 `LICENSE` 和 `NOTICE` 中的原始版权信息，未修改算法源码。
 - 用户已手动发布 `@qiuyedx/smooth-corners@0.1.0`。
-- 发布后在 `qiuye-shadcn_ui` 中使用 pnpm 8.7.0 安装 `@qiuyedx/smooth-corners@0.1.0`，并保持 `pnpm-lock.yaml` 的 lockfileVersion 为 `6.0`。
+- 发布后在 `qiuye-ui` 中使用 pnpm 8.7.0 安装 `@qiuyedx/smooth-corners@0.1.0`，并保持 `pnpm-lock.yaml` 的 lockfileVersion 为 `6.0`。
 
 ## 修改文件
 
@@ -24,7 +24,7 @@
 - `/Users/qiuyedx/Documents/Github/smooth-corners-web/index.html`
 - `/Users/qiuyedx/Documents/Github/smooth-corners-web/index.zh-CN.html`
 - `/Users/qiuyedx/Documents/Github/smooth-corners-web/CLAUDE.md`
-- `/Users/qiuyedx/Documents/Github/qiuye-shadcn_ui/docs/设计并开发SmoothCorners组件/SmoothCorners组件执行计划.md`
+- `docs/设计并开发SmoothCorners组件/SmoothCorners组件执行计划.md`
 
 ## 接口或数据结构变化
 
@@ -66,7 +66,7 @@ npx -y pnpm@8.7.0 add @qiuyedx/smooth-corners@0.1.0
 - `npm pack --dry-run` 成功生成发布预览：`@qiuyedx/smooth-corners@0.1.0`，14 个文件，约 8.9 kB package size。
 - 旧 npm 包名和旧 GitHub Pages / repository URL 已从项目文档与 demo 示例中清理。
 - 用户手动发布后，`npm view @qiuyedx/smooth-corners ...` 返回版本 `0.1.0`，包名 `@qiuyedx/smooth-corners`。
-- `npx -y pnpm@8.7.0 add @qiuyedx/smooth-corners@0.1.0` 成功，`qiuye-shadcn_ui/package.json` 与 `pnpm-lock.yaml` 已同步依赖。
+- `npx -y pnpm@8.7.0 add @qiuyedx/smooth-corners@0.1.0` 成功，`qiuye-ui/package.json` 与 `pnpm-lock.yaml` 已同步依赖。
 
 ## 未完成事项
 

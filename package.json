@@ -1,7 +1,8 @@
 {
-  "name": "qiuye-ui-components",
+  "name": "qiuye-ui",
   "version": "1.0.0",
-  "private": false,
+  "private": true,
+  "packageManager": "pnpm@8.7.0",
   "description": "精心设计的自定义UI组件库，基于 Shadcn/ui 构建，支持一键CLI安装。中国大陆用户可访问 ui.qiuyedx.com",
   "keywords": [
     "ui",
@@ -15,7 +16,7 @@
   "homepage": "https://ui.qiuyedx.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/qiuyedx/qiuye-shadcn_ui.git"
+    "url": "https://github.com/qiuyedx/qiuye-ui.git"
   },
   "author": "QiuYeDx <me@qiuyedx.com>",
   "license": "MIT",
