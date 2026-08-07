@@ -2,7 +2,11 @@
 
 import * as React from "react";
 
-import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
+import {
+  SmoothCorners,
+  useSmoothCornersSupport,
+} from "@/components/qiuye-ui/smooth-corners";
+import { SmoothCornersSupportNotice } from "@/components/smooth-corners-support-notice";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -54,19 +58,6 @@ export function SizeAwareDemo() {
 }`,
 };
 
-function useCornerShapeSupport() {
-  const [supported, setSupported] = React.useState<boolean | null>(null);
-
-  React.useEffect(() => {
-    setSupported(
-      typeof CSS !== "undefined" &&
-        CSS.supports("corner-shape", "superellipse(2)")
-    );
-  }, []);
-
-  return supported;
-}
-
 function formatNumber(value: number) {
   return Number(value).toFixed(2).replace(/\.00$/, "");
 }
@@ -75,10 +66,12 @@ export function SmoothCornersDemo() {
   const [radius, setRadius] = React.useState(32);
   const [smoothing, setSmoothing] = React.useState(0.6);
   const [wide, setWide] = React.useState(false);
-  const supportsCornerShape = useCornerShapeSupport();
+  const supportsCornerShape = useSmoothCornersSupport();
 
   return (
     <div className="space-y-8">
+      <SmoothCornersSupportNotice supported={supportsCornerShape} />
+
       <Card>
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
@@ -88,29 +81,64 @@ export function SmoothCornersDemo() {
                 使用 radius 与 smoothing 参数生成 Figma/iOS 风格的连续圆角。
               </CardDescription>
             </div>
-            <ViewSourceButton code={sourceCodes.basic} title="基础用法 - 源码" />
+            <ViewSourceButton
+              code={sourceCodes.basic}
+              title="基础用法 - 源码"
+            />
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              { label: "圆弧", smoothing: 0 },
-              { label: "默认", smoothing: 0.6 },
-              { label: "更平滑", smoothing: 0.95 },
-            ].map((item) => (
+          {supportsCornerShape === true && (
+            <div className="grid gap-4 sm:grid-cols-3">
+              {[
+                { label: "圆弧", smoothing: 0 },
+                { label: "默认", smoothing: 0.6 },
+                { label: "更平滑", smoothing: 0.95 },
+              ].map((item) => (
+                <SmoothCorners
+                  key={item.label}
+                  radius={30}
+                  smoothing={item.smoothing}
+                  className="min-h-32 bg-primary p-5 text-primary-foreground"
+                >
+                  <div className="text-sm font-medium">{item.label}</div>
+                  <div className="mt-10 text-xs opacity-80">
+                    smoothing {item.smoothing}
+                  </div>
+                </SmoothCorners>
+              ))}
+            </div>
+          )}
+
+          {supportsCornerShape === false && (
+            <div className="grid items-center gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(180px,0.8fr)]">
               <SmoothCorners
-                key={item.label}
                 radius={30}
-                smoothing={item.smoothing}
+                smoothing={0.6}
                 className="min-h-32 bg-primary p-5 text-primary-foreground"
               >
-                <div className="text-sm font-medium">{item.label}</div>
+                <div className="text-sm font-medium">普通圆角降级</div>
                 <div className="mt-10 text-xs opacity-80">
-                  smoothing {item.smoothing}
+                  border-radius 30px
                 </div>
               </SmoothCorners>
-            ))}
-          </div>
+              <p className="text-sm leading-6 text-muted-foreground">
+                当前环境不会渲染 superellipse，已隐藏三组 smoothing
+                对比，避免把相同的降级结果误认为平滑度没有区别。
+              </p>
+            </div>
+          )}
+
+          {supportsCornerShape === null && (
+            <div className="grid gap-4 sm:grid-cols-3" aria-hidden="true">
+              {[0, 1, 2].map((item) => (
+                <div
+                  key={item}
+                  className="min-h-32 animate-pulse rounded-lg bg-muted"
+                />
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -123,7 +151,10 @@ export function SmoothCornersDemo() {
                 将平滑圆角直接应用到已有元素，避免额外包裹层。
               </CardDescription>
             </div>
-            <ViewSourceButton code={sourceCodes.asChild} title="asChild - 源码" />
+            <ViewSourceButton
+              code={sourceCodes.asChild}
+              title="asChild - 源码"
+            />
           </div>
         </CardHeader>
         <CardContent>
@@ -198,8 +229,14 @@ export function SmoothCornersDemo() {
                   min={0}
                   max={1}
                   step={0.01}
+                  disabled={supportsCornerShape !== true}
                   onValueChange={(value) => setSmoothing(value[0] ?? 0.6)}
                 />
+                {supportsCornerShape === false && (
+                  <p className="text-xs leading-5 text-amber-800 dark:text-amber-300">
+                    降级模式下 smoothing 不影响外观，因此暂不可调。
+                  </p>
+                )}
               </div>
 
               <pre className="overflow-x-auto rounded-md bg-muted/60 p-3 text-xs">
@@ -246,20 +283,20 @@ export function SmoothCornersDemo() {
               smoothing={0.8}
               className={cn(
                 "h-24 bg-primary transition-[width] duration-300",
-                wide ? "w-72" : "w-40"
+                wide ? "w-72" : "w-40",
               )}
             />
           </div>
           <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             <Badge variant="secondary">
-              corner-shape:{" "}
+              当前渲染:{" "}
               {supportsCornerShape === null
                 ? "检测中"
                 : supportsCornerShape
-                  ? "supported"
-                  : "fallback"}
+                  ? "superellipse"
+                  : "border-radius fallback"}
             </Badge>
-            <span>不支持时会自动回退到原始 border-radius。</span>
+            <span>不支持时会保留原始圆角半径，不影响元素裁切。</span>
           </div>
         </CardContent>
       </Card>

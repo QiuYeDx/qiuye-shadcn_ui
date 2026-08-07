@@ -20,7 +20,11 @@ import { CodeBlock, CodeBlockPanel } from "@/components/qiuye-ui/code-block";
 import { Typewriter } from "@/components/qiuye-ui/typewriter";
 import { MarkdownRenderer } from "@/components/qiuye-ui/markdown-renderer";
 import { ColorPicker } from "@/components/qiuye-ui/color-picker";
-import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
+import {
+  SmoothCorners,
+  useSmoothCornersSupport,
+} from "@/components/qiuye-ui/smooth-corners";
+import { SmoothCornersSupportNotice } from "@/components/smooth-corners-support-notice";
 import { Tour, type TourStep } from "@/components/qiuye-ui/tour";
 import { DotMatrixEffect } from "@/components/qiuye-ui/matrix-effect";
 import { Button } from "@/components/ui/button";
@@ -426,57 +430,87 @@ export function ColorPickerSimpleDemo() {
 
 // SmoothCorners 简单演示
 export function SmoothCornersSimpleDemo() {
+  const supportsSmoothCorners = useSmoothCornersSupport();
+
   return (
-    <div className="grid gap-3 sm:grid-cols-3">
-      {[
-        {
-          label: "0",
-          smoothing: 0,
-          className: "bg-primary text-primary-foreground",
-        },
-        {
-          label: "0.6",
-          smoothing: 0.6,
-          className: "bg-primary text-primary-foreground",
-        },
-        {
-          label: "0.95",
-          smoothing: 0.95,
-          className: "bg-foreground text-background",
-        },
-      ].map((item) => (
-        <SmoothCorners
-          key={item.label}
-          radius={28}
-          smoothing={item.smoothing}
-          style={
+    <div className="space-y-3">
+      <SmoothCornersSupportNotice supported={supportsSmoothCorners} compact />
+
+      {supportsSmoothCorners === true && (
+        <div className="grid gap-3 sm:grid-cols-3">
+          {[
             {
-              borderRadius: 28,
-              cornerShape: item.smoothing === 0 ? "round" : undefined,
-            } as React.CSSProperties
-          }
-          className={cn(
-            "flex aspect-[4/3] min-h-24 flex-col justify-between p-4 shadow-sm",
-            item.className,
-          )}
-        >
-          <span className="flex items-center gap-1.5 text-sm font-medium">
-            {item.smoothing === 0 && (
-              <CircleOff className="size-3.5" aria-hidden="true" />
-            )}
-            {item.smoothing === 0 ? "普通圆角" : "smoothing"}
-          </span>
-          <span
-            className={cn(
-              item.smoothing === 0
-                ? "text-sm font-medium"
-                : "font-mono text-lg",
-            )}
+              label: "0",
+              smoothing: 0,
+              className: "bg-primary text-primary-foreground",
+            },
+            {
+              label: "0.6",
+              smoothing: 0.6,
+              className: "bg-primary text-primary-foreground",
+            },
+            {
+              label: "0.95",
+              smoothing: 0.95,
+              className: "bg-foreground text-background",
+            },
+          ].map((item) => (
+            <SmoothCorners
+              key={item.label}
+              radius={28}
+              smoothing={item.smoothing}
+              style={
+                item.smoothing === 0
+                  ? ({ cornerShape: "round" } as React.CSSProperties)
+                  : undefined
+              }
+              className={cn(
+                "flex aspect-[4/3] min-h-24 flex-col justify-between p-4 shadow-sm",
+                item.className,
+              )}
+            >
+              <span className="flex items-center gap-1.5 text-sm font-medium">
+                {item.smoothing === 0 && (
+                  <CircleOff className="size-3.5" aria-hidden="true" />
+                )}
+                {item.smoothing === 0 ? "普通圆角" : "smoothing"}
+              </span>
+              <span
+                className={cn(
+                  item.smoothing === 0
+                    ? "text-sm font-medium"
+                    : "font-mono text-lg",
+                )}
+              >
+                {item.smoothing === 0 ? "未使用平滑" : item.label}
+              </span>
+            </SmoothCorners>
+          ))}
+        </div>
+      )}
+
+      {supportsSmoothCorners === false && (
+        <div className="grid items-center gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(160px,0.8fr)]">
+          <SmoothCorners
+            radius={28}
+            smoothing={0.6}
+            className="flex aspect-[4/3] min-h-24 flex-col justify-between bg-primary p-4 text-primary-foreground shadow-sm"
           >
-            {item.smoothing === 0 ? "未使用平滑" : item.label}
-          </span>
-        </SmoothCorners>
-      ))}
+            <CircleOff className="size-3.5" aria-hidden="true" />
+            <span className="text-sm font-medium">普通圆角降级</span>
+          </SmoothCorners>
+          <p className="text-sm leading-6 text-muted-foreground">
+            smoothing 对比已隐藏；当前只会显示标准 border-radius。
+          </p>
+        </div>
+      )}
+
+      {supportsSmoothCorners === null && (
+        <div
+          className="min-h-24 animate-pulse rounded-lg bg-muted"
+          aria-hidden="true"
+        />
+      )}
     </div>
   );
 }

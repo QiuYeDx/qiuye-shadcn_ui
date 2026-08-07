@@ -2,10 +2,7 @@
 
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
-import {
-  smoothCorners,
-  smoothCornersCSS,
-} from "@qiuyedx/smooth-corners";
+import { smoothCorners, smoothCornersCSS } from "@qiuyedx/smooth-corners";
 import { observe, unobserve } from "@qiuyedx/smooth-corners/observer";
 
 import { cn } from "@/lib/utils";
@@ -15,10 +12,39 @@ type SmoothCornerStyle = React.CSSProperties & Partial<SmoothCornerVars>;
 
 const STYLE_ID = "qiuye-ui-smooth-corners-style";
 
+function subscribeToSmoothCornersSupport() {
+  return () => undefined;
+}
+
+function getSmoothCornersSupport() {
+  return (
+    typeof CSS !== "undefined" &&
+    CSS.supports("corner-shape", "superellipse(2)")
+  );
+}
+
+function getServerSmoothCornersSupport() {
+  return null;
+}
+
 /**
  * 可复用的基础 CSS。需要手动放入全局样式时可直接使用该字符串。
  */
 export const smoothCornersBaseCSS = smoothCornersCSS;
+
+/**
+ * 检测当前浏览器是否支持 SmoothCorners 使用的 CSS `corner-shape` 语法。
+ *
+ * 服务端渲染及客户端首次水合时返回 `null`，完成水合后返回实际支持状态。
+ * 不支持时 SmoothCorners 仍会自动回退到标准 `border-radius`。
+ */
+export function useSmoothCornersSupport(): boolean | null {
+  return React.useSyncExternalStore(
+    subscribeToSmoothCornersSupport,
+    getSmoothCornersSupport,
+    getServerSmoothCornersSupport,
+  );
+}
 
 function ensureSmoothCornersStyles() {
   if (typeof document === "undefined") return;
@@ -59,8 +85,10 @@ function normalizeNumber(value: number | undefined, fallback: number) {
 }
 
 /** SmoothCorners 组件的属性 */
-export interface SmoothCornersProps
-  extends Omit<React.HTMLAttributes<HTMLElement>, "style"> {
+export interface SmoothCornersProps extends Omit<
+  React.HTMLAttributes<HTMLElement>,
+  "style"
+> {
   /**
    * 原始圆角半径，单位 px。
    * @default 16
@@ -125,7 +153,7 @@ export const SmoothCorners = React.forwardRef<HTMLElement, SmoothCornersProps>(
       style,
       ...props
     },
-    forwardedRef
+    forwardedRef,
   ) => {
     useSmoothCornersStyles();
 
@@ -137,7 +165,7 @@ export const SmoothCorners = React.forwardRef<HTMLElement, SmoothCornersProps>(
       if (disabled) return {};
       return smoothCorners(
         normalizedRadius,
-        normalizedSmoothing
+        normalizedSmoothing,
       ) as SmoothCornerStyle;
     }, [disabled, normalizedRadius, normalizedSmoothing]);
 
@@ -166,7 +194,7 @@ export const SmoothCorners = React.forwardRef<HTMLElement, SmoothCornersProps>(
         {...props}
       />
     );
-  }
+  },
 );
 
 SmoothCorners.displayName = "SmoothCorners";

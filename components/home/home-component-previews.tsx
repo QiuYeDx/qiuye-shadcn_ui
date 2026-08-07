@@ -15,6 +15,7 @@ import {
   MoonIcon,
   ScanLineIcon,
   SunIcon,
+  TriangleAlertIcon,
   UserRoundIcon,
   WalletCardsIcon,
   XIcon,
@@ -45,9 +46,13 @@ import { ThemeTransitionToggle } from "@/components/qiuye-ui/theme-transition-to
 import { ImageViewer } from "@/components/qiuye-ui/image-viewer";
 import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
 import { SegmentedControl } from "@/components/qiuye-ui/segmented-control";
-import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
+import {
+  SmoothCorners,
+  useSmoothCornersSupport,
+} from "@/components/qiuye-ui/smooth-corners";
 import { Tour, type TourStep } from "@/components/qiuye-ui/tour";
 import { Typewriter } from "@/components/qiuye-ui/typewriter";
+import { SmoothCornersSupportNotice } from "@/components/smooth-corners-support-notice";
 import { Button } from "@/components/ui/button";
 import { ComponentId } from "@/lib/component-constants";
 import { useHoverSupport } from "@/hooks/use-hover-support";
@@ -1389,51 +1394,83 @@ function TourPreview() {
 }
 
 function SmoothCornersPreview() {
+  const supportsSmoothCorners = useSmoothCornersSupport();
+
   return (
-    <div className="flex w-full max-w-xs items-end justify-center gap-3">
-      {[
-        {
-          label: "0",
-          smoothing: 0,
-          className: "bg-primary text-primary-foreground",
-        },
-        {
-          label: "0.6",
-          smoothing: 0.6,
-          className: "bg-primary text-primary-foreground",
-        },
-      ].map((item) => (
-        <SmoothCorners
-          key={item.label}
-          radius={24}
-          smoothing={item.smoothing}
-          style={
+    <div className="w-full max-w-xs space-y-2.5">
+      <SmoothCornersSupportNotice supported={supportsSmoothCorners} compact />
+
+      {supportsSmoothCorners === true && (
+        <div className="flex w-full items-end gap-3">
+          {[
             {
-              borderRadius: 24,
-              cornerShape: item.smoothing === 0 ? "round" : undefined,
-            } as React.CSSProperties
-          }
-          className={cn(
-            "flex h-28 w-24 shrink-0 flex-col justify-between p-3 text-xs shadow-sm",
-            item.className,
-          )}
-        >
-          {item.smoothing === 0 ? (
-            <CircleOffIcon className="size-3.5" aria-hidden="true" />
-          ) : (
-            <span className="font-medium">smooth</span>
-          )}
-          <span
-            className={cn(
-              item.smoothing === 0
-                ? "whitespace-nowrap text-[10px] font-medium"
-                : "font-mono",
-            )}
+              label: "0",
+              smoothing: 0,
+              className: "bg-primary text-primary-foreground",
+            },
+            {
+              label: "0.6",
+              smoothing: 0.6,
+              className: "bg-primary text-primary-foreground",
+            },
+          ].map((item) => (
+            <SmoothCorners
+              key={item.label}
+              radius={24}
+              smoothing={item.smoothing}
+              style={
+                item.smoothing === 0
+                  ? ({ cornerShape: "round" } as React.CSSProperties)
+                  : undefined
+              }
+              className={cn(
+                "flex h-24 min-w-0 flex-1 flex-col justify-between p-3 text-xs shadow-sm",
+                item.className,
+              )}
+            >
+              {item.smoothing === 0 ? (
+                <CircleOffIcon className="size-3.5" aria-hidden="true" />
+              ) : (
+                <span className="font-medium">smooth</span>
+              )}
+              <span
+                className={cn(
+                  item.smoothing === 0
+                    ? "whitespace-nowrap text-[10px] font-medium"
+                    : "font-mono",
+                )}
+              >
+                {item.smoothing === 0 ? "普通圆角" : item.label}
+              </span>
+            </SmoothCorners>
+          ))}
+        </div>
+      )}
+
+      {supportsSmoothCorners === false && (
+        <div className="flex items-center justify-center gap-3">
+          <SmoothCorners
+            radius={24}
+            smoothing={0.6}
+            className="flex h-20 w-28 shrink-0 flex-col justify-between bg-primary p-3 text-primary-foreground shadow-sm"
           >
-            {item.smoothing === 0 ? "普通圆角" : item.label}
-          </span>
-        </SmoothCorners>
-      ))}
+            <TriangleAlertIcon className="size-3.5" aria-hidden="true" />
+            <span className="font-mono text-[10px]">border-radius</span>
+          </SmoothCorners>
+          <p className="max-w-24 text-[11px] leading-4 text-muted-foreground">
+            平滑度对比已隐藏，避免误判为没有差异。
+          </p>
+        </div>
+      )}
+
+      {supportsSmoothCorners === null && (
+        <SmoothCorners
+          radius={24}
+          smoothing={0}
+          className="mx-auto h-20 w-28 animate-pulse bg-muted"
+          aria-hidden="true"
+        ></SmoothCorners>
+      )}
     </div>
   );
 }
