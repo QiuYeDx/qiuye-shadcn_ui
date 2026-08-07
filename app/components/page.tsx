@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Search, Package, Copy, CheckCircle } from "lucide-react";
+import { Search, Package, Copy, Check } from "lucide-react";
 import {
   motion,
   AnimatePresence,
@@ -162,6 +162,7 @@ export default function ComponentsPage() {
     const command = generateCommand(componentId);
     clipboard.copy(command);
     toast.success("复制成功！", {
+      id: `copy-command-${componentId}`,
       description: `已复制命令: ${command}`,
     });
   };
@@ -310,11 +311,30 @@ interface ComponentCardProps {
 
 function ComponentCard({ component, onCopyCommand }: ComponentCardProps) {
   const [copied, setCopied] = useState(false);
+  const resetCopiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+
+  useEffect(() => {
+    return () => {
+      if (resetCopiedTimerRef.current) {
+        clearTimeout(resetCopiedTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleCopy = () => {
     onCopyCommand(component.cliName);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+
+    if (resetCopiedTimerRef.current) {
+      clearTimeout(resetCopiedTimerRef.current);
+    }
+
+    resetCopiedTimerRef.current = setTimeout(() => {
+      setCopied(false);
+      resetCopiedTimerRef.current = null;
+    }, 2000);
   };
 
   return (
@@ -361,7 +381,9 @@ function ComponentCard({ component, onCopyCommand }: ComponentCardProps) {
             <DualStateToggle
               active={copied}
               onToggle={handleCopy}
-              activeIcon={<CheckCircle className="text-emerald-500" />}
+              activeIcon={
+                <Check className="text-emerald-500" strokeWidth={2} />
+              }
               inactiveIcon={<Copy />}
               activeLabel={`已复制 ${component.name} 安装命令`}
               inactiveLabel={`复制 ${component.name} 安装命令`}
